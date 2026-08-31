@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonyx/subtitles"
 	"github.com/farshidrezaei/vidonyx/timeline"
 	"github.com/farshidrezaei/vidonyx/visualizer"
 )
@@ -177,11 +178,22 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 		return nil, fmt.Errorf("compiler: failed building video composition: %w", err)
 	}
 
+	// 4. Attach subtitle tracks if present
+	for _, track := range compositionTimeline.Tracks {
+		if track.Kind == timeline.TrackKindSubtitle && track.SubtitleTrack != nil {
+			subtitledPad, err := subtitles.AttachSubtitles(graph, finalVideoPad, track.SubtitleTrack, compositionTimeline.Canvas)
+			if err != nil {
+				return nil, fmt.Errorf("compiler: failed attaching subtitles: %w", err)
+			}
+			finalVideoPad = subtitledPad
+		}
+	}
+
 	// Rename final video pad to out_v
 	outVLabel := "out_v"
 	finalVideoPad.ID = outVLabel
 
-	// 4. Mix final audio stream
+	// 5. Mix final audio stream
 	finalAudioPad, err := BuildAudioMixer(graph, compositionTimeline, processedAudioPads)
 	if err != nil {
 		return nil, fmt.Errorf("compiler: failed building audio mixer: %w", err)
@@ -191,18 +203,18 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 	outALabel := "out_a"
 	finalAudioPad.ID = outALabel
 
-	// 5. Run Graph Optimization Passes
+	// 6. Run Graph Optimization Passes
 	if err := compilerInstance.pipeline.Execute(graph); err != nil {
 		return nil, fmt.Errorf("compiler: graph optimization failed: %w", err)
 	}
 
-	// 6. Format filter_complex string
+	// 7. Format filter_complex string
 	filterComplexStr, err := graph.FormattedFilterComplex()
 	if err != nil {
 		return nil, fmt.Errorf("compiler: failed serializing filter_complex: %w", err)
 	}
 
-	// 7. Emit CLI Arguments
+	// 8. Emit CLI Arguments
 	args := BuildFFmpegArgs(uniqueInputs, filterComplexStr, outVLabel, outALabel, outputPath, compilerInstance.encoding)
 
 	return &CompilationResult{

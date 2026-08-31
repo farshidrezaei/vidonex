@@ -3,6 +3,8 @@ package timeline
 import (
 	"iter"
 	"time"
+
+	"github.com/farshidrezaei/vidonyx/subtitles"
 )
 
 // TrackKind specifies the primary media layer type of a track.
@@ -17,6 +19,8 @@ const (
 	TrackKindOverlay
 	// TrackKindText represents title cards, subtitles, and captions.
 	TrackKindText
+	// TrackKindSubtitle represents dedicated subtitle and caption streams.
+	TrackKindSubtitle
 )
 
 // String returns the human-readable name of the track kind.
@@ -30,6 +34,8 @@ func (kind TrackKind) String() string {
 		return "overlay"
 	case TrackKindText:
 		return "text"
+	case TrackKindSubtitle:
+		return "subtitle"
 	default:
 		return "unknown"
 	}
@@ -37,13 +43,14 @@ func (kind TrackKind) String() string {
 
 // Track defines a sequence or layer of clips within a timeline.
 type Track struct {
-	ID          string
-	Kind        TrackKind
-	ZIndex      int
-	Muted       bool
-	Volume      float64
-	Clips       []*Clip
-	Transitions []*Transition
+	ID            string
+	Kind          TrackKind
+	ZIndex        int
+	Muted         bool
+	Volume        float64
+	Clips         []*Clip
+	Transitions   []*Transition
+	SubtitleTrack *subtitles.SubtitleTrack
 }
 
 // NewTrack creates a new Track with default volume.
@@ -55,6 +62,24 @@ func NewTrack(id string, kind TrackKind) *Track {
 		Clips:       make([]*Clip, 0),
 		Transitions: make([]*Transition, 0),
 	}
+}
+
+// NewSubtitleTrack creates a track dedicated to rendering subtitles.
+func NewSubtitleTrack(id string, subtitleTrack *subtitles.SubtitleTrack) *Track {
+	return &Track{
+		ID:            id,
+		Kind:          TrackKindSubtitle,
+		Volume:        1.0,
+		Clips:         make([]*Clip, 0),
+		Transitions:   make([]*Transition, 0),
+		SubtitleTrack: subtitleTrack,
+	}
+}
+
+// SetSubtitleTrack attaches a subtitle track.
+func (track *Track) SetSubtitleTrack(subtitleTrack *subtitles.SubtitleTrack) *Track {
+	track.SubtitleTrack = subtitleTrack
+	return track
 }
 
 // SetZIndex sets the visual layer priority (higher Z-index renders on top).
@@ -93,6 +118,12 @@ func (track *Track) Duration() time.Duration {
 	for _, clip := range track.Clips {
 		if endTimestamp := clip.TimelineEnd(); endTimestamp > maximumEndTimestamp {
 			maximumEndTimestamp = endTimestamp
+		}
+	}
+	if track.SubtitleTrack != nil && len(track.SubtitleTrack.Cues) > 0 {
+		lastCue := track.SubtitleTrack.Cues[len(track.SubtitleTrack.Cues)-1]
+		if lastCue.EndTime > maximumEndTimestamp {
+			maximumEndTimestamp = lastCue.EndTime
 		}
 	}
 	return maximumEndTimestamp

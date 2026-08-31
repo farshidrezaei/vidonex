@@ -7,6 +7,7 @@ import (
 
 	"github.com/farshidrezaei/vidonyx/animation"
 	"github.com/farshidrezaei/vidonyx/compiler"
+	"github.com/farshidrezaei/vidonyx/subtitles"
 	"github.com/farshidrezaei/vidonyx/timeline"
 	"github.com/farshidrezaei/vidonyx/types"
 )
@@ -39,6 +40,36 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-map [out_a]",
 				"-c:v libx264",
 				"out_single.mp4",
+			},
+		},
+		{
+			name: "clip with subtitle track burn in",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+				videoTrack := timeline.NewTrack("v0", timeline.TrackKindVideo)
+				videoTrack.AddClip(timeline.NewClip("c1", "input.mp4", 0, 5*time.Second))
+
+				subTrack := subtitles.NewSubtitleTrack().
+					AddCue(subtitles.SubtitleCue{
+						Index:     1,
+						StartTime: 1 * time.Second,
+						EndTime:   4 * time.Second,
+						Text:      "Vidonyx Subtitles In Action",
+					})
+
+				subTimelineTrack := timeline.NewSubtitleTrack("sub_track", subTrack)
+
+				tl.AddTrack(videoTrack, subTimelineTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_sub.mp4",
+			expectedInputCount: 1,
+			expectedArgSnippets: []string{
+				"drawtext=",
+				"Vidonyx Subtitles In Action",
+				"between(t,1.0000,4.0000)",
+				"out_sub.mp4",
 			},
 		},
 		{
