@@ -95,7 +95,7 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 
 		mixerNode := graph.NewNode(fmt.Sprintf("opacity_%s", clip.ID), "colorchannelmixer")
 		if clip.OpacityTrack != nil {
-			mixerNode.SetParam("aa", clip.OpacityTrack.ToFFmpegExpression())
+			mixerNode.SetParam("aa", fmt.Sprintf("'%s'", clip.OpacityTrack.ToFFmpegExpression()))
 		} else {
 			mixerNode.SetParam("aa", fmt.Sprintf("%.2f", clip.Opacity))
 		}
@@ -112,8 +112,8 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	if clip.ScaleTrack != nil {
 		scaleNode := graph.NewNode(fmt.Sprintf("scale_anim_%s", clip.ID), "scale")
 		scaleExpr := clip.ScaleTrack.ToFFmpegExpression()
-		scaleNode.SetParam("w", fmt.Sprintf("iw*(%s)", scaleExpr))
-		scaleNode.SetParam("h", fmt.Sprintf("ih*(%s)", scaleExpr))
+		scaleNode.SetParam("w", fmt.Sprintf("'iw*(%s)'", scaleExpr))
+		scaleNode.SetParam("h", fmt.Sprintf("'ih*(%s)'", scaleExpr))
 		scaleNode.SetParam("eval", "frame")
 		scaleInput := scaleNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
 		scaleOutput := scaleNode.AddOutput(graph.NextPadID("scale_out"), filtergraph.StreamTypeVideo)
@@ -324,7 +324,9 @@ func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timelin
 
 		var xExpression, yExpression string
 		if item.Clip.PositionTrack != nil {
-			xExpression, yExpression = item.Clip.PositionTrack.ToFFmpegExpressions()
+			posX, posY := item.Clip.PositionTrack.ToFFmpegExpressions()
+			xExpression = fmt.Sprintf("'%s'", posX)
+			yExpression = fmt.Sprintf("'%s'", posY)
 			overlayNode.SetParam("eval", "frame")
 		} else {
 			xExpression = fmt.Sprintf("%d", item.Clip.Position.X)
@@ -337,7 +339,7 @@ func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timelin
 		// Time interval enable expression
 		startSeconds := item.Clip.TimelineStart.Seconds()
 		endSeconds := item.Clip.TimelineEnd().Seconds()
-		overlayNode.SetParam("enable", fmt.Sprintf("between(t,%.4f,%.4f)", startSeconds, endSeconds))
+		overlayNode.SetParam("enable", fmt.Sprintf("'between(t,%.4f,%.4f)'", startSeconds, endSeconds))
 		overlayNode.SetParam("eof_action", "pass")
 
 		inputBase := overlayNode.AddInput(currentCanvas.ID, filtergraph.StreamTypeVideo)

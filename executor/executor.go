@@ -2,6 +2,7 @@
 package executor
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os/exec"
@@ -35,6 +36,9 @@ func (executorInstance *OSExecutor) Run(ctx context.Context, cmdName string, arg
 		return fmt.Errorf("executor: failed to acquire stdout pipe: %w", err)
 	}
 
+	var stderrBuffer bytes.Buffer
+	cmd.Stderr = &stderrBuffer
+
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("executor: failed to start %s: %w", cmdName, err)
 	}
@@ -49,7 +53,7 @@ func (executorInstance *OSExecutor) Run(ctx context.Context, cmdName string, arg
 	parseErr := <-parseErrChan
 
 	if cmdErr != nil {
-		return fmt.Errorf("executor: command %s failed: %w", cmdName, cmdErr)
+		return fmt.Errorf("executor: command %s failed: %w\nStderr: %s", cmdName, cmdErr, stderrBuffer.String())
 	}
 	if parseErr != nil {
 		return fmt.Errorf("executor: progress parsing failed: %w", parseErr)

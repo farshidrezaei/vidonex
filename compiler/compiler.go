@@ -124,7 +124,14 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					IsInput:    false,
 				}
 
-				clipAudioPad, err := ProcessClipAudio(graph, rawAudioIn, clip)
+				clipForAudio := clip
+				if len(track.Transitions) > 0 {
+					clipForAudioCopy := *clip
+					clipForAudioCopy.TimelineStart = 0
+					clipForAudio = &clipForAudioCopy
+				}
+
+				clipAudioPad, err := ProcessClipAudio(graph, rawAudioIn, clipForAudio)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed processing audio clip %q: %w", clip.ID, err)
 				}
@@ -145,8 +152,13 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 				return nil, err
 			}
 			if len(track.Clips) > 0 {
+				syntheticChainedClip := &timeline.Clip{
+					ID:            fmt.Sprintf("chained_%s", track.ID),
+					TimelineStart: track.Clips[0].TimelineStart,
+					Duration:      track.Duration() - track.Clips[0].TimelineStart,
+				}
 				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
-					Clip:   track.Clips[0],
+					Clip:   syntheticChainedClip,
 					ZIndex: track.ZIndex,
 					Pad:    chainedVideoPad,
 				})

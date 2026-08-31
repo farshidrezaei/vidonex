@@ -57,7 +57,7 @@ func AttachSubtitles(graph *filtergraph.Graph, inputVideoPad *filtergraph.Pad, s
 		// Display time interval
 		startSec := cue.StartTime.Seconds()
 		endSec := cue.EndTime.Seconds()
-		drawTextNode.SetParam("enable", fmt.Sprintf("between(t,%.4f,%.4f)", startSec, endSec))
+		drawTextNode.SetParam("enable", fmt.Sprintf("'between(t,%.4f,%.4f)'", startSec, endSec))
 
 		inputPad := drawTextNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
 		outputPad := drawTextNode.AddOutput(graph.NextPadID("sub_out"), filtergraph.StreamTypeVideo)

@@ -29,6 +29,8 @@ var (
 	ColorGreen = Color{R: 0, G: 255, B: 0, A: 255}
 	// ColorBlue represents solid opaque blue.
 	ColorBlue = Color{R: 0, G: 0, B: 255, A: 255}
+	// ColorYellow represents solid opaque yellow.
+	ColorYellow = Color{R: 255, G: 255, B: 0, A: 255}
 )
 
 // RGB constructs an opaque Color (Alpha=255).

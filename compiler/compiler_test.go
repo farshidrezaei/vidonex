@@ -220,9 +220,9 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 			outputPath:         "out_anim.mp4",
 			expectedInputCount: 1,
 			expectedArgSnippets: []string{
-				"scale=w=iw*(if(lt(t,",
+				"scale=w='iw*(if(lt(t,",
 				"eval=frame",
-				"overlay=eval=frame:x=if(lt(t,",
+				"overlay=eval=frame:x='if(lt(t,",
 			},
 		},
 		{
