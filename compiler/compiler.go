@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/farshidrezaei/vidonyx/ducking"
 	"github.com/farshidrezaei/vidonyx/filtergraph"
 	"github.com/farshidrezaei/vidonyx/subtitles"
 	"github.com/farshidrezaei/vidonyx/timeline"
@@ -81,7 +82,7 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 	}
 
 	processedVideoPads := make([]*ClipVideoPad, 0)
-	processedAudioPads := make([]*filtergraph.Pad, 0)
+	trackAudioPadMap := make(map[string]*filtergraph.Pad)
 
 	// 2. Process each track's clips
 	for _, track := range compositionTimeline.Tracks {
@@ -166,9 +167,41 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 			if err != nil {
 				return nil, err
 			}
-			processedAudioPads = append(processedAudioPads, chainedAudioPad)
-		} else {
-			processedAudioPads = append(processedAudioPads, trackAudioPads...)
+			trackAudioPadMap[track.ID] = chainedAudioPad
+		} else if len(trackAudioPads) == 1 {
+			trackAudioPadMap[track.ID] = trackAudioPads[0]
+		} else if len(trackAudioPads) > 1 {
+			// Mix intra-track audio clips
+			intraMixNode := graph.NewNode(fmt.Sprintf("intra_amix_%s", track.ID), "amix")
+			intraMixNode.SetParam("inputs", len(trackAudioPads))
+			intraMixNode.SetParam("duration", "longest")
+			for _, ap := range trackAudioPads {
+				inPad := intraMixNode.AddInput(ap.ID, filtergraph.StreamTypeAudio)
+				_ = graph.Connect(ap, inPad)
+			}
+			trackAudioPadMap[track.ID] = intraMixNode.AddOutput(graph.NextPadID("intra_mix_out"), filtergraph.StreamTypeAudio)
+		}
+	}
+
+	// Apply sidechain ducking between tracks where requested
+	for _, track := range compositionTimeline.Tracks {
+		if track.DucksUnderTrackID != "" {
+			musicPad, musicExists := trackAudioPadMap[track.ID]
+			voicePad, voiceExists := trackAudioPadMap[track.DucksUnderTrackID]
+			if musicExists && voiceExists && track.DuckingOptions != nil {
+				duckedMusicPad, err := ducking.ApplySidechainDucking(graph, fmt.Sprintf("duck_%s_under_%s", track.ID, track.DucksUnderTrackID), musicPad, voicePad, *track.DuckingOptions)
+				if err != nil {
+					return nil, fmt.Errorf("compiler: failed applying ducking: %w", err)
+				}
+				trackAudioPadMap[track.ID] = duckedMusicPad
+			}
+		}
+	}
+
+	processedAudioPads := make([]*filtergraph.Pad, 0, len(trackAudioPadMap))
+	for _, track := range compositionTimeline.Tracks {
+		if pad, ok := trackAudioPadMap[track.ID]; ok {
+			processedAudioPads = append(processedAudioPads, pad)
 		}
 	}
 

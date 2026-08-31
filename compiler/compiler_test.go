@@ -7,6 +7,7 @@ import (
 
 	"github.com/farshidrezaei/vidonyx/animation"
 	"github.com/farshidrezaei/vidonyx/compiler"
+	"github.com/farshidrezaei/vidonyx/ducking"
 	"github.com/farshidrezaei/vidonyx/subtitles"
 	"github.com/farshidrezaei/vidonyx/timeline"
 	"github.com/farshidrezaei/vidonyx/types"
@@ -40,6 +41,39 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-map [out_a]",
 				"-c:v libx264",
 				"out_single.mp4",
+			},
+		},
+		{
+			name: "music track auto ducking under voiceover track",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+
+				videoTrack := timeline.NewTrack("v0", timeline.TrackKindVideo)
+				videoTrack.AddClip(timeline.NewClip("v1", "gameplay.mp4", 0, 10*time.Second))
+
+				voiceTrack := timeline.NewTrack("voice_track", timeline.TrackKindAudio)
+				voiceTrack.AddClip(timeline.NewClip("speech", "dialogue.mp3", 2*time.Second, 5*time.Second))
+
+				musicTrack := timeline.NewTrack("music_track", timeline.TrackKindAudio).
+					WithDucking("voice_track", ducking.Options{
+						Threshold:           0.1,
+						Ratio:               4.0,
+						AttackMilliseconds:  20,
+						ReleaseMilliseconds: 300,
+					})
+				musicTrack.AddClip(timeline.NewClip("bgm", "ambient.mp3", 0, 10*time.Second))
+
+				tl.AddTrack(videoTrack, voiceTrack, musicTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_ducked.mp4",
+			expectedInputCount: 3,
+			expectedArgSnippets: []string{
+				"sidechaincompress=threshold=0.100:ratio=4.0:attack=20:release=300",
+				"asplit",
+				"amix=inputs=3",
+				"out_ducked.mp4",
 			},
 		},
 		{

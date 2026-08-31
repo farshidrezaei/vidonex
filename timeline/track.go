@@ -4,6 +4,7 @@ import (
 	"iter"
 	"time"
 
+	"github.com/farshidrezaei/vidonyx/ducking"
 	"github.com/farshidrezaei/vidonyx/subtitles"
 )
 
@@ -43,14 +44,16 @@ func (kind TrackKind) String() string {
 
 // Track defines a sequence or layer of clips within a timeline.
 type Track struct {
-	ID            string
-	Kind          TrackKind
-	ZIndex        int
-	Muted         bool
-	Volume        float64
-	Clips         []*Clip
-	Transitions   []*Transition
-	SubtitleTrack *subtitles.SubtitleTrack
+	ID                string
+	Kind              TrackKind
+	ZIndex            int
+	Muted             bool
+	Volume            float64
+	Clips             []*Clip
+	Transitions       []*Transition
+	SubtitleTrack     *subtitles.SubtitleTrack
+	DucksUnderTrackID string
+	DuckingOptions    *ducking.Options
 }
 
 // NewTrack creates a new Track with default volume.
@@ -74,6 +77,18 @@ func NewSubtitleTrack(id string, subtitleTrack *subtitles.SubtitleTrack) *Track 
 		Transitions:   make([]*Transition, 0),
 		SubtitleTrack: subtitleTrack,
 	}
+}
+
+// WithDucking configures this track to automatically duck under a voiceover or dialogue track.
+func (track *Track) WithDucking(voiceoverTrackID string, customOptions ...ducking.Options) *Track {
+	track.DucksUnderTrackID = voiceoverTrackID
+	if len(customOptions) > 0 {
+		track.DuckingOptions = &customOptions[0]
+	} else {
+		opts := ducking.DefaultOptions()
+		track.DuckingOptions = &opts
+	}
+	return track
 }
 
 // SetSubtitleTrack attaches a subtitle track.
