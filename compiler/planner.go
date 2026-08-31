@@ -126,7 +126,17 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		if err := graph.Connect(currentPad, zoompanInput); err != nil {
 			return nil, err
 		}
-		currentPad = zoompanOutput
+
+		// Ensure monotonic PTS after zoompan so overlay filter syncs instantaneously without blocking
+		ptsZoomNode := graph.NewNode(fmt.Sprintf("pts_zoom_%s", clip.ID), "setpts")
+		ptsZoomNode.SetParam("expr", "N/FRAME_RATE/TB")
+		ptsZoomInput := ptsZoomNode.AddInput(zoompanOutput.ID, filtergraph.StreamTypeVideo)
+		ptsZoomOutput := ptsZoomNode.AddOutput(graph.NextPadID("pts_zoom_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(zoompanOutput, ptsZoomInput); err != nil {
+			return nil, err
+		}
+
+		currentPad = ptsZoomOutput
 	} else if clip.Scale != 1.0 && clip.Scale > 0 {
 		scaleNode := graph.NewNode(fmt.Sprintf("scale_%s", clip.ID), "scale")
 		scaleNode.SetParam("w", fmt.Sprintf("iw*%.4f", clip.Scale))
