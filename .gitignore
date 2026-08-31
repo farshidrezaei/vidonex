@@ -1,0 +1,23 @@
+# Binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.mp4
+*.mkv
+*.mov
+*.wav
+*.mp3
+
+# Output directories
+bin/
+dist/
+
+# OS and IDE files
+.DS_Store
+.idea/
+.vscode/
+*.swp
