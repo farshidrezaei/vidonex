@@ -1,4 +1,4 @@
-# Binaries and build artifacts
+# ── Compiled binaries & build artifacts ──
 *.exe
 *.exe~
 *.dll
@@ -6,18 +6,62 @@
 *.dylib
 *.test
 *.out
-*.mp4
-*.mkv
-*.mov
-*.wav
-*.mp3
+/vidonyx
 
-# Output directories
+# ── Go build & module cache ──
+vendor/
 bin/
 dist/
 
-# OS and IDE files
+# ── Test & coverage ──
+*.prof
+*.coverprofile
+coverage.out
+coverage.html
+coverage.txt
+*.test.log
+
+# ── Media files (generated/test outputs) ──
+*.mp4
+*.mkv
+*.mov
+*.avi
+*.webm
+*.wav
+*.mp3
+*.aac
+*.flac
+*.ogg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.srt
+*.vtt
+
+# ── Demo project ──
+demo_project/
+
+# ── OS files ──
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── IDE & editor files ──
 .idea/
 .vscode/
 *.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ── Debug ──
+__debug_bin*
+*.log
