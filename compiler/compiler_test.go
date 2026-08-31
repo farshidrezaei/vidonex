@@ -12,11 +12,11 @@ import (
 
 func TestCompiler_CompositionsTable(t *testing.T) {
 	tests := []struct {
-		name               string
-		buildTimeline      func() *timeline.Timeline
-		encodingOpts       compiler.EncodingOptions
-		outputPath         string
-		expectedInputCount int
+		name                string
+		buildTimeline       func() *timeline.Timeline
+		encodingOpts        compiler.EncodingOptions
+		outputPath          string
+		expectedInputCount  int
 		expectedArgSnippets []string
 	}{
 		{
@@ -38,6 +38,30 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-map [out_a]",
 				"-c:v libx264",
 				"out_single.mp4",
+			},
+		},
+		{
+			name: "sequential clips with xfade transition and acrossfade audio",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+				tr := timeline.NewTrack("v_main", timeline.TrackKindVideo)
+
+				clipA := timeline.NewClip("clip_a", "intro.mp4", 0, 5*time.Second)
+				clipB := timeline.NewClip("clip_b", "outro.mp4", 4*time.Second, 5*time.Second)
+				transition := timeline.NewTransition("trans1", timeline.TransitionDissolve, 1*time.Second, clipA, clipB)
+
+				tr.AddClip(clipA, clipB)
+				tr.AddTransition(transition)
+				tl.AddTrack(tr)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_trans.mp4",
+			expectedInputCount: 2,
+			expectedArgSnippets: []string{
+				"xfade=transition=dissolve:duration=1.00:offset=4.00",
+				"acrossfade=d=1.00:c1=tri:c2=tri",
+				"out_trans.mp4",
 			},
 		},
 		{

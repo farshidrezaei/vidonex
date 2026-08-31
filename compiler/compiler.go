@@ -84,6 +84,9 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 
 	// 2. Process each track's clips
 	for _, track := range compositionTimeline.Tracks {
+		trackVideoPads := make([]*filtergraph.Pad, 0, len(track.Clips))
+		trackAudioPads := make([]*filtergraph.Pad, 0, len(track.Clips))
+
 		for _, clip := range track.Clips {
 			inputIndex := inputIndexMap[clip.Source]
 
@@ -107,11 +110,7 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					return nil, fmt.Errorf("compiler: failed normalizing video clip %q: %w", clip.ID, err)
 				}
 
-				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
-					Clip:   clip,
-					ZIndex: track.ZIndex,
-					Pad:    normalizedVideoPad,
-				})
+				trackVideoPads = append(trackVideoPads, normalizedVideoPad)
 			}
 
 			// Handle Audio
@@ -132,8 +131,43 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					return nil, fmt.Errorf("compiler: failed normalizing audio clip %q: %w", clip.ID, err)
 				}
 
-				processedAudioPads = append(processedAudioPads, normalizedAudioPad)
+				trackAudioPads = append(trackAudioPads, normalizedAudioPad)
 			}
+		}
+
+		// If track has transitions, chain the track's clips together with xfade / acrossfade
+		if len(track.Transitions) > 0 && len(trackVideoPads) > 1 {
+			chainedVideoPad, err := ChainTrackTransitionsVideo(graph, trackVideoPads, track.Transitions, track.Clips)
+			if err != nil {
+				return nil, err
+			}
+			if len(track.Clips) > 0 {
+				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
+					Clip:   track.Clips[0],
+					ZIndex: track.ZIndex,
+					Pad:    chainedVideoPad,
+				})
+			}
+		} else {
+			for index, clip := range track.Clips {
+				if index < len(trackVideoPads) {
+					processedVideoPads = append(processedVideoPads, &ClipVideoPad{
+						Clip:   clip,
+						ZIndex: track.ZIndex,
+						Pad:    trackVideoPads[index],
+					})
+				}
+			}
+		}
+
+		if len(track.Transitions) > 0 && len(trackAudioPads) > 1 {
+			chainedAudioPad, err := ChainTrackTransitionsAudio(graph, trackAudioPads, track.Transitions)
+			if err != nil {
+				return nil, err
+			}
+			processedAudioPads = append(processedAudioPads, chainedAudioPad)
+		} else {
+			processedAudioPads = append(processedAudioPads, trackAudioPads...)
 		}
 	}
 

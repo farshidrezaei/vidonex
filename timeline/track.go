@@ -81,9 +81,9 @@ func (track *Track) AddClip(clips ...*Clip) *Track {
 	return track
 }
 
-// AddTransition adds a transition between clips on this track.
-func (track *Track) AddTransition(transition *Transition) *Track {
-	track.Transitions = append(track.Transitions, transition)
+// AddTransition adds one or more transitions between clips on this track.
+func (track *Track) AddTransition(transitions ...*Transition) *Track {
+	track.Transitions = append(track.Transitions, transitions...)
 	return track
 }
 

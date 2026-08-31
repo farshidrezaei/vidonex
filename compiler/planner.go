@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/farshidrezaei/vidonyx/effects"
 	"github.com/farshidrezaei/vidonyx/filtergraph"
 	"github.com/farshidrezaei/vidonyx/timeline"
 )
@@ -132,6 +133,80 @@ func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	}
 
 	return currentPad, nil
+}
+
+// ChainTrackTransitionsVideo connects adjacent video clips on a track using xfade transitions.
+func ChainTrackTransitionsVideo(graph *filtergraph.Graph, videoPads []*filtergraph.Pad, transitions []*timeline.Transition, clips []*timeline.Clip) (*filtergraph.Pad, error) {
+	if len(videoPads) == 0 {
+		return nil, nil
+	}
+	if len(videoPads) == 1 || len(transitions) == 0 {
+		return videoPads[0], nil
+	}
+
+	currentStream := videoPads[0]
+	accumulatedDuration := clips[0].Duration.Seconds()
+
+	for index := 0; index < len(transitions) && index+1 < len(videoPads); index++ {
+		transition := transitions[index]
+		nextPad := videoPads[index+1]
+
+		transitionDuration := transition.Duration.Seconds()
+		transitionOffset := accumulatedDuration - transitionDuration
+		if transitionOffset < 0 {
+			transitionOffset = 0
+		}
+
+		xfadeFilter := effects.XFadeFilter{
+			Transition: transition.Type,
+			Duration:   transitionDuration,
+			Offset:     transitionOffset,
+		}
+
+		transitionNodeID := graph.NextPadID(fmt.Sprintf("xfade_trans_%d", index))
+		transitionedOutput, err := xfadeFilter.Apply(graph, transitionNodeID, currentStream, nextPad)
+		if err != nil {
+			return nil, fmt.Errorf("compiler: failed to apply xfade transition %q: %w", transition.ID, err)
+		}
+
+		currentStream = transitionedOutput
+		accumulatedDuration += clips[index+1].Duration.Seconds() - transitionDuration
+	}
+
+	return currentStream, nil
+}
+
+// ChainTrackTransitionsAudio connects adjacent audio clips on a track using acrossfade transitions.
+func ChainTrackTransitionsAudio(graph *filtergraph.Graph, audioPads []*filtergraph.Pad, transitions []*timeline.Transition) (*filtergraph.Pad, error) {
+	if len(audioPads) == 0 {
+		return nil, nil
+	}
+	if len(audioPads) == 1 || len(transitions) == 0 {
+		return audioPads[0], nil
+	}
+
+	currentStream := audioPads[0]
+
+	for index := 0; index < len(transitions) && index+1 < len(audioPads); index++ {
+		transition := transitions[index]
+		nextPad := audioPads[index+1]
+
+		acrossFadeFilter := effects.AcrossFadeFilter{
+			Duration: transition.Duration.Seconds(),
+			Curve1:   "tri",
+			Curve2:   "tri",
+		}
+
+		transitionNodeID := graph.NextPadID(fmt.Sprintf("acrossfade_trans_%d", index))
+		transitionedOutput, err := acrossFadeFilter.Apply(graph, transitionNodeID, currentStream, nextPad)
+		if err != nil {
+			return nil, fmt.Errorf("compiler: failed to apply acrossfade transition %q: %w", transition.ID, err)
+		}
+
+		currentStream = transitionedOutput
+	}
+
+	return currentStream, nil
 }
 
 // BuildVideoCompositor builds the background canvas and overlays all video tracks by Z-index.
