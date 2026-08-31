@@ -10,67 +10,152 @@ import (
 	"github.com/farshidrezaei/vidonyx/types"
 )
 
-func TestCompiler_PictureInPictureComposition(t *testing.T) {
-	// Build a 1080p 30fps timeline with a base background video and an overlay PiP clip
-	tl := timeline.New(
-		timeline.WithCanvas(types.Res1080p),
-		timeline.WithFPS(types.FPS30),
-	)
+func TestCompiler_CompositionsTable(t *testing.T) {
+	tests := []struct {
+		name               string
+		buildTimeline      func() *timeline.Timeline
+		encodingOpts       compiler.EncodingOptions
+		outputPath         string
+		expectedInputCount int
+		expectedArgSnippets []string
+	}{
+		{
+			name: "single clip basic composition",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+				tr := timeline.NewTrack("v0", timeline.TrackKindVideo)
+				tr.AddClip(timeline.NewClip("c1", "input.mp4", 0, 5*time.Second))
+				tl.AddTrack(tr)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_single.mp4",
+			expectedInputCount: 1,
+			expectedArgSnippets: []string{
+				"-i input.mp4",
+				"-filter_complex",
+				"-map [out_v]",
+				"-map [out_a]",
+				"-c:v libx264",
+				"out_single.mp4",
+			},
+		},
+		{
+			name: "picture-in-picture with overlay coordinates and opacity",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
 
-	// Track 0: Main background video
-	mainTrack := timeline.NewTrack("main_track", timeline.TrackKindVideo).SetZIndex(0)
-	mainClip := timeline.NewClip("main_clip", "background.mp4", 0, 10*time.Second)
-	mainTrack.AddClip(mainClip)
+				mainTrack := timeline.NewTrack("main", timeline.TrackKindVideo).SetZIndex(0)
+				mainTrack.AddClip(timeline.NewClip("bg", "bg.mp4", 0, 10*time.Second))
 
-	// Track 1: PiP Overlay (Z-index 1)
-	pipTrack := timeline.NewTrack("pip_track", timeline.TrackKindOverlay).SetZIndex(1)
-	pipClip := timeline.NewClip("pip_clip", "facecam.mp4", 2*time.Second, 6*time.Second).
-		WithScale(0.3).
-		WithPosition(types.Point{X: 50, Y: 50}).
-		WithOpacity(0.9)
-	pipTrack.AddClip(pipClip)
+				pipTrack := timeline.NewTrack("pip", timeline.TrackKindOverlay).SetZIndex(1)
+				pipTrack.AddClip(timeline.NewClip("fg", "cam.mp4", 1*time.Second, 5*time.Second).
+					WithScale(0.3).
+					WithPosition(types.Point{X: 100, Y: 100}).
+					WithOpacity(0.8))
 
-	// Track 2: Background Music
-	bgmTrack := timeline.NewTrack("bgm_track", timeline.TrackKindAudio)
-	bgmClip := timeline.NewClip("bgm_clip", "music.mp3", 0, 10*time.Second).WithVolume(0.5)
-	bgmTrack.AddClip(bgmClip)
+				tl.AddTrack(mainTrack, pipTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_pip.mp4",
+			expectedInputCount: 2,
+			expectedArgSnippets: []string{
+				"-i bg.mp4",
+				"-i cam.mp4",
+				"overlay=x=100:y=100",
+				"between(t,1.0000,6.0000)",
+				"out_pip.mp4",
+			},
+		},
+		{
+			name: "multi-track audio mixing with delay",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res720p), timeline.WithFPS(types.FPS25))
 
-	tl.AddTrack(mainTrack, pipTrack, bgmTrack)
+				vTrack := timeline.NewTrack("v", timeline.TrackKindVideo)
+				vTrack.AddClip(timeline.NewClip("v1", "clip.mp4", 0, 10*time.Second))
 
-	c := compiler.New(nil)
-	res, err := c.Compile(tl, "output.mp4")
-	if err != nil {
-		t.Fatalf("Compile failed: %v", err)
+				aTrack1 := timeline.NewTrack("voice", timeline.TrackKindAudio)
+				aTrack1.AddClip(timeline.NewClip("voice_clip", "voice.mp3", 0, 5*time.Second).WithVolume(1.2))
+
+				aTrack2 := timeline.NewTrack("music", timeline.TrackKindAudio)
+				aTrack2.AddClip(timeline.NewClip("music_clip", "music.mp3", 2*time.Second, 8*time.Second).WithVolume(0.4))
+
+				tl.AddTrack(vTrack, aTrack1, aTrack2)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_audio_mix.mp4",
+			expectedInputCount: 3,
+			expectedArgSnippets: []string{
+				"amix=inputs=3",
+				"adelay=delays=2000|2000",
+				"out_audio_mix.mp4",
+			},
+		},
+		{
+			name: "custom encoding options",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS60))
+				tr := timeline.NewTrack("v0", timeline.TrackKindVideo)
+				tr.AddClip(timeline.NewClip("c1", "src.mp4", 0, 3*time.Second))
+				tl.AddTrack(tr)
+				return tl
+			},
+			encodingOpts: compiler.EncodingOptions{
+				VideoCodec:   "libx265",
+				AudioCodec:   "libopus",
+				PixelFormat:  "yuv420p10le",
+				AudioBitrate: "128k",
+				CRF:          18,
+				Preset:       "slow",
+			},
+			outputPath:         "out_hevc.mkv",
+			expectedInputCount: 1,
+			expectedArgSnippets: []string{
+				"-c:v libx265",
+				"-c:a libopus",
+				"-pix_fmt yuv420p10le",
+				"-crf 18",
+				"-preset slow",
+				"-b:a 128k",
+				"out_hevc.mkv",
+			},
+		},
 	}
 
-	if len(res.Inputs) != 3 {
-		t.Fatalf("Expected 3 unique inputs, got %d: %v", len(res.Inputs), res.Inputs)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tl := tt.buildTimeline()
+			c := compiler.New(nil).SetEncodingOptions(tt.encodingOpts)
 
-	// Verify CLI arguments
-	fullCommand := strings.Join(res.Args, " ")
-	if !strings.Contains(fullCommand, "-filter_complex") {
-		t.Fatal("Expected -filter_complex flag in CLI arguments")
-	}
-	if !strings.Contains(fullCommand, "-map [out_v]") || !strings.Contains(fullCommand, "-map [out_a]") {
-		t.Fatal("Expected -map [out_v] and -map [out_a] in CLI arguments")
-	}
+			res, err := c.Compile(tl, tt.outputPath)
+			if err != nil {
+				t.Fatalf("Compile failed: %v", err)
+			}
 
-	// Verify Mermaid generation
-	mermaidDiagram, err := res.Mermaid()
-	if err != nil {
-		t.Fatalf("Mermaid generation failed: %v", err)
-	}
-	if !strings.Contains(mermaidDiagram, "graph LR") {
-		t.Fatalf("Expected Mermaid diagram to start with graph LR:\n%s", mermaidDiagram)
-	}
+			if len(res.Inputs) != tt.expectedInputCount {
+				t.Errorf("Inputs count = %d, want %d: %v", len(res.Inputs), tt.expectedInputCount, res.Inputs)
+			}
 
-	// Verify DOT generation
-	dotGraph, err := res.DOT()
-	if err != nil {
-		t.Fatalf("DOT generation failed: %v", err)
-	}
-	if !strings.Contains(dotGraph, "digraph Filtergraph") {
-		t.Fatalf("Expected DOT graph to contain digraph Filtergraph:\n%s", dotGraph)
+			fullCmd := strings.Join(res.Args, " ")
+			for _, snippet := range tt.expectedArgSnippets {
+				if !strings.Contains(fullCmd, snippet) {
+					t.Errorf("expected command to contain %q\nFull command:\n%s", snippet, fullCmd)
+				}
+			}
+
+			// Verify visualizers
+			mermaid, err := res.Mermaid()
+			if err != nil || !strings.Contains(mermaid, "graph LR") {
+				t.Errorf("Mermaid export failed: %v", err)
+			}
+
+			dot, err := res.DOT()
+			if err != nil || !strings.Contains(dot, "digraph Filtergraph") {
+				t.Errorf("DOT export failed: %v", err)
+			}
+		})
 	}
 }
