@@ -4,59 +4,66 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/farshidrezaei/vidonyx)](https://goreportcard.com/report/github.com/farshidrezaei/vidonyx)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Vidonyx** is an open-source, production-grade Go library and engine for declarative, non-linear video editing (NLE composition engine, conceptually similar to Remotion, Editframe, or the CapCut backend, but written natively in idiomatic Go).
+**Vidonyx** is an open-source, production-grade Go library and engine for declarative, non-linear video editing (conceptually similar to Remotion, Editframe, or the CapCut backend, but written natively in idiomatic, high-performance Go).
 
 ---
 
-## Key Features
+## 🌟 Key Capabilities
 
-- 🎯 **Declarative Timeline Model**: Intuitive, type-safe builder for multi-track video, audio, overlay, and text layers.
-- ⚡ **Filtergraph DAG Compiler**: Compiles timelines into valid, optimized FFmpeg Directed Acyclic Graphs (`-filter_complex`), eliminating brittle string concatenations.
-- 🔄 **Automatic Optimization Passes**:
-  - **Auto-Split Injection**: Automatically inserts `split` or `asplit` filters when an output stream feeds multiple downstream filters.
-  - **Dead-Code Elimination (DCE)**: Prunes unreferenced nodes and dangling pads before generating CLI commands.
-  - **Normalization**: Auto-injects resolution, aspect ratio (SAR=1), frame rate (FPS), and pixel format (`yuv420p`) coercions.
+- 🎯 **Declarative Timeline Model**: Intuitive, type-safe builder for multi-track video, audio, overlay, waveform, subtitle, and effect layers.
+- ⚡ **Filtergraph DAG Compiler**: Compiles high-level timelines into valid, optimized FFmpeg Directed Acyclic Graphs (`-filter_complex`), eliminating brittle string concatenations.
+- 🔄 **Graph Optimization Passes**:
+  - **Auto-Split Injection (`AutoSplitPass`)**: Automatically inserts `split` or `asplit` filters when an output stream feeds multiple downstream filters.
+  - **Dead-Code Elimination (`DeadCodeEliminationPass`)**: Prunes unreferenced nodes and dangling pads before generating CLI commands.
+  - **Normalization**: Auto-injects resolution, aspect ratio (SAR=1), frame rate (FPS), and pixel format (`yuv420p` / `yuva420p`) coercions.
+- 📐 **Ken Burns & Dynamic Keyframe Animations**: Mathematical easing curves (Linear, Quad, Cubic, Sine) for dynamic 2D motion paths, scaling, and opacity.
+- 💬 **Subtitles & Animated Caption Burn-in**: Parsers for SubRip (`.srt`) and WebVTT (`.vtt`) with TikTok/Reels bounding box styling.
+- 🎚 **Smart Audio Ducking**: Sidechain compression automatically lowers background music whenever dialogue or voiceover tracks are active.
+- 🌊 **Audio Waveform Visualizer**: Converts audio directly into animated, transparent waveforms (`showwaves`) for podcast audiograms and music visualization.
+- 🟢 **Studio Chroma Keying & Despill**: Professional green/blue screen removal with edge feathering and reflected light suppression.
+- 🚀 **Platform Presets & GPU Acceleration**: Out-of-the-box configurations for TikTok (9:16 vertical 60fps), YouTube 4K, and GPU acceleration (NVIDIA NVENC, Apple VideoToolbox, Intel QSV).
 - 📊 **Visual Debugging**: Built-in export to **Mermaid.js** and **Graphviz (DOT)** diagrams for instant graph visualization.
-- ⏱ **Zero-Drift Rational Time**: High-precision fractional time arithmetic (`types.Rational`) avoiding floating-point precision drift.
-- 🔌 **Pluggable & Mockable Runtime**: `CommandExecutor` interface allows 100% deterministic unit testing and CI/CD runs without requiring FFmpeg binaries.
+- ⏱ **Zero-Drift Rational Time**: High-precision fractional time arithmetic (`types.Rational`) preventing floating-point precision drift.
+- 🔌 **Pluggable & Mockable Runtime**: `CommandExecutor` and `MediaProber` interfaces for 100% deterministic testing and CI/CD without requiring local binaries.
 - 📡 **Real-time Telemetry**: Streaming progress parsing from FFmpeg's `-progress pipe:1`.
-- 🚀 **Zero External Runtime Dependencies**: Built purely on the Go standard library.
 
 ---
 
-## Architecture Overview
+## 🏗 Architecture Overview
 
 ```mermaid
 graph LR
     subgraph TimelineAST["1. Declarative AST"]
-        TL["Timeline / Tracks / Clips"]
+        TL["Timeline / Tracks / Clips / Transitions / Subtitles / Waveforms"]
     end
 
-    subgraph Compiler["2. Compiler & Normalization"]
-        Norm["Stream Normalizer"]
-        Plan["Track Planner & Stacker"]
+    subgraph Compiler["2. Multi-Stage Compiler"]
+        Norm["Stream Normalizer & Format Coercion"]
+        Plan["Track Planner, Transitions & Layer Stacker"]
+        Duck["Sidechain Ducking & Waveform Generator"]
     end
 
     subgraph IR["3. Filtergraph DAG (IR)"]
-        DAG["Nodes, Typed Pads & Links"]
-        Passes["Passes: AutoSplit & DCE"]
+        DAG["Nodes, Typed Pads & Strict Links"]
+        Passes["Optimization: AutoSplit & DCE Passes"]
     end
 
     subgraph Backends["4. Target Emitters"]
         CLI["FFmpeg CLI (-filter_complex)"]
-        Mermaid["Mermaid / DOT Diagrams"]
+        Mermaid["Mermaid.js & DOT Flowcharts"]
     end
 
     subgraph Runtime["5. Execution Runtime"]
-        Exec["OS / Mock Executor + Progress"]
+        Exec["OS / Mock Executor + Real-time Telemetry"]
+        Probe["FFprobe Stream & Container Inspector"]
     end
 
-    TL --> Norm --> Plan --> DAG --> Passes --> CLI & Mermaid --> Exec
+    TL --> Norm --> Plan --> Duck --> DAG --> Passes --> CLI & Mermaid --> Exec --> Probe
 ```
 
 ---
 
-## Installation
+## 📦 Installation
 
 ```bash
 go get github.com/farshidrezaei/vidonyx
@@ -64,9 +71,7 @@ go get github.com/farshidrezaei/vidonyx
 
 ---
 
-## Quickstart
-
-### Picture-in-Picture Video Composition
+## 🚀 Quickstart: Picture-in-Picture Composition
 
 ```go
 package main
@@ -115,7 +120,7 @@ func main() {
 	// 5. Compose and Render
 	c := composer.New()
 
-	// Dry-run inspection
+	// Dry-run inspection & Mermaid flowchart
 	compilation, err := c.Compile(tl, "output.mp4")
 	if err != nil {
 		log.Fatalf("Compilation failed: %v", err)
@@ -137,41 +142,58 @@ func main() {
 
 ---
 
-## Mandatory Development Contracts
+## 📚 Package Layout
 
-Vidonyx adheres to strict, production-grade development contracts for humans and AI agents. See [CONTRACTS.md](CONTRACTS.md) for full specifications:
-
-1. **Descriptive Naming**: No cryptic abbreviations (`compositionTimeline`, `durationSeconds`, `sourceOutputPad`).
-2. **Table-Driven Tests**: All unit and feature tests must be table-driven and cover all edge cases.
-3. **Mandatory Quality Passes**: Zero warnings on `golangci-lint run ./...` and 100% clean passes on `go test -race ./...`.
-4. **Cutting-Edge Go Idioms**: Go iterators (`iter.Seq`), `log/slog`, `errors.Join`, and exact fractional arithmetic (`types.Rational`).
-
----
-
-## Package Organization
-
-- [`types`](./types/): Exact Rational time arithmetic, frame rate definitions, geometry, and color models.
-- [`timeline`](./timeline/): High-level declarative timeline, track, clip, transition, and effect AST.
-- [`filtergraph`](./filtergraph/): Generic FFmpeg Filtergraph IR (DAG), topological sort (Kahn's algorithm), and optimization passes (AutoSplit, DeadCodeElimination).
-- [`compiler`](./compiler/): Translates Timeline AST $\rightarrow$ Filtergraph DAG $\rightarrow$ valid FFmpeg CLI arguments.
-- [`effects`](./effects/): Type-safe filter abstractions (`Scale`, `Overlay`, `DrawText`, `ChromaKey`, `Volume`, `AcrossFade`, `XFade`).
-- [`visualizer`](./visualizer/): Mermaid.js and Graphviz DOT diagram generators.
-- [`executor`](./executor/): Subprocess execution with context cancellation, real-time `-progress` stream parser, and `MockExecutor`.
-- [`composer`](./composer/): Unified facade uniting composition, compilation, inspection, and rendering.
+| Package | Purpose | Key Symbols |
+| :--- | :--- | :--- |
+| [`types`](./types/) | Exact math, geometry & colors | `Rational`, `Size`, `Point`, `Rect`, `Color`, `Alignment` |
+| [`timeline`](./timeline/) | Declarative timeline AST | `Timeline`, `Track`, `Clip`, `Transition`, `Effect`, `Validate()` |
+| [`filtergraph`](./filtergraph/) | Filtergraph DAG intermediate representation | `Graph`, `Node`, `Pad`, `AutoSplitPass`, `DeadCodeEliminationPass` |
+| [`compiler`](./compiler/) | AST $\rightarrow$ DAG $\rightarrow$ CLI Compiler | `Compiler`, `CompilationResult`, `BuildFFmpegArgs()` |
+| [`animation`](./animation/) | Keyframing & mathematical easing | `PositionTrack`, `FloatKeyframeTrack`, `KenBurnsAnimation`, `Easing` |
+| [`subtitles`](./subtitles/) | SRT/VTT parsing & styled caption burn-in | `ParseSRT()`, `ParseVTT()`, `SubtitleTrack`, `AttachSubtitles()` |
+| [`ducking`](./ducking/) | Sidechain compression audio ducking | `ApplySidechainDucking()`, `Options`, `DefaultOptions()` |
+| [`waveform`](./waveform/) | Animated audio waveform generation | `ApplyWaveformVisualizer()`, `ModePeakToPeak`, `Options` |
+| [`chromakey`](./chromakey/) | Green/blue screen removal & despill | `ApplyChromaKey()`, `Options`, `StudioGreenScreen` |
+| [`presets`](./presets/) | Social platform presets & GPU acceleration | `TikTokVertical1080p60()`, `YouTube4K60()`, `AcceleratorNVENC` |
+| [`effects`](./effects/) | Type-safe reusable filter nodes | `ScaleFilter`, `DrawTextFilter`, `XFadeFilter`, `VolumeFilter` |
+| [`probe`](./probe/) | Automated media inspection & stream caching | `MediaProber`, `FFprobeProber`, `CachedProber`, `MockProber` |
+| [`executor`](./executor/) | Subprocess execution & live telemetry | `CommandExecutor`, `OSExecutor`, `MockExecutor`, `ParseProgressStream()` |
+| [`visualizer`](./visualizer/) | Flowchart generation | `ToMermaid()`, `ToDOT()` |
+| [`composer`](./composer/) | Unified high-level facade | `Composer`, `New()`, `Compile()`, `Render()` |
 
 ---
 
-## Testing & Quality
+## 🍳 Example Recipes
 
-Run the complete test suite with the Go race detector:
+Complete, runnable recipes located in [`examples/`](./examples/):
+
+1. **[`01_simple_cut`](./examples/01_simple_cut/)**: Single video trimming and canvas normalization.
+2. **[`02_picture_in_picture`](./examples/02_picture_in_picture/)**: Facecam overlay on top of gameplay video with opacity.
+3. **[`03_transitions`](./examples/03_transitions/)**: Seamless video crossfades (`xfade`) and audio transitions (`acrossfade`).
+4. **[`04_animated_motion`](./examples/04_animated_motion/)**: Ken Burns pan/zoom and dynamic 2D position/scale keyframe tracks.
+5. **[`05_animated_subtitles`](./examples/05_animated_subtitles/)**: SRT subtitle parsing with styled yellow captions and bounding boxes.
+6. **[`06_audio_ducking`](./examples/06_audio_ducking/)**: Background soundtrack automatically ducking during voiceover commentary.
+7. **[`07_platform_presets`](./examples/07_platform_presets/)**: Vertical 9:16 TikTok 60fps render with NVIDIA NVENC GPU acceleration.
+8. **[`08_podcast_audio_waveform`](./examples/08_podcast_audio_waveform/)**: Square 1:1 podcast audiogram with neon animated waveform overlay.
+9. **[`09_green_screen_studio`](./examples/09_green_screen_studio/)**: Studio presenter green screen removal with despill filter onto a virtual background.
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+Vidonyx follows strict engineering contracts enshrined in [CONTRACTS.md](CONTRACTS.md).
 
 ```bash
+# Run all unit and real-FFmpeg end-to-end tests with race detection
 go test -race -v ./...
+
+# Run static analysis and linter
 golangci-lint run ./...
 ```
 
 ---
 
-## License
+## 📄 License
 
 MIT License. See [LICENSE](LICENSE) for details.
