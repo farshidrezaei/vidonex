@@ -3,7 +3,6 @@ package animation
 import (
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/farshidrezaei/vidonyx/types"
@@ -74,8 +73,13 @@ func (track *FloatKeyframeTrack) Evaluate(timestamp time.Duration) float64 {
 	return track.Keyframes[lastIndex].Value
 }
 
-// ToFFmpegExpression generates nested IF expressions for FFmpeg filters.
+// ToFFmpegExpression generates nested IF expressions for FFmpeg filters using variable "t".
 func (track *FloatKeyframeTrack) ToFFmpegExpression() string {
+	return track.ToFFmpegExpressionWithVariable("t")
+}
+
+// ToFFmpegExpressionWithVariable generates nested IF expressions for FFmpeg filters with a custom time variable (e.g. "t" or "in_time").
+func (track *FloatKeyframeTrack) ToFFmpegExpressionWithVariable(timeVariable string) string {
 	if len(track.Keyframes) == 0 {
 		return "0.0"
 	}
@@ -87,7 +91,7 @@ func (track *FloatKeyframeTrack) ToFFmpegExpression() string {
 	for index := 0; index < len(track.Keyframes)-1; index++ {
 		k1 := track.Keyframes[index]
 		k2 := track.Keyframes[index+1]
-		expr := GenerateFFmpegExpression(k1.Value, k2.Value, k1.Time, k2.Time, k2.Easing)
+		expr := GenerateFFmpegExpressionWithVariable(k1.Value, k2.Value, k1.Time, k2.Time, k2.Easing, timeVariable)
 		expressions = append(expressions, expr)
 	}
 
@@ -176,6 +180,5 @@ func NewKenBurns(startScale, endScale float64, startPos, endPos types.Point, dur
 
 // GenerateScaleExpression creates dynamic FFmpeg scale expression for Ken Burns.
 func (kenBurns *KenBurnsAnimation) GenerateScaleExpression() string {
-	expr := GenerateFFmpegExpression(kenBurns.StartScale, kenBurns.EndScale, 0, kenBurns.Duration, kenBurns.Easing)
-	return strings.ReplaceAll(expr, "t", "t")
+	return GenerateFFmpegExpressionWithVariable(kenBurns.StartScale, kenBurns.EndScale, 0, kenBurns.Duration, kenBurns.Easing, "in_time")
 }

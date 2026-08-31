@@ -11,8 +11,8 @@ import (
 )
 
 // ProcessClipVideo processes a single clip's video pipeline:
-// Trim -> Speed (setpts) -> ChromaKey -> Fade In/Out -> Opacity / Animated Opacity -> Animated Scale -> Normalized Stream
-func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip, _ *timeline.Timeline) (*filtergraph.Pad, error) {
+// Trim -> Speed (setpts) -> ChromaKey -> Fade In/Out -> Opacity / Animated Opacity -> Animated Scale (zoompan) -> Normalized Stream
+func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip, compositionTimeline *timeline.Timeline) (*filtergraph.Pad, error) {
 	currentPad := rawInputPad
 
 	// 1. Trim & SetPTS
@@ -108,19 +108,25 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = mixerOutput
 	}
 
-	// 5. Clip scale & position handling (Static or Animated Keyframe Track)
+	// 5. Clip scale handling (Static or Animated Keyframe Track)
+	// Uses zoompan filter instead of scale with eval=frame because dynamically changing
+	// output dimensions per frame causes FFmpeg to hang or deadlock when combined with
+	// downstream overlay filters. zoompan maintains constant output dimensions.
 	if clip.ScaleTrack != nil {
-		scaleNode := graph.NewNode(fmt.Sprintf("scale_anim_%s", clip.ID), "scale")
-		scaleExpr := clip.ScaleTrack.ToFFmpegExpression()
-		scaleNode.SetParam("w", fmt.Sprintf("'iw*(%s)'", scaleExpr))
-		scaleNode.SetParam("h", fmt.Sprintf("'ih*(%s)'", scaleExpr))
-		scaleNode.SetParam("eval", "frame")
-		scaleInput := scaleNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
-		scaleOutput := scaleNode.AddOutput(graph.NextPadID("scale_out"), filtergraph.StreamTypeVideo)
-		if err := graph.Connect(currentPad, scaleInput); err != nil {
+		zoompanNode := graph.NewNode(fmt.Sprintf("zoompan_%s", clip.ID), "zoompan")
+		scaleExpression := clip.ScaleTrack.ToFFmpegExpressionWithVariable("in_time")
+		zoompanNode.SetParam("z", fmt.Sprintf("'%s'", scaleExpression))
+		zoompanNode.SetParam("x", "'iw/2-(iw/zoom/2)'")
+		zoompanNode.SetParam("y", "'ih/2-(ih/zoom/2)'")
+		zoompanNode.SetParam("d", "1")
+		zoompanNode.SetParam("s", fmt.Sprintf("%dx%d", compositionTimeline.Canvas.Width, compositionTimeline.Canvas.Height))
+		zoompanNode.SetParam("fps", compositionTimeline.FPS.FFmpegString())
+		zoompanInput := zoompanNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		zoompanOutput := zoompanNode.AddOutput(graph.NextPadID("zoompan_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, zoompanInput); err != nil {
 			return nil, err
 		}
-		currentPad = scaleOutput
+		currentPad = zoompanOutput
 	} else if clip.Scale != 1.0 && clip.Scale > 0 {
 		scaleNode := graph.NewNode(fmt.Sprintf("scale_%s", clip.ID), "scale")
 		scaleNode.SetParam("w", fmt.Sprintf("iw*%.4f", clip.Scale))

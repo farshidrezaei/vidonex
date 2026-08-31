@@ -78,8 +78,16 @@ func InterpolateFloat(start, end, progress float64, easing EasingFunction) float
 	return start + (end-start)*easedProgress
 }
 
-// GenerateFFmpegExpression creates an FFmpeg expression computing dynamic value across time interval.
+// GenerateFFmpegExpression creates an FFmpeg expression computing dynamic value across time interval using default variable "t".
 func GenerateFFmpegExpression(startValue, endValue float64, startTime, endTime time.Duration, easing EasingFunction) string {
+	return GenerateFFmpegExpressionWithVariable(startValue, endValue, startTime, endTime, easing, "t")
+}
+
+// GenerateFFmpegExpressionWithVariable creates an FFmpeg expression computing dynamic value across time interval with a configurable time variable name (e.g. "t" or "in_time").
+func GenerateFFmpegExpressionWithVariable(startValue, endValue float64, startTime, endTime time.Duration, easing EasingFunction, timeVariable string) string {
+	if timeVariable == "" {
+		timeVariable = "t"
+	}
 	startSec := startTime.Seconds()
 	endSec := endTime.Seconds()
 	durationSec := endSec - startSec
@@ -88,7 +96,7 @@ func GenerateFFmpegExpression(startValue, endValue float64, startTime, endTime t
 		return fmt.Sprintf("%.4f", endValue)
 	}
 
-	normalizedT := fmt.Sprintf("((t-%.4f)/%.4f)", startSec, durationSec)
+	normalizedT := fmt.Sprintf("((%s-%.4f)/%.4f)", timeVariable, startSec, durationSec)
 
 	var progressExpr string
 	switch easing {
@@ -107,6 +115,6 @@ func GenerateFFmpegExpression(startValue, endValue float64, startTime, endTime t
 	delta := endValue - startValue
 	interpolatedExpr := fmt.Sprintf("(%.4f+(%.4f*%s))", startValue, delta, progressExpr)
 
-	return fmt.Sprintf("if(lt(t,%.4f),%.4f,if(gt(t,%.4f),%.4f,%s))",
-		startSec, startValue, endSec, endValue, interpolatedExpr)
+	return fmt.Sprintf("if(lt(%s,%.4f),%.4f,if(gt(%s,%.4f),%.4f,%s))",
+		timeVariable, startSec, startValue, timeVariable, endSec, endValue, interpolatedExpr)
 }
