@@ -1,3 +1,4 @@
+// Package visualizer generates diagrammatic representations of filtergraph DAGs in Mermaid.js and Graphviz DOT formats.
 package visualizer
 
 import (
@@ -8,33 +9,33 @@ import (
 )
 
 // ToDOT generates a Graphviz DOT representation of the filtergraph.
-func ToDOT(g *filtergraph.Graph) (string, error) {
-	var sb strings.Builder
-	sb.WriteString("digraph Filtergraph {\n")
-	sb.WriteString("    rankdir=LR;\n")
-	sb.WriteString("    node [shape=box, style=\"rounded,filled\", fillcolor=\"#F0F4F8\", fontname=\"Helvetica\"];\n")
-	sb.WriteString("    edge [fontname=\"Helvetica\", fontsize=10];\n\n")
+func ToDOT(graph *filtergraph.Graph) (string, error) {
+	var stringBuilder strings.Builder
+	stringBuilder.WriteString("digraph Filtergraph {\n")
+	stringBuilder.WriteString("    rankdir=LR;\n")
+	stringBuilder.WriteString("    node [shape=box, style=\"rounded,filled\", fillcolor=\"#F0F4F8\", fontname=\"Helvetica\"];\n")
+	stringBuilder.WriteString("    edge [fontname=\"Helvetica\", fontsize=10];\n\n")
 
 	// Nodes
-	for node := range g.Nodes() {
+	for node := range graph.Nodes() {
 		filterLabel := strings.ReplaceAll(node.FormattedFilter(), "\"", "\\\"")
-		sb.WriteString(fmt.Sprintf("    \"%s\" [label=\"%s\\n%s\"];\n", node.ID, node.ID, filterLabel))
+		fmt.Fprintf(&stringBuilder, "    \"%s\" [label=\"%s\\n%s\"];\n", node.ID, node.ID, filterLabel)
 	}
 
-	sb.WriteString("\n")
+	stringBuilder.WriteString("\n")
 
 	// Edges
-	for node := range g.Nodes() {
-		for _, outPad := range node.Outputs {
-			consumers := g.GetConsumerPads(outPad)
-			for _, inPad := range consumers {
-				if inPad.Node != nil {
-					sb.WriteString(fmt.Sprintf("    \"%s\" -> \"%s\" [label=\"[%s]\"];\n", node.ID, inPad.Node.ID, outPad.ID))
+	for node := range graph.Nodes() {
+		for _, outputPad := range node.Outputs {
+			consumers := graph.GetConsumerPads(outputPad)
+			for _, inputPad := range consumers {
+				if inputPad.Node != nil {
+					fmt.Fprintf(&stringBuilder, "    \"%s\" -> \"%s\" [label=\"[%s]\"];\n", node.ID, inputPad.Node.ID, outputPad.ID)
 				}
 			}
 		}
 	}
 
-	sb.WriteString("}\n")
-	return sb.String(), nil
+	stringBuilder.WriteString("}\n")
+	return stringBuilder.String(), nil
 }

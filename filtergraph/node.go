@@ -34,107 +34,107 @@ func NewNode(id, filterName string) *Node {
 }
 
 // SetParam sets or updates a key-value parameter on the node.
-func (n *Node) SetParam(key string, value any) *Node {
-	for i, p := range n.Params {
-		if p.Key == key {
-			n.Params[i].Value = value
-			return n
+func (node *Node) SetParam(key string, value any) *Node {
+	for index, param := range node.Params {
+		if param.Key == key {
+			node.Params[index].Value = value
+			return node
 		}
 	}
-	n.Params = append(n.Params, FilterParam{Key: key, Value: value})
-	return n
+	node.Params = append(node.Params, FilterParam{Key: key, Value: value})
+	return node
 }
 
 // AddInput appends a new input pad to the node.
-func (n *Node) AddInput(id string, st StreamType) *Pad {
+func (node *Node) AddInput(id string, streamType StreamType) *Pad {
 	pad := &Pad{
 		ID:         id,
-		StreamType: st,
-		Node:       n,
+		StreamType: streamType,
+		Node:       node,
 		IsInput:    true,
 	}
-	n.Inputs = append(n.Inputs, pad)
+	node.Inputs = append(node.Inputs, pad)
 	return pad
 }
 
 // AddOutput appends a new output pad to the node.
-func (n *Node) AddOutput(id string, st StreamType) *Pad {
+func (node *Node) AddOutput(id string, streamType StreamType) *Pad {
 	pad := &Pad{
 		ID:         id,
-		StreamType: st,
-		Node:       n,
+		StreamType: streamType,
+		Node:       node,
 		IsInput:    false,
 	}
-	n.Outputs = append(n.Outputs, pad)
+	node.Outputs = append(node.Outputs, pad)
 	return pad
 }
 
 // IsSource reports whether this node produces streams without inputs (e.g. color, anullsrc, or input media).
-func (n *Node) IsSource() bool {
-	return len(n.Inputs) == 0
+func (node *Node) IsSource() bool {
+	return len(node.Inputs) == 0
 }
 
 // IsSink reports whether this node is a terminal consumer.
-func (n *Node) IsSink() bool {
-	return len(n.Outputs) == 0
+func (node *Node) IsSink() bool {
+	return len(node.Outputs) == 0
 }
 
 // FormattedFilter formats the filter name and arguments (e.g., "scale=1920:1080:flags=lanczos").
-func (n *Node) FormattedFilter() string {
-	if len(n.Params) == 0 {
-		return n.FilterName
+func (node *Node) FormattedFilter() string {
+	if len(node.Params) == 0 {
+		return node.FilterName
 	}
 
-	var sb strings.Builder
-	sb.WriteString(n.FilterName)
-	sb.WriteString("=")
+	var stringBuilder strings.Builder
+	stringBuilder.WriteString(node.FilterName)
+	stringBuilder.WriteString("=")
 
-	for i, p := range n.Params {
-		if i > 0 {
-			sb.WriteString(":")
+	for index, param := range node.Params {
+		if index > 0 {
+			stringBuilder.WriteString(":")
 		}
-		if p.Key == "" {
-			sb.WriteString(fmt.Sprintf("%v", p.Value))
+		if param.Key == "" {
+			fmt.Fprintf(&stringBuilder, "%v", param.Value)
 		} else {
-			sb.WriteString(fmt.Sprintf("%s=%v", p.Key, p.Value))
+			fmt.Fprintf(&stringBuilder, "%s=%v", param.Key, param.Value)
 		}
 	}
-	return sb.String()
+	return stringBuilder.String()
 }
 
 // String returns a single filter expression with input and output pad labels
 // (e.g. "[0:v][1:v]overlay=x=100:y=200[v_out]").
-func (n *Node) String() string {
-	var sb strings.Builder
+func (node *Node) String() string {
+	var stringBuilder strings.Builder
 
 	// Inputs
-	for _, in := range n.Inputs {
-		sb.WriteString(in.Label())
+	for _, inputPad := range node.Inputs {
+		stringBuilder.WriteString(inputPad.Label())
 	}
 
 	// Filter
-	sb.WriteString(n.FormattedFilter())
+	stringBuilder.WriteString(node.FormattedFilter())
 
 	// Outputs
-	for _, out := range n.Outputs {
-		sb.WriteString(out.Label())
+	for _, outputPad := range node.Outputs {
+		stringBuilder.WriteString(outputPad.Label())
 	}
 
-	return sb.String()
+	return stringBuilder.String()
 }
 
 // ParamsMap returns a copy of parameters as a map.
-func (n *Node) ParamsMap() map[string]any {
-	m := make(map[string]any, len(n.Params))
-	for _, p := range n.Params {
-		m[p.Key] = p.Value
+func (node *Node) ParamsMap() map[string]any {
+	paramMap := make(map[string]any, len(node.Params))
+	for _, param := range node.Params {
+		paramMap[param.Key] = param.Value
 	}
-	return m
+	return paramMap
 }
 
 // SortParams ensures deterministic parameter ordering for unit testing and reproducibility.
-func (n *Node) SortParams() {
-	sort.Slice(n.Params, func(i, j int) bool {
-		return n.Params[i].Key < n.Params[j].Key
+func (node *Node) SortParams() {
+	sort.Slice(node.Params, func(i, j int) bool {
+		return node.Params[i].Key < node.Params[j].Key
 	})
 }

@@ -12,13 +12,13 @@ type Clip struct {
 	Source        string // Filepath or URL
 	TimelineStart time.Duration
 	Duration      time.Duration
-	SourceStart   time.Duration // Trim in
+	SourceStart   time.Duration // Trim in offset within the source media
 	Speed         float64       // Playback rate multiplier (default 1.0)
 	Volume        float64       // Audio volume multiplier (default 1.0)
 	Opacity       float64       // Visual opacity 0.0 (transparent) to 1.0 (opaque)
 	Position      types.Point   // Absolute (X, Y) coordinate on canvas
 	Alignment     types.Alignment
-	Scale         float64  // Scale factor (1.0 = original)
+	Scale         float64  // Scale factor (1.0 = original size)
 	Rotation      float64  // Rotation in degrees (e.g. 90.0, 180.0)
 	Effects       []Effect // Attached filters and visual transformations
 }
@@ -41,54 +41,54 @@ func NewClip(id, source string, start, duration time.Duration) *Clip {
 }
 
 // TimelineEnd returns the absolute end timestamp of the clip on the timeline.
-func (c *Clip) TimelineEnd() time.Duration {
-	return c.TimelineStart + c.Duration
+func (clip *Clip) TimelineEnd() time.Duration {
+	return clip.TimelineStart + clip.Duration
 }
 
 // WithTrim sets the in-point offset within the source media.
-func (c *Clip) WithTrim(sourceStart time.Duration) *Clip {
-	c.SourceStart = sourceStart
-	return c
+func (clip *Clip) WithTrim(sourceStart time.Duration) *Clip {
+	clip.SourceStart = sourceStart
+	return clip
 }
 
 // WithSpeed sets playback speed rate (e.g. 2.0 = double speed, 0.5 = slow motion).
-func (c *Clip) WithSpeed(speed float64) *Clip {
-	c.Speed = speed
-	return c
+func (clip *Clip) WithSpeed(speed float64) *Clip {
+	clip.Speed = speed
+	return clip
 }
 
 // WithVolume sets the audio volume level (1.0 = 100%).
-func (c *Clip) WithVolume(volume float64) *Clip {
-	c.Volume = volume
-	return c
+func (clip *Clip) WithVolume(volume float64) *Clip {
+	clip.Volume = volume
+	return clip
 }
 
 // WithOpacity sets the visual transparency level (0.0 to 1.0).
-func (c *Clip) WithOpacity(opacity float64) *Clip {
-	c.Opacity = opacity
-	return c
+func (clip *Clip) WithOpacity(opacity float64) *Clip {
+	clip.Opacity = opacity
+	return clip
 }
 
 // WithPosition sets the exact (X, Y) canvas coordinates.
-func (c *Clip) WithPosition(p types.Point) *Clip {
-	c.Position = p
-	return c
+func (clip *Clip) WithPosition(position types.Point) *Clip {
+	clip.Position = position
+	return clip
 }
 
 // WithScale sets the size scale multiplier.
-func (c *Clip) WithScale(scale float64) *Clip {
-	c.Scale = scale
-	return c
+func (clip *Clip) WithScale(scale float64) *Clip {
+	clip.Scale = scale
+	return clip
 }
 
 // WithRotation sets the rotation in degrees.
-func (c *Clip) WithRotation(degrees float64) *Clip {
-	c.Rotation = degrees
-	return c
+func (clip *Clip) WithRotation(degrees float64) *Clip {
+	clip.Rotation = degrees
+	return clip
 }
 
 // AddEffect attaches a filter effect to the clip.
-func (c *Clip) AddEffect(e Effect) *Clip {
-	c.Effects = append(c.Effects, e)
-	return c
+func (clip *Clip) AddEffect(effect Effect) *Clip {
+	clip.Effects = append(clip.Effects, effect)
+	return clip
 }

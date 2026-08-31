@@ -1,3 +1,4 @@
+// Package effects provides pre-built, type-safe video and audio filters for FFmpeg filtergraphs.
 package effects
 
 import (
@@ -12,12 +13,12 @@ type VolumeFilter struct {
 }
 
 // Apply attaches a volume node to the graph.
-func (f VolumeFilter) Apply(g *filtergraph.Graph, id string, inPad *filtergraph.Pad) (*filtergraph.Pad, error) {
-	node := g.NewNode(id, "volume")
-	node.SetParam("volume", fmt.Sprintf("%.2f", f.Volume))
-	in := node.AddInput(inPad.ID, filtergraph.StreamTypeAudio)
-	out := node.AddOutput(g.NextPadID("vol_out"), filtergraph.StreamTypeAudio)
-	return out, g.Connect(inPad, in)
+func (filter VolumeFilter) Apply(graph *filtergraph.Graph, id string, inputPad *filtergraph.Pad) (*filtergraph.Pad, error) {
+	node := graph.NewNode(id, "volume")
+	node.SetParam("volume", fmt.Sprintf("%.2f", filter.Volume))
+	in := node.AddInput(inputPad.ID, filtergraph.StreamTypeAudio)
+	out := node.AddOutput(graph.NextPadID("volume_out"), filtergraph.StreamTypeAudio)
+	return out, graph.Connect(inputPad, in)
 }
 
 // AcrossFadeFilter cross-fades two audio streams.
@@ -28,28 +29,28 @@ type AcrossFadeFilter struct {
 }
 
 // Apply connects two audio pads into an acrossfade filter.
-func (f AcrossFadeFilter) Apply(g *filtergraph.Graph, id string, inPadA, inPadB *filtergraph.Pad) (*filtergraph.Pad, error) {
-	node := g.NewNode(id, "acrossfade")
-	dur := f.Duration
+func (filter AcrossFadeFilter) Apply(graph *filtergraph.Graph, id string, inputPadA, inputPadB *filtergraph.Pad) (*filtergraph.Pad, error) {
+	node := graph.NewNode(id, "acrossfade")
+	dur := filter.Duration
 	if dur <= 0 {
 		dur = 1.0
 	}
 	node.SetParam("d", fmt.Sprintf("%.2f", dur))
-	if f.Curve1 != "" {
-		node.SetParam("c1", f.Curve1)
+	if filter.Curve1 != "" {
+		node.SetParam("c1", filter.Curve1)
 	}
-	if f.Curve2 != "" {
-		node.SetParam("c2", f.Curve2)
+	if filter.Curve2 != "" {
+		node.SetParam("c2", filter.Curve2)
 	}
 
-	inA := node.AddInput(inPadA.ID, filtergraph.StreamTypeAudio)
-	inB := node.AddInput(inPadB.ID, filtergraph.StreamTypeAudio)
-	out := node.AddOutput(g.NextPadID("across_out"), filtergraph.StreamTypeAudio)
+	inA := node.AddInput(inputPadA.ID, filtergraph.StreamTypeAudio)
+	inB := node.AddInput(inputPadB.ID, filtergraph.StreamTypeAudio)
+	out := node.AddOutput(graph.NextPadID("across_out"), filtergraph.StreamTypeAudio)
 
-	if err := g.Connect(inPadA, inA); err != nil {
+	if err := graph.Connect(inputPadA, inA); err != nil {
 		return nil, err
 	}
-	if err := g.Connect(inPadB, inB); err != nil {
+	if err := graph.Connect(inputPadB, inB); err != nil {
 		return nil, err
 	}
 	return out, nil

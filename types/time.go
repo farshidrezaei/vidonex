@@ -1,3 +1,4 @@
+// Package types defines exact mathematical, geometric, and temporal primitives for Vidonyx.
 package types
 
 import (
@@ -15,14 +16,22 @@ type Rational struct {
 
 // Common video standard frame rates.
 var (
-	FPS23_976 = Rational{Num: 24000, Den: 1001}
-	FPS24     = Rational{Num: 24, Den: 1}
-	FPS25     = Rational{Num: 25, Den: 1}
-	FPS29_97  = Rational{Num: 30000, Den: 1001}
-	FPS30     = Rational{Num: 30, Den: 1}
-	FPS50     = Rational{Num: 50, Den: 1}
-	FPS59_94  = Rational{Num: 60000, Den: 1001}
-	FPS60     = Rational{Num: 60, Den: 1}
+	// FPS23976 represents the 23.976 NTSC film frame rate (24000/1001).
+	FPS23976 = Rational{Num: 24000, Den: 1001}
+	// FPS24 represents standard 24 fps cinema frame rate (24/1).
+	FPS24 = Rational{Num: 24, Den: 1}
+	// FPS25 represents European PAL television frame rate (25/1).
+	FPS25 = Rational{Num: 25, Den: 1}
+	// FPS2997 represents 29.97 NTSC standard television frame rate (30000/1001).
+	FPS2997 = Rational{Num: 30000, Den: 1001}
+	// FPS30 represents standard 30 fps frame rate (30/1).
+	FPS30 = Rational{Num: 30, Den: 1}
+	// FPS50 represents 50 fps high-rate PAL broadcast (50/1).
+	FPS50 = Rational{Num: 50, Den: 1}
+	// FPS5994 represents 59.94 NTSC high-rate frame rate (60000/1001).
+	FPS5994 = Rational{Num: 60000, Den: 1001}
+	// FPS60 represents standard 60 fps frame rate (60/1).
+	FPS60 = Rational{Num: 60, Den: 1}
 )
 
 // NewRational creates a new Rational fraction and reduces it to simplest terms.

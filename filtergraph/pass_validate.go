@@ -11,38 +11,40 @@ import (
 // 3. Verifies no dangling unassigned internal inputs.
 type ValidatePass struct{}
 
-func (p *ValidatePass) Name() string {
+// Name returns the unique pass name.
+func (pass *ValidatePass) Name() string {
 	return "ValidatePass"
 }
 
-func (p *ValidatePass) Run(g *Graph) error {
-	var errs []error
+// Run verifies graph integrity and type correctness.
+func (pass *ValidatePass) Run(graph *Graph) error {
+	var collectedErrors []error
 
 	// 1. Check for cycles via Topological Sort
-	if _, err := g.TopologicalSort(); err != nil {
-		errs = append(errs, err)
+	if _, err := graph.TopologicalSort(); err != nil {
+		collectedErrors = append(collectedErrors, err)
 	}
 
 	// 2. Check stream types and connectivity
-	for node := range g.Nodes() {
-		for _, inPad := range node.Inputs {
-			srcOut, connected := g.GetSourcePad(inPad)
+	for node := range graph.Nodes() {
+		for _, inputPad := range node.Inputs {
+			sourceOutputPad, connected := graph.GetSourcePad(inputPad)
 			if !connected {
 				// Non-connected inputs (unless external input stream like [0:v])
-				if !isExternalPad(inPad.ID) {
-					errs = append(errs, fmt.Errorf("node %q input pad %q is disconnected", node.ID, inPad.ID))
+				if !isExternalPad(inputPad.ID) {
+					collectedErrors = append(collectedErrors, fmt.Errorf("node %q input pad %q is disconnected", node.ID, inputPad.ID))
 				}
 				continue
 			}
-			if srcOut.StreamType != inPad.StreamType {
-				errs = append(errs, fmt.Errorf("node %q input %q (%s) connected to mismatched output %q (%s)",
-					node.ID, inPad.ID, inPad.StreamType, srcOut.ID, srcOut.StreamType))
+			if sourceOutputPad.StreamType != inputPad.StreamType {
+				collectedErrors = append(collectedErrors, fmt.Errorf("node %q input %q (%s) connected to mismatched output %q (%s)",
+					node.ID, inputPad.ID, inputPad.StreamType, sourceOutputPad.ID, sourceOutputPad.StreamType))
 			}
 		}
 	}
 
-	if len(errs) > 0 {
-		return errors.Join(errs...)
+	if len(collectedErrors) > 0 {
+		return errors.Join(collectedErrors...)
 	}
 	return nil
 }

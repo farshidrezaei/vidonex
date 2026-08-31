@@ -1,3 +1,4 @@
+// Package types defines exact mathematical, geometric, and temporal primitives for Vidonyx.
 package types
 
 import (
@@ -13,11 +14,16 @@ type Size struct {
 
 // Common video standard resolutions.
 var (
-	Res4K            = Size{Width: 3840, Height: 2160}
-	Res1080p         = Size{Width: 1920, Height: 1080}
-	Res720p          = Size{Width: 1280, Height: 720}
-	ResSquare1080    = Size{Width: 1080, Height: 1080}
-	ResPortrait1080p = Size{Width: 1080, Height: 1920} // 9:16 vertical (Shorts / Reels / TikTok)
+	// Res4K represents 3840x2160 UHD resolution.
+	Res4K = Size{Width: 3840, Height: 2160}
+	// Res1080p represents 1920x1080 Full HD resolution.
+	Res1080p = Size{Width: 1920, Height: 1080}
+	// Res720p represents 1280x720 HD resolution.
+	Res720p = Size{Width: 1280, Height: 720}
+	// ResSquare1080 represents 1080x1080 1:1 square resolution.
+	ResSquare1080 = Size{Width: 1080, Height: 1080}
+	// ResPortrait1080p represents 1080x1920 9:16 vertical resolution (Shorts, Reels, TikTok).
+	ResPortrait1080p = Size{Width: 1080, Height: 1920}
 )
 
 // NewSize creates a new Size struct.
@@ -106,14 +112,23 @@ func (r Rect) Origin() Point {
 type Alignment uint8
 
 const (
+	// AlignTopLeft positions content at the top-left corner.
 	AlignTopLeft Alignment = iota
+	// AlignTopCenter positions content horizontally centered at the top edge.
 	AlignTopCenter
+	// AlignTopRight positions content at the top-right corner.
 	AlignTopRight
+	// AlignCenterLeft positions content vertically centered at the left edge.
 	AlignCenterLeft
+	// AlignCenter positions content centered both horizontally and vertically.
 	AlignCenter
+	// AlignCenterRight positions content vertically centered at the right edge.
 	AlignCenterRight
+	// AlignBottomLeft positions content at the bottom-left corner.
 	AlignBottomLeft
+	// AlignBottomCenter positions content horizontally centered at the bottom edge.
 	AlignBottomCenter
+	// AlignBottomRight positions content at the bottom-right corner.
 	AlignBottomRight
 )
 

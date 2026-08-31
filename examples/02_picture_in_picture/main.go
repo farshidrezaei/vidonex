@@ -1,3 +1,4 @@
+// Package main demonstrates Picture-in-Picture overlay composition with Vidonyx.
 package main
 
 import (
@@ -55,8 +56,8 @@ func main() {
 	fmt.Println(dotGraph)
 
 	ctx := context.Background()
-	_, err = c.Render(ctx, tl, "output_pip.mp4", func(ev executor.ProgressEvent) {
-		fmt.Printf("[Render Progress] Speed: %.2fx | %.1f%%\n", ev.Speed, ev.Percentage)
+	_, err = c.Render(ctx, tl, "output_pip.mp4", func(event executor.ProgressEvent) {
+		fmt.Printf("[Render Progress] Speed: %.2fx | %.1f%%\n", event.Speed, event.Percentage)
 	})
 	if err != nil {
 		log.Fatalf("Render failed: %v", err)

@@ -10,141 +10,141 @@ import (
 
 // ProcessClipVideo processes a single clip's video pipeline:
 // Trim -> Speed (setpts) -> Opacity -> Custom Effects -> Normalized Stream
-func ProcessClipVideo(g *filtergraph.Graph, rawInPad *filtergraph.Pad, clip *timeline.Clip, tl *timeline.Timeline) (*filtergraph.Pad, error) {
-	currPad := rawInPad
+func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip, _ *timeline.Timeline) (*filtergraph.Pad, error) {
+	currentPad := rawInputPad
 
 	// 1. Trim & SetPTS
-	trimNode := g.NewNode(fmt.Sprintf("trim_v_%s", clip.ID), "trim")
-	startSec := clip.SourceStart.Seconds()
-	durSec := clip.Duration.Seconds()
-	trimNode.SetParam("start", fmt.Sprintf("%.4f", startSec))
-	trimNode.SetParam("duration", fmt.Sprintf("%.4f", durSec))
+	trimNode := graph.NewNode(fmt.Sprintf("trim_video_%s", clip.ID), "trim")
+	startSeconds := clip.SourceStart.Seconds()
+	durationSeconds := clip.Duration.Seconds()
+	trimNode.SetParam("start", fmt.Sprintf("%.4f", startSeconds))
+	trimNode.SetParam("duration", fmt.Sprintf("%.4f", durationSeconds))
 
-	trimIn := trimNode.AddInput(currPad.ID, filtergraph.StreamTypeVideo)
-	trimOut := trimNode.AddOutput(g.NextPadID("trim_out_v"), filtergraph.StreamTypeVideo)
-	if err := g.Connect(currPad, trimIn); err != nil {
+	trimInput := trimNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+	trimOutput := trimNode.AddOutput(graph.NextPadID("trim_out_video"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentPad, trimInput); err != nil {
 		return nil, err
 	}
-	currPad = trimOut
+	currentPad = trimOutput
 
 	// SetPTS based on speed and start offset
-	ptsNode := g.NewNode(fmt.Sprintf("pts_v_%s", clip.ID), "setpts")
+	ptsNode := graph.NewNode(fmt.Sprintf("pts_video_%s", clip.ID), "setpts")
 	if clip.Speed > 0 && clip.Speed != 1.0 {
 		ptsNode.SetParam("expr", fmt.Sprintf("(PTS-STARTPTS)/%.4f", clip.Speed))
 	} else {
 		ptsNode.SetParam("expr", "PTS-STARTPTS")
 	}
-	ptsIn := ptsNode.AddInput(currPad.ID, filtergraph.StreamTypeVideo)
-	ptsOut := ptsNode.AddOutput(g.NextPadID("pts_out_v"), filtergraph.StreamTypeVideo)
-	if err := g.Connect(currPad, ptsIn); err != nil {
+	ptsInput := ptsNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+	ptsOutput := ptsNode.AddOutput(graph.NextPadID("pts_out_video"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentPad, ptsInput); err != nil {
 		return nil, err
 	}
-	currPad = ptsOut
+	currentPad = ptsOutput
 
 	// 2. Opacity
 	if clip.Opacity < 1.0 && clip.Opacity >= 0.0 {
-		fmtYuva := g.NewNode(fmt.Sprintf("fmt_yuva_%s", clip.ID), "format")
-		fmtYuva.SetParam("pix_fmts", "yuva420p")
-		yuvaIn := fmtYuva.AddInput(currPad.ID, filtergraph.StreamTypeVideo)
-		yuvaOut := fmtYuva.AddOutput(g.NextPadID("yuva_out"), filtergraph.StreamTypeVideo)
-		if err := g.Connect(currPad, yuvaIn); err != nil {
+		formatYuva := graph.NewNode(fmt.Sprintf("format_yuva_%s", clip.ID), "format")
+		formatYuva.SetParam("pix_fmts", "yuva420p")
+		yuvaInput := formatYuva.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		yuvaOutput := formatYuva.AddOutput(graph.NextPadID("yuva_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, yuvaInput); err != nil {
 			return nil, err
 		}
 
-		mixNode := g.NewNode(fmt.Sprintf("opacity_%s", clip.ID), "colorchannelmixer")
-		mixNode.SetParam("aa", fmt.Sprintf("%.2f", clip.Opacity))
-		mixIn := mixNode.AddInput(yuvaOut.ID, filtergraph.StreamTypeVideo)
-		mixOut := mixNode.AddOutput(g.NextPadID("opac_out"), filtergraph.StreamTypeVideo)
-		if err := g.Connect(yuvaOut, mixIn); err != nil {
+		mixerNode := graph.NewNode(fmt.Sprintf("opacity_%s", clip.ID), "colorchannelmixer")
+		mixerNode.SetParam("aa", fmt.Sprintf("%.2f", clip.Opacity))
+		mixerInput := mixerNode.AddInput(yuvaOutput.ID, filtergraph.StreamTypeVideo)
+		mixerOutput := mixerNode.AddOutput(graph.NextPadID("opacity_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(yuvaOutput, mixerInput); err != nil {
 			return nil, err
 		}
-		currPad = mixOut
+		currentPad = mixerOutput
 	}
 
 	// 3. Clip scale & position handling
 	if clip.Scale != 1.0 && clip.Scale > 0 {
-		scaleNode := g.NewNode(fmt.Sprintf("scale_%s", clip.ID), "scale")
+		scaleNode := graph.NewNode(fmt.Sprintf("scale_%s", clip.ID), "scale")
 		scaleNode.SetParam("w", fmt.Sprintf("iw*%.4f", clip.Scale))
 		scaleNode.SetParam("h", fmt.Sprintf("ih*%.4f", clip.Scale))
-		sIn := scaleNode.AddInput(currPad.ID, filtergraph.StreamTypeVideo)
-		sOut := scaleNode.AddOutput(g.NextPadID("sc_out"), filtergraph.StreamTypeVideo)
-		if err := g.Connect(currPad, sIn); err != nil {
+		scaleInput := scaleNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		scaleOutput := scaleNode.AddOutput(graph.NextPadID("scale_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, scaleInput); err != nil {
 			return nil, err
 		}
-		currPad = sOut
+		currentPad = scaleOutput
 	}
 
-	return currPad, nil
+	return currentPad, nil
 }
 
 // ProcessClipAudio processes a single clip's audio pipeline:
 // Trim -> atempo (speed) -> Volume -> Delay (adelay to TimelineStart)
-func ProcessClipAudio(g *filtergraph.Graph, rawInPad *filtergraph.Pad, clip *timeline.Clip) (*filtergraph.Pad, error) {
-	currPad := rawInPad
+func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip) (*filtergraph.Pad, error) {
+	currentPad := rawInputPad
 
 	// 1. atrim & asetpts
-	atrimNode := g.NewNode(fmt.Sprintf("atrim_%s", clip.ID), "atrim")
-	startSec := clip.SourceStart.Seconds()
-	durSec := clip.Duration.Seconds()
-	atrimNode.SetParam("start", fmt.Sprintf("%.4f", startSec))
-	atrimNode.SetParam("duration", fmt.Sprintf("%.4f", durSec))
+	atrimNode := graph.NewNode(fmt.Sprintf("atrim_%s", clip.ID), "atrim")
+	startSeconds := clip.SourceStart.Seconds()
+	durationSeconds := clip.Duration.Seconds()
+	atrimNode.SetParam("start", fmt.Sprintf("%.4f", startSeconds))
+	atrimNode.SetParam("duration", fmt.Sprintf("%.4f", durationSeconds))
 
-	atrimIn := atrimNode.AddInput(currPad.ID, filtergraph.StreamTypeAudio)
-	atrimOut := atrimNode.AddOutput(g.NextPadID("atrim_out"), filtergraph.StreamTypeAudio)
-	if err := g.Connect(currPad, atrimIn); err != nil {
+	atrimInput := atrimNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
+	atrimOutput := atrimNode.AddOutput(graph.NextPadID("atrim_out"), filtergraph.StreamTypeAudio)
+	if err := graph.Connect(currentPad, atrimInput); err != nil {
 		return nil, err
 	}
-	currPad = atrimOut
+	currentPad = atrimOutput
 
 	// asetpts
-	aptsNode := g.NewNode(fmt.Sprintf("apts_%s", clip.ID), "asetpts")
+	aptsNode := graph.NewNode(fmt.Sprintf("apts_%s", clip.ID), "asetpts")
 	aptsNode.SetParam("expr", "PTS-STARTPTS")
-	aptsIn := aptsNode.AddInput(currPad.ID, filtergraph.StreamTypeAudio)
-	aptsOut := aptsNode.AddOutput(g.NextPadID("apts_out"), filtergraph.StreamTypeAudio)
-	if err := g.Connect(currPad, aptsIn); err != nil {
+	aptsInput := aptsNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
+	aptsOutput := aptsNode.AddOutput(graph.NextPadID("apts_out"), filtergraph.StreamTypeAudio)
+	if err := graph.Connect(currentPad, aptsInput); err != nil {
 		return nil, err
 	}
-	currPad = aptsOut
+	currentPad = aptsOutput
 
 	// 2. Volume
 	if clip.Volume != 1.0 && clip.Volume >= 0.0 {
-		volNode := g.NewNode(fmt.Sprintf("vol_%s", clip.ID), "volume")
-		volNode.SetParam("volume", fmt.Sprintf("%.2f", clip.Volume))
-		volIn := volNode.AddInput(currPad.ID, filtergraph.StreamTypeAudio)
-		volOut := volNode.AddOutput(g.NextPadID("vol_out"), filtergraph.StreamTypeAudio)
-		if err := g.Connect(currPad, volIn); err != nil {
+		volumeNode := graph.NewNode(fmt.Sprintf("volume_%s", clip.ID), "volume")
+		volumeNode.SetParam("volume", fmt.Sprintf("%.2f", clip.Volume))
+		volumeInput := volumeNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
+		volumeOutput := volumeNode.AddOutput(graph.NextPadID("volume_out"), filtergraph.StreamTypeAudio)
+		if err := graph.Connect(currentPad, volumeInput); err != nil {
 			return nil, err
 		}
-		currPad = volOut
+		currentPad = volumeOutput
 	}
 
 	// 3. adelay (to position audio on the timeline)
 	if clip.TimelineStart > 0 {
-		delayMs := clip.TimelineStart.Milliseconds()
-		delayNode := g.NewNode(fmt.Sprintf("delay_%s", clip.ID), "adelay")
-		delayNode.SetParam("delays", fmt.Sprintf("%d|%d", delayMs, delayMs))
-		dIn := delayNode.AddInput(currPad.ID, filtergraph.StreamTypeAudio)
-		dOut := delayNode.AddOutput(g.NextPadID("delay_out"), filtergraph.StreamTypeAudio)
-		if err := g.Connect(currPad, dIn); err != nil {
+		delayMilliseconds := clip.TimelineStart.Milliseconds()
+		delayNode := graph.NewNode(fmt.Sprintf("delay_%s", clip.ID), "adelay")
+		delayNode.SetParam("delays", fmt.Sprintf("%d|%d", delayMilliseconds, delayMilliseconds))
+		delayInput := delayNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
+		delayOutput := delayNode.AddOutput(graph.NextPadID("delay_out"), filtergraph.StreamTypeAudio)
+		if err := graph.Connect(currentPad, delayInput); err != nil {
 			return nil, err
 		}
-		currPad = dOut
+		currentPad = delayOutput
 	}
 
-	return currPad, nil
+	return currentPad, nil
 }
 
 // BuildVideoCompositor builds the background canvas and overlays all video tracks by Z-index.
-func BuildVideoCompositor(g *filtergraph.Graph, tl *timeline.Timeline, processedVideoPads []*ClipVideoPad) (*filtergraph.Pad, error) {
+func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timeline.Timeline, processedVideoPads []*ClipVideoPad) (*filtergraph.Pad, error) {
 	// 1. Generate base color background canvas
-	bgNode := g.NewNode("bg_canvas", "color")
-	bgNode.SetParam("c", tl.BackgroundColor.FFmpegColor())
-	bgNode.SetParam("s", tl.Canvas.String())
-	bgNode.SetParam("r", tl.FPS.FFmpegString())
-	bgNode.SetParam("d", fmt.Sprintf("%.4f", tl.Duration().Seconds()))
-	bgOut := bgNode.AddOutput(g.NextPadID("base_canvas"), filtergraph.StreamTypeVideo)
+	backgroundNode := graph.NewNode("bg_canvas", "color")
+	backgroundNode.SetParam("c", compositionTimeline.BackgroundColor.FFmpegColor())
+	backgroundNode.SetParam("s", compositionTimeline.Canvas.String())
+	backgroundNode.SetParam("r", compositionTimeline.FPS.FFmpegString())
+	backgroundNode.SetParam("d", fmt.Sprintf("%.4f", compositionTimeline.Duration().Seconds()))
+	backgroundOutput := backgroundNode.AddOutput(graph.NextPadID("base_canvas"), filtergraph.StreamTypeVideo)
 
-	currCanvas := bgOut
+	currentCanvas := backgroundOutput
 
 	// Sort clips by Track Z-Index and TimelineStart
 	sort.SliceStable(processedVideoPads, func(i, j int) bool {
@@ -155,46 +155,46 @@ func BuildVideoCompositor(g *filtergraph.Graph, tl *timeline.Timeline, processed
 	})
 
 	// Overlay each clip on top of the canvas
-	for i, item := range processedVideoPads {
-		overlayNode := g.NewNode(fmt.Sprintf("overlay_%d_%s", i, item.Clip.ID), "overlay")
-		
+	for index, item := range processedVideoPads {
+		overlayNode := graph.NewNode(fmt.Sprintf("overlay_%d_%s", index, item.Clip.ID), "overlay")
+
 		// Position coordinates
-		xExpr := fmt.Sprintf("%d", item.Clip.Position.X)
-		yExpr := fmt.Sprintf("%d", item.Clip.Position.Y)
-		overlayNode.SetParam("x", xExpr)
-		overlayNode.SetParam("y", yExpr)
-		
+		xExpression := fmt.Sprintf("%d", item.Clip.Position.X)
+		yExpression := fmt.Sprintf("%d", item.Clip.Position.Y)
+		overlayNode.SetParam("x", xExpression)
+		overlayNode.SetParam("y", yExpression)
+
 		// Time interval enable expression
-		startSec := item.Clip.TimelineStart.Seconds()
-		endSec := item.Clip.TimelineEnd().Seconds()
-		overlayNode.SetParam("enable", fmt.Sprintf("between(t,%.4f,%.4f)", startSec, endSec))
+		startSeconds := item.Clip.TimelineStart.Seconds()
+		endSeconds := item.Clip.TimelineEnd().Seconds()
+		overlayNode.SetParam("enable", fmt.Sprintf("between(t,%.4f,%.4f)", startSeconds, endSeconds))
 		overlayNode.SetParam("eof_action", "pass")
 
-		inBase := overlayNode.AddInput(currCanvas.ID, filtergraph.StreamTypeVideo)
-		inOverlay := overlayNode.AddInput(item.Pad.ID, filtergraph.StreamTypeVideo)
-		outCanvas := overlayNode.AddOutput(g.NextPadID("comp_v"), filtergraph.StreamTypeVideo)
+		inputBase := overlayNode.AddInput(currentCanvas.ID, filtergraph.StreamTypeVideo)
+		inputOverlay := overlayNode.AddInput(item.Pad.ID, filtergraph.StreamTypeVideo)
+		outputCanvas := overlayNode.AddOutput(graph.NextPadID("composite_video"), filtergraph.StreamTypeVideo)
 
-		if err := g.Connect(currCanvas, inBase); err != nil {
+		if err := graph.Connect(currentCanvas, inputBase); err != nil {
 			return nil, err
 		}
-		if err := g.Connect(item.Pad, inOverlay); err != nil {
+		if err := graph.Connect(item.Pad, inputOverlay); err != nil {
 			return nil, err
 		}
 
-		currCanvas = outCanvas
+		currentCanvas = outputCanvas
 	}
 
-	return currCanvas, nil
+	return currentCanvas, nil
 }
 
 // BuildAudioMixer mixes all processed audio streams into a single stereo output.
-func BuildAudioMixer(g *filtergraph.Graph, tl *timeline.Timeline, audioPads []*filtergraph.Pad) (*filtergraph.Pad, error) {
+func BuildAudioMixer(graph *filtergraph.Graph, compositionTimeline *timeline.Timeline, audioPads []*filtergraph.Pad) (*filtergraph.Pad, error) {
 	if len(audioPads) == 0 {
 		// Generate silent audio stream matching timeline duration
-		silentNode := g.NewNode("silent_audio", "anullsrc")
+		silentNode := graph.NewNode("silent_audio", "anullsrc")
 		silentNode.SetParam("r", "48000")
 		silentNode.SetParam("cl", "stereo")
-		silentNode.SetParam("d", fmt.Sprintf("%.4f", tl.Duration().Seconds()))
+		silentNode.SetParam("d", fmt.Sprintf("%.4f", compositionTimeline.Duration().Seconds()))
 		return silentNode.AddOutput("out_a", filtergraph.StreamTypeAudio), nil
 	}
 
@@ -203,20 +203,20 @@ func BuildAudioMixer(g *filtergraph.Graph, tl *timeline.Timeline, audioPads []*f
 	}
 
 	// Mix multiple audio streams with amix
-	amixNode := g.NewNode("audio_mixer", "amix")
+	amixNode := graph.NewNode("audio_mixer", "amix")
 	amixNode.SetParam("inputs", len(audioPads))
 	amixNode.SetParam("duration", "longest")
 	amixNode.SetParam("dropout_transition", "0")
 
 	for _, pad := range audioPads {
-		inPad := amixNode.AddInput(pad.ID, filtergraph.StreamTypeAudio)
-		if err := g.Connect(pad, inPad); err != nil {
+		inputPad := amixNode.AddInput(pad.ID, filtergraph.StreamTypeAudio)
+		if err := graph.Connect(pad, inputPad); err != nil {
 			return nil, err
 		}
 	}
 
-	amixOut := amixNode.AddOutput("mixed_a", filtergraph.StreamTypeAudio)
-	return amixOut, nil
+	amixOutput := amixNode.AddOutput("mixed_audio", filtergraph.StreamTypeAudio)
+	return amixOutput, nil
 }
 
 // ClipVideoPad pairs a processed video pad with its Clip metadata and Track Z-Index.

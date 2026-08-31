@@ -1,3 +1,4 @@
+// Package executor manages process lifecycle, streaming progress telemetry, and mocks for FFmpeg execution.
 package executor
 
 import (
@@ -21,7 +22,7 @@ func NewOSExecutor() *OSExecutor {
 }
 
 // Run executes the command, pipes progress telemetry, and respects context cancellation.
-func (e *OSExecutor) Run(ctx context.Context, cmdName string, args []string, totalDuration time.Duration, onProgress func(ProgressEvent)) error {
+func (executorInstance *OSExecutor) Run(ctx context.Context, cmdName string, args []string, totalDuration time.Duration, onProgress func(ProgressEvent)) error {
 	// Prepend -progress pipe:1 to capture telemetry on stdout
 	execArgs := make([]string, 0, len(args)+2)
 	execArgs = append(execArgs, "-progress", "pipe:1")

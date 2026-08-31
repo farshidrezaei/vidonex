@@ -8,24 +8,26 @@ import (
 // and automatically injects 'split' or 'asplit' filter nodes.
 type AutoSplitPass struct{}
 
-func (p *AutoSplitPass) Name() string {
+// Name returns the unique identifier name of the pass.
+func (pass *AutoSplitPass) Name() string {
 	return "AutoSplitPass"
 }
 
-func (p *AutoSplitPass) Run(g *Graph) error {
+// Run executes the auto-split injection pass across the graph.
+func (pass *AutoSplitPass) Run(graph *Graph) error {
 	// Find all output pads that have more than 1 consumer
 	type splitTarget struct {
-		outPad    *Pad
+		outputPad *Pad
 		consumers []*Pad
 	}
 
 	targets := make([]splitTarget, 0)
-	for node := range g.Nodes() {
-		for _, outPad := range node.Outputs {
-			consumers := g.GetConsumerPads(outPad)
+	for node := range graph.Nodes() {
+		for _, outputPad := range node.Outputs {
+			consumers := graph.GetConsumerPads(outputPad)
 			if len(consumers) > 1 {
 				targets = append(targets, splitTarget{
-					outPad:    outPad,
+					outputPad: outputPad,
 					consumers: append([]*Pad(nil), consumers...),
 				})
 			}
@@ -33,40 +35,39 @@ func (p *AutoSplitPass) Run(g *Graph) error {
 	}
 
 	for _, target := range targets {
-		nConsumers := len(target.consumers)
+		consumerCount := len(target.consumers)
 		filterName := "split"
-		prefix := "v_split"
-		if target.outPad.StreamType == StreamTypeAudio {
+		prefix := "video_split"
+		if target.outputPad.StreamType == StreamTypeAudio {
 			filterName = "asplit"
-			prefix = "a_split"
+			prefix = "audio_split"
 		}
 
-		splitNodeID := g.NextPadID(prefix)
+		splitNodeID := graph.NextPadID(prefix)
 		splitNode := NewNode(splitNodeID, filterName)
-		if nConsumers > 2 {
-			splitNode.SetParam("", nConsumers)
+		if consumerCount > 2 {
+			splitNode.SetParam("", consumerCount)
 		}
 
 		// Input pad on the split node
-		splitIn := splitNode.AddInput(target.outPad.ID, target.outPad.StreamType)
-		if err := g.AddNode(splitNode); err != nil {
+		splitInput := splitNode.AddInput(target.outputPad.ID, target.outputPad.StreamType)
+		if err := graph.AddNode(splitNode); err != nil {
 			return err
 		}
 
-		// Connect original outPad to splitIn
-		// First disconnect all original consumers
-		for _, consumerIn := range target.consumers {
-			_ = g.Disconnect(consumerIn)
+		// Connect original outputPad to splitInput
+		for _, consumerInput := range target.consumers {
+			_ = graph.Disconnect(consumerInput)
 		}
-		if err := g.Connect(target.outPad, splitIn); err != nil {
+		if err := graph.Connect(target.outputPad, splitInput); err != nil {
 			return fmt.Errorf("failed connecting source to split node: %w", err)
 		}
 
 		// Create N output pads on the split node and connect each to one consumer
-		for i, consumerIn := range target.consumers {
-			outPadID := g.NextPadID(fmt.Sprintf("%s_out_%d", prefix, i+1))
-			splitOut := splitNode.AddOutput(outPadID, target.outPad.StreamType)
-			if err := g.Connect(splitOut, consumerIn); err != nil {
+		for index, consumerInput := range target.consumers {
+			outputPadID := graph.NextPadID(fmt.Sprintf("%s_out_%d", prefix, index+1))
+			splitOutput := splitNode.AddOutput(outputPadID, target.outputPad.StreamType)
+			if err := graph.Connect(splitOutput, consumerInput); err != nil {
 				return fmt.Errorf("failed connecting split out to consumer: %w", err)
 			}
 		}

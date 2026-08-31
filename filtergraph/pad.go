@@ -15,8 +15,8 @@ const (
 )
 
 // String returns a human-readable stream type name.
-func (st StreamType) String() string {
-	switch st {
+func (streamType StreamType) String() string {
+	switch streamType {
 	case StreamTypeVideo:
 		return "video"
 	case StreamTypeAudio:
@@ -35,22 +35,22 @@ type Pad struct {
 }
 
 // Label returns the bracketed pad name used in FFmpeg filtergraphs (e.g. "[v0]" or "[0:v]").
-func (p *Pad) Label() string {
-	if p == nil || p.ID == "" {
+func (pad *Pad) Label() string {
+	if pad == nil || pad.ID == "" {
 		return ""
 	}
-	return fmt.Sprintf("[%s]", p.ID)
+	return fmt.Sprintf("[%s]", pad.ID)
 }
 
 // String returns the string representation of the Pad.
-func (p *Pad) String() string {
-	dir := "out"
-	if p.IsInput {
-		dir = "in"
+func (pad *Pad) String() string {
+	direction := "out"
+	if pad.IsInput {
+		direction = "in"
 	}
 	nodeName := "none"
-	if p.Node != nil {
-		nodeName = p.Node.ID
+	if pad.Node != nil {
+		nodeName = pad.Node.ID
 	}
-	return fmt.Sprintf("Pad(%s, %s, %s, node=%s)", p.ID, p.StreamType, dir, nodeName)
+	return fmt.Sprintf("Pad(%s, %s, %s, node=%s)", pad.ID, pad.StreamType, direction, nodeName)
 }

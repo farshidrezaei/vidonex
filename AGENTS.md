@@ -11,21 +11,30 @@ This guide is optimized for autonomous AI coding agents (and human engineers) wo
 
 ---
 
-## 2. Invariants & Rules for AI Agents
+## 2. Core Mandatory Project Contracts & Invariants
 
-1. **No String Concatenation for Filtergraphs**:
+1. **Descriptive Naming with No Arbitrary Abbreviations**:
+   - Function and method names MUST clearly express their exact operation (e.g. `InjectVideoNormalizer`, `BuildVideoCompositor`, `CalculateOffset`).
+   - Variable and parameter names MUST be descriptive and meaningful (e.g. `compositionTimeline`, `durationSeconds`, `sourceOutputPad`, `destinationInputPad`, `consumerCount`).
+   - Never use cryptic abbreviations (`tl`, `tr`, `dur`, `res`, `pct`, `sz`, `sc`, `pts`, `inPad`, `outPad`).
+2. **No String Concatenation for Filtergraphs**:
    - NEVER construct raw FFmpeg filter strings manually with `fmt.Sprintf` or string concatenation in domain code.
-   - Always build a `filtergraph.Graph`, add `filtergraph.Node`s with `filtergraph.Pad`s, and connect them with `g.Connect(srcOut, dstIn)`.
-2. **Never Use Floating-Point `float64` for Core Time Calculations**:
+   - Always build a `filtergraph.Graph`, add `filtergraph.Node`s with `filtergraph.Pad`s, and connect them with `graph.Connect(sourceOutputPad, destinationInputPad)`.
+3. **Never Use Floating-Point `float64` for Core Time Calculations**:
    - Always use `types.Rational` or `time.Duration` to prevent floating-point precision drift across video frames.
-3. **Stream Type Safety**:
+4. **Stream Type Safety**:
    - Video pads (`filtergraph.StreamTypeVideo`) can ONLY connect to video pads. Audio pads (`filtergraph.StreamTypeAudio`) can ONLY connect to audio pads.
-4. **Standard Library First**:
-   - The core packages (`types`, `timeline`, `filtergraph`, `compiler`) must remain 100% standard library only.
-5. **Deterministic Testing with Mocks**:
-   - Unit tests MUST NOT depend on a locally installed `ffmpeg` binary. Use `executor.NewMockExecutor()` and graph structure assertions.
-6. **Even Dimension Constraint**:
-   - Video resolutions must always have even width and height for H.264 / `yuv420p` compatibility (`types.makeEven`).
+5. **Table-Driven Tests Covering All Scenarios**:
+   - All unit and feature tests MUST be Table-Driven (`Test...Table`), covering happy paths, edge cases, zero-values, and error conditions.
+6. **Mandatory Quality Checks (`golangci-lint` & Race Detector)**:
+   - Always run and ensure 100% clean passes for:
+     ```bash
+     golangci-lint run ./...
+     go test -race -v ./...
+     ```
+7. **Standard Library First & Modern Go Standards**:
+   - Core packages (`types`, `timeline`, `filtergraph`, `compiler`) must remain 100% standard library only.
+   - Use modern Go idioms (Go iterators `iter.Seq`, `log/slog`, `errors.Join`, generics).
 
 ---
 
@@ -47,16 +56,14 @@ This guide is optimized for autonomous AI coding agents (and human engineers) wo
 
 ## 4. Common Developer Workflows
 
+### Running Linter:
+```bash
+golangci-lint run ./...
+```
+
 ### Running All Tests with Race Detector:
 ```bash
 go test -race -v ./...
-```
-
-### Running Table-Driven Tests for Specific Packages:
-```bash
-go test -race -v ./timeline/...
-go test -race -v ./filtergraph/...
-go test -race -v ./compiler/...
 ```
 
 ### Running Example Recipes:

@@ -13,15 +13,15 @@ const (
 	TrackKindVideo TrackKind = iota
 	// TrackKindAudio represents sound effects, voiceover, and music layers.
 	TrackKindAudio
-	// TrackKindOverlay represents graphic overlays, stickers, and PiP layers.
+	// TrackKindOverlay represents graphic overlays, stickers, and Picture-in-Picture layers.
 	TrackKindOverlay
 	// TrackKindText represents title cards, subtitles, and captions.
 	TrackKindText
 )
 
-// String returns the name of the track kind.
-func (k TrackKind) String() string {
-	switch k {
+// String returns the human-readable name of the track kind.
+func (kind TrackKind) String() string {
+	switch kind {
 	case TrackKindVideo:
 		return "video"
 	case TrackKindAudio:
@@ -46,7 +46,7 @@ type Track struct {
 	Transitions []*Transition
 }
 
-// NewTrack creates a new Track.
+// NewTrack creates a new Track with default volume.
 func NewTrack(id string, kind TrackKind) *Track {
 	return &Track{
 		ID:          id,
@@ -58,51 +58,51 @@ func NewTrack(id string, kind TrackKind) *Track {
 }
 
 // SetZIndex sets the visual layer priority (higher Z-index renders on top).
-func (t *Track) SetZIndex(z int) *Track {
-	t.ZIndex = z
-	return t
+func (track *Track) SetZIndex(zIndex int) *Track {
+	track.ZIndex = zIndex
+	return track
 }
 
 // SetVolume sets the track audio multiplier (1.0 = 100%).
-func (t *Track) SetVolume(vol float64) *Track {
-	t.Volume = vol
-	return t
+func (track *Track) SetVolume(volume float64) *Track {
+	track.Volume = volume
+	return track
 }
 
 // SetMuted mutes or unmutes the track.
-func (t *Track) SetMuted(muted bool) *Track {
-	t.Muted = muted
-	return t
+func (track *Track) SetMuted(muted bool) *Track {
+	track.Muted = muted
+	return track
 }
 
 // AddClip appends one or more clips to the track.
-func (t *Track) AddClip(clips ...*Clip) *Track {
-	t.Clips = append(t.Clips, clips...)
-	return t
+func (track *Track) AddClip(clips ...*Clip) *Track {
+	track.Clips = append(track.Clips, clips...)
+	return track
 }
 
 // AddTransition adds a transition between clips on this track.
-func (t *Track) AddTransition(tr *Transition) *Track {
-	t.Transitions = append(t.Transitions, tr)
-	return t
+func (track *Track) AddTransition(transition *Transition) *Track {
+	track.Transitions = append(track.Transitions, transition)
+	return track
 }
 
 // Duration returns the timestamp where the last clip ends on this track.
-func (t *Track) Duration() time.Duration {
-	var maxEnd time.Duration
-	for _, c := range t.Clips {
-		if end := c.TimelineEnd(); end > maxEnd {
-			maxEnd = end
+func (track *Track) Duration() time.Duration {
+	var maximumEndTimestamp time.Duration
+	for _, clip := range track.Clips {
+		if endTimestamp := clip.TimelineEnd(); endTimestamp > maximumEndTimestamp {
+			maximumEndTimestamp = endTimestamp
 		}
 	}
-	return maxEnd
+	return maximumEndTimestamp
 }
 
 // AllClips returns an iterator over all clips in the track.
-func (t *Track) AllClips() iter.Seq[*Clip] {
+func (track *Track) AllClips() iter.Seq[*Clip] {
 	return func(yield func(*Clip) bool) {
-		for _, c := range t.Clips {
-			if !yield(c) {
+		for _, clip := range track.Clips {
+			if !yield(clip) {
 				return
 			}
 		}

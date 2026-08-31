@@ -202,7 +202,7 @@ func TestRational_FrameConversionsTable(t *testing.T) {
 		{name: "1s at 30fps", duration: 1 * time.Second, fps: types.FPS30, wantFrames: 30},
 		{name: "5s at 60fps", duration: 5 * time.Second, fps: types.FPS60, wantFrames: 300},
 		{name: "2.5s at 24fps", duration: 2500 * time.Millisecond, fps: types.FPS24, wantFrames: 60},
-		{name: "1s at 29.97fps", duration: 1 * time.Second, fps: types.FPS29_97, wantFrames: 30},
+		{name: "1s at 29.97fps", duration: 1 * time.Second, fps: types.FPS2997, wantFrames: 30},
 	}
 
 	for _, tt := range tests {
@@ -229,7 +229,8 @@ func TestRational_StringAndFFmpeg(t *testing.T) {
 		expectedFFmpeg string
 	}{
 		{name: "integer fraction", r: types.NewRational(30, 1), expectedStr: "30", expectedFFmpeg: "30"},
-		{name: "standard fractional", r: types.NewRational(30000, 1001), expectedStr: "30000/1001", expectedFFmpeg: "30000/1001"},
+		{name: "standard fractional", r: types.FPS2997, expectedStr: "30000/1001", expectedFFmpeg: "30000/1001"},
+		{name: "standard 23.976", r: types.FPS23976, expectedStr: "24000/1001", expectedFFmpeg: "24000/1001"},
 		{name: "reduced fraction", r: types.NewRational(16, 9), expectedStr: "16/9", expectedFFmpeg: "16/9"},
 	}
 

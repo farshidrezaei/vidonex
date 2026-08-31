@@ -1,3 +1,4 @@
+// Package timeline provides declarative composition models for video timelines, tracks, clips, and transitions.
 package timeline
 
 import (
@@ -7,22 +8,34 @@ import (
 // TransitionType enumerates visual and audio transition types.
 type TransitionType string
 
+// Visual and audio transition constants.
 const (
-	// Visual Transitions
-	TransitionFade       TransitionType = "fade"
-	TransitionDissolve   TransitionType = "dissolve"
-	TransitionWipeLeft   TransitionType = "wipeleft"
-	TransitionWipeRight  TransitionType = "wiperight"
-	TransitionWipeUp     TransitionType = "wipeup"
-	TransitionWipeDown   TransitionType = "wipedown"
-	TransitionSlideLeft  TransitionType = "slideleft"
+	// TransitionFade fades from clip A to clip B.
+	TransitionFade TransitionType = "fade"
+	// TransitionDissolve dissolves smoothly between clip A and clip B.
+	TransitionDissolve TransitionType = "dissolve"
+	// TransitionWipeLeft wipes from right to left.
+	TransitionWipeLeft TransitionType = "wipeleft"
+	// TransitionWipeRight wipes from left to right.
+	TransitionWipeRight TransitionType = "wiperight"
+	// TransitionWipeUp wipes from bottom to top.
+	TransitionWipeUp TransitionType = "wipeup"
+	// TransitionWipeDown wipes from top to bottom.
+	TransitionWipeDown TransitionType = "wipedown"
+	// TransitionSlideLeft slides incoming clip leftwards.
+	TransitionSlideLeft TransitionType = "slideleft"
+	// TransitionSlideRight slides incoming clip rightwards.
 	TransitionSlideRight TransitionType = "slideright"
-	TransitionSlideUp    TransitionType = "slideup"
-	TransitionSlideDown  TransitionType = "slidedown"
+	// TransitionSlideUp slides incoming clip upwards.
+	TransitionSlideUp TransitionType = "slideup"
+	// TransitionSlideDown slides incoming clip downwards.
+	TransitionSlideDown TransitionType = "slidedown"
+	// TransitionCircleCrop expands a circular crop into the next clip.
 	TransitionCircleCrop TransitionType = "circlecrop"
-	TransitionZoomIn     TransitionType = "zoomin"
+	// TransitionZoomIn zooms smoothly into the next clip.
+	TransitionZoomIn TransitionType = "zoomin"
 
-	// Audio Transitions
+	// TransitionAcrossFade cross-fades audio streams.
 	TransitionAcrossFade TransitionType = "acrossfade"
 )
 
@@ -36,10 +49,10 @@ type Transition struct {
 }
 
 // NewTransition creates a new Transition between clipA and clipB.
-func NewTransition(id string, transType TransitionType, duration time.Duration, clipA, clipB *Clip) *Transition {
+func NewTransition(id string, transitionType TransitionType, duration time.Duration, clipA, clipB *Clip) *Transition {
 	return &Transition{
 		ID:       id,
-		Type:     transType,
+		Type:     transitionType,
 		Duration: duration,
 		ClipA:    clipA,
 		ClipB:    clipB,

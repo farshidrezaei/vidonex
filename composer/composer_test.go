@@ -31,7 +31,7 @@ func TestComposer_EndToEndPipelineWithMock(t *testing.T) {
 	ctx := context.Background()
 	var progressTicks int
 
-	result, err := c.Render(ctx, tl, "final.mp4", func(ev executor.ProgressEvent) {
+	result, err := c.Render(ctx, tl, "final.mp4", func(_ executor.ProgressEvent) {
 		progressTicks++
 	})
 

@@ -9,86 +9,86 @@ import (
 
 // InjectVideoNormalizer creates a normalization chain ensuring uniform resolution, FPS, SAR and pixel format:
 // [in] -> scale -> pad -> setsar -> fps -> format=yuv420p -> [out]
-func InjectVideoNormalizer(g *filtergraph.Graph, inPad *filtergraph.Pad, canvas types.Size, fps types.Rational) (*filtergraph.Pad, error) {
-	normID := g.NextPadID("v_norm")
+func InjectVideoNormalizer(graph *filtergraph.Graph, inputPad *filtergraph.Pad, canvas types.Size, frameRate types.Rational) (*filtergraph.Pad, error) {
+	normalizerID := graph.NextPadID("video_norm")
 
 	// Scale & Pad to canvas with letterboxing/pillarboxing
-	scaleNode := g.NewNode(fmt.Sprintf("%s_scale", normID), "scale")
+	scaleNode := graph.NewNode(fmt.Sprintf("%s_scale", normalizerID), "scale")
 	scaleNode.SetParam("w", canvas.Width)
 	scaleNode.SetParam("h", canvas.Height)
 	scaleNode.SetParam("force_original_aspect_ratio", "decrease")
 
-	scaleIn := scaleNode.AddInput(inPad.ID, filtergraph.StreamTypeVideo)
-	scaleOut := scaleNode.AddOutput(g.NextPadID("sc_out"), filtergraph.StreamTypeVideo)
-	if err := g.Connect(inPad, scaleIn); err != nil {
+	scaleInput := scaleNode.AddInput(inputPad.ID, filtergraph.StreamTypeVideo)
+	scaleOutput := scaleNode.AddOutput(graph.NextPadID("scale_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(inputPad, scaleInput); err != nil {
 		return nil, err
 	}
 
 	// Pad node
-	padNode := g.NewNode(fmt.Sprintf("%s_pad", normID), "pad")
+	padNode := graph.NewNode(fmt.Sprintf("%s_pad", normalizerID), "pad")
 	padNode.SetParam("w", canvas.Width)
 	padNode.SetParam("h", canvas.Height)
 	padNode.SetParam("x", "(ow-iw)/2")
 	padNode.SetParam("y", "(oh-ih)/2")
 	padNode.SetParam("color", "black@0.0")
 
-	padIn := padNode.AddInput(scaleOut.ID, filtergraph.StreamTypeVideo)
-	padOut := padNode.AddOutput(g.NextPadID("pad_out"), filtergraph.StreamTypeVideo)
-	if err := g.Connect(scaleOut, padIn); err != nil {
+	padInput := padNode.AddInput(scaleOutput.ID, filtergraph.StreamTypeVideo)
+	padOutput := padNode.AddOutput(graph.NextPadID("pad_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(scaleOutput, padInput); err != nil {
 		return nil, err
 	}
 
 	// SetSAR node
-	sarNode := g.NewNode(fmt.Sprintf("%s_sar", normID), "setsar")
+	sarNode := graph.NewNode(fmt.Sprintf("%s_sar", normalizerID), "setsar")
 	sarNode.SetParam("sar", "1")
-	sarIn := sarNode.AddInput(padOut.ID, filtergraph.StreamTypeVideo)
-	sarOut := sarNode.AddOutput(g.NextPadID("sar_out"), filtergraph.StreamTypeVideo)
-	if err := g.Connect(padOut, sarIn); err != nil {
+	sarInput := sarNode.AddInput(padOutput.ID, filtergraph.StreamTypeVideo)
+	sarOutput := sarNode.AddOutput(graph.NextPadID("sar_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(padOutput, sarInput); err != nil {
 		return nil, err
 	}
 
 	// FPS node
-	fpsNode := g.NewNode(fmt.Sprintf("%s_fps", normID), "fps")
-	fpsNode.SetParam("fps", fps.FFmpegString())
-	fpsIn := fpsNode.AddInput(sarOut.ID, filtergraph.StreamTypeVideo)
-	fpsOut := fpsNode.AddOutput(g.NextPadID("fps_out"), filtergraph.StreamTypeVideo)
-	if err := g.Connect(sarOut, fpsIn); err != nil {
+	fpsNode := graph.NewNode(fmt.Sprintf("%s_fps", normalizerID), "fps")
+	fpsNode.SetParam("fps", frameRate.FFmpegString())
+	fpsInput := fpsNode.AddInput(sarOutput.ID, filtergraph.StreamTypeVideo)
+	fpsOutput := fpsNode.AddOutput(graph.NextPadID("fps_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(sarOutput, fpsInput); err != nil {
 		return nil, err
 	}
 
 	// Format node
-	formatNode := g.NewNode(fmt.Sprintf("%s_fmt", normID), "format")
+	formatNode := graph.NewNode(fmt.Sprintf("%s_format", normalizerID), "format")
 	formatNode.SetParam("pix_fmts", "yuv420p")
-	fmtIn := formatNode.AddInput(fpsOut.ID, filtergraph.StreamTypeVideo)
-	finalOut := formatNode.AddOutput(normID, filtergraph.StreamTypeVideo)
-	if err := g.Connect(fpsOut, fmtIn); err != nil {
+	formatInput := formatNode.AddInput(fpsOutput.ID, filtergraph.StreamTypeVideo)
+	finalOutput := formatNode.AddOutput(normalizerID, filtergraph.StreamTypeVideo)
+	if err := graph.Connect(fpsOutput, formatInput); err != nil {
 		return nil, err
 	}
 
-	return finalOut, nil
+	return finalOutput, nil
 }
 
 // InjectAudioNormalizer creates a normalization chain ensuring 48kHz stereo FLTP audio:
 // [in] -> aresample=48000 -> aformat=sample_fmts=fltp:channel_layouts=stereo -> [out]
-func InjectAudioNormalizer(g *filtergraph.Graph, inPad *filtergraph.Pad) (*filtergraph.Pad, error) {
-	normID := g.NextPadID("a_norm")
+func InjectAudioNormalizer(graph *filtergraph.Graph, inputPad *filtergraph.Pad) (*filtergraph.Pad, error) {
+	normalizerID := graph.NextPadID("audio_norm")
 
-	resampleNode := g.NewNode(fmt.Sprintf("%s_resample", normID), "aresample")
+	resampleNode := graph.NewNode(fmt.Sprintf("%s_resample", normalizerID), "aresample")
 	resampleNode.SetParam("sample_rate", 48000)
-	resampleIn := resampleNode.AddInput(inPad.ID, filtergraph.StreamTypeAudio)
-	resampleOut := resampleNode.AddOutput(g.NextPadID("res_out"), filtergraph.StreamTypeAudio)
-	if err := g.Connect(inPad, resampleIn); err != nil {
+	resampleInput := resampleNode.AddInput(inputPad.ID, filtergraph.StreamTypeAudio)
+	resampleOutput := resampleNode.AddOutput(graph.NextPadID("resample_out"), filtergraph.StreamTypeAudio)
+	if err := graph.Connect(inputPad, resampleInput); err != nil {
 		return nil, err
 	}
 
-	formatNode := g.NewNode(fmt.Sprintf("%s_aformat", normID), "aformat")
+	formatNode := graph.NewNode(fmt.Sprintf("%s_aformat", normalizerID), "aformat")
 	formatNode.SetParam("sample_fmts", "fltp")
 	formatNode.SetParam("channel_layouts", "stereo")
-	fmtIn := formatNode.AddInput(resampleOut.ID, filtergraph.StreamTypeAudio)
-	finalOut := formatNode.AddOutput(normID, filtergraph.StreamTypeAudio)
-	if err := g.Connect(resampleOut, fmtIn); err != nil {
+	formatInput := formatNode.AddInput(resampleOutput.ID, filtergraph.StreamTypeAudio)
+	finalOutput := formatNode.AddOutput(normalizerID, filtergraph.StreamTypeAudio)
+	if err := graph.Connect(resampleOutput, formatInput); err != nil {
 		return nil, err
 	}
 
-	return finalOut, nil
+	return finalOutput, nil
 }

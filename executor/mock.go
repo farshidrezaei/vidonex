@@ -27,31 +27,31 @@ func NewMockExecutor() *MockExecutor {
 }
 
 // Run records the command and simulates progress ticks.
-func (m *MockExecutor) Run(ctx context.Context, cmdName string, args []string, totalDuration time.Duration, onProgress func(ProgressEvent)) error {
-	m.Commands = append(m.Commands, ExecutedCommand{
+func (mock *MockExecutor) Run(ctx context.Context, cmdName string, args []string, _ time.Duration, onProgress func(ProgressEvent)) error {
+	mock.Commands = append(mock.Commands, ExecutedCommand{
 		Command: cmdName,
 		Args:    append([]string(nil), args...),
 	})
 
-	if m.SimulateErr != nil {
-		return m.SimulateErr
+	if mock.SimulateErr != nil {
+		return mock.SimulateErr
 	}
 
 	// Simulate progress ticks
-	if onProgress != nil && m.ProgressStep > 0 {
-		for i := 1; i <= m.ProgressStep; i++ {
+	if onProgress != nil && mock.ProgressStep > 0 {
+		for i := 1; i <= mock.ProgressStep; i++ {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
 			default:
-				pct := (float64(i) / float64(m.ProgressStep)) * 100.0
-				prog := "continue"
-				if i == m.ProgressStep {
-					prog = "end"
+				percentage := (float64(i) / float64(mock.ProgressStep)) * 100.0
+				progress := "continue"
+				if i == mock.ProgressStep {
+					progress = "end"
 				}
 				onProgress(ProgressEvent{
-					Percentage: pct,
-					Progress:   prog,
+					Percentage: percentage,
+					Progress:   progress,
 				})
 			}
 		}

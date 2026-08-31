@@ -1,3 +1,4 @@
+// Package compiler translates declarative Timeline AST specifications into optimized FFmpeg filtergraph DAGs and CLI commands.
 package compiler
 
 import (
@@ -21,13 +22,13 @@ type CompilationResult struct {
 }
 
 // Mermaid returns the Mermaid.js flowchart representation of the compiled filtergraph DAG.
-func (r *CompilationResult) Mermaid() (string, error) {
-	return visualizer.ToMermaid(r.Graph)
+func (result *CompilationResult) Mermaid() (string, error) {
+	return visualizer.ToMermaid(result.Graph)
 }
 
 // DOT returns the Graphviz DOT representation of the compiled filtergraph DAG.
-func (r *CompilationResult) DOT() (string, error) {
-	return visualizer.ToDOT(r.Graph)
+func (result *CompilationResult) DOT() (string, error) {
+	return visualizer.ToDOT(result.Graph)
 }
 
 // Compiler translates a declarative Timeline AST into an optimized Filtergraph DAG and FFmpeg CLI command.
@@ -50,24 +51,24 @@ func New(logger *slog.Logger) *Compiler {
 }
 
 // SetEncodingOptions overrides default encoding parameters.
-func (c *Compiler) SetEncodingOptions(opts EncodingOptions) *Compiler {
-	c.encoding = opts
-	return c
+func (compilerInstance *Compiler) SetEncodingOptions(options EncodingOptions) *Compiler {
+	compilerInstance.encoding = options
+	return compilerInstance
 }
 
 // Compile translates the given timeline and output path into a complete CompilationResult.
-func (c *Compiler) Compile(tl *timeline.Timeline, outputPath string) (*CompilationResult, error) {
-	if err := timeline.Validate(tl); err != nil {
+func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline, outputPath string) (*CompilationResult, error) {
+	if err := timeline.Validate(compositionTimeline); err != nil {
 		return nil, fmt.Errorf("compiler: timeline validation failed: %w", err)
 	}
 
-	g := filtergraph.NewGraph()
+	graph := filtergraph.NewGraph()
 
 	// 1. Discover unique input sources and map to FFmpeg input indices (0, 1, 2, ...)
 	inputIndexMap := make(map[string]int)
 	uniqueInputs := make([]string, 0)
 
-	for _, track := range tl.Tracks {
+	for _, track := range compositionTimeline.Tracks {
 		for _, clip := range track.Clips {
 			if clip.Source != "" {
 				if _, exists := inputIndexMap[clip.Source]; !exists {
@@ -82,26 +83,26 @@ func (c *Compiler) Compile(tl *timeline.Timeline, outputPath string) (*Compilati
 	processedAudioPads := make([]*filtergraph.Pad, 0)
 
 	// 2. Process each track's clips
-	for _, track := range tl.Tracks {
+	for _, track := range compositionTimeline.Tracks {
 		for _, clip := range track.Clips {
-			inIdx := inputIndexMap[clip.Source]
+			inputIndex := inputIndexMap[clip.Source]
 
 			// Handle Video
 			if track.Kind == timeline.TrackKindVideo || track.Kind == timeline.TrackKindOverlay {
 				rawVideoIn := &filtergraph.Pad{
-					ID:         fmt.Sprintf("%d:v", inIdx),
+					ID:         fmt.Sprintf("%d:v", inputIndex),
 					StreamType: filtergraph.StreamTypeVideo,
 					IsInput:    false,
 				}
 
 				// Clip video pipeline (trim, speed, opacity, scale)
-				clipVPad, err := ProcessClipVideo(g, rawVideoIn, clip, tl)
+				clipVideoPad, err := ProcessClipVideo(graph, rawVideoIn, clip, compositionTimeline)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed processing video clip %q: %w", clip.ID, err)
 				}
 
 				// Normalize clip stream to canvas bounds if needed
-				normVPad, err := InjectVideoNormalizer(g, clipVPad, tl.Canvas, tl.FPS)
+				normalizedVideoPad, err := InjectVideoNormalizer(graph, clipVideoPad, compositionTimeline.Canvas, compositionTimeline.FPS)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed normalizing video clip %q: %w", clip.ID, err)
 				}
@@ -109,35 +110,35 @@ func (c *Compiler) Compile(tl *timeline.Timeline, outputPath string) (*Compilati
 				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
 					Clip:   clip,
 					ZIndex: track.ZIndex,
-					Pad:    normVPad,
+					Pad:    normalizedVideoPad,
 				})
 			}
 
 			// Handle Audio
 			if (track.Kind == timeline.TrackKindAudio || track.Kind == timeline.TrackKindVideo) && !track.Muted {
 				rawAudioIn := &filtergraph.Pad{
-					ID:         fmt.Sprintf("%d:a", inIdx),
+					ID:         fmt.Sprintf("%d:a", inputIndex),
 					StreamType: filtergraph.StreamTypeAudio,
 					IsInput:    false,
 				}
 
-				clipAPad, err := ProcessClipAudio(g, rawAudioIn, clip)
+				clipAudioPad, err := ProcessClipAudio(graph, rawAudioIn, clip)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed processing audio clip %q: %w", clip.ID, err)
 				}
 
-				normAPad, err := InjectAudioNormalizer(g, clipAPad)
+				normalizedAudioPad, err := InjectAudioNormalizer(graph, clipAudioPad)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed normalizing audio clip %q: %w", clip.ID, err)
 				}
 
-				processedAudioPads = append(processedAudioPads, normAPad)
+				processedAudioPads = append(processedAudioPads, normalizedAudioPad)
 			}
 		}
 	}
 
 	// 3. Compose final video stream
-	finalVideoPad, err := BuildVideoCompositor(g, tl, processedVideoPads)
+	finalVideoPad, err := BuildVideoCompositor(graph, compositionTimeline, processedVideoPads)
 	if err != nil {
 		return nil, fmt.Errorf("compiler: failed building video composition: %w", err)
 	}
@@ -147,7 +148,7 @@ func (c *Compiler) Compile(tl *timeline.Timeline, outputPath string) (*Compilati
 	finalVideoPad.ID = outVLabel
 
 	// 4. Mix final audio stream
-	finalAudioPad, err := BuildAudioMixer(g, tl, processedAudioPads)
+	finalAudioPad, err := BuildAudioMixer(graph, compositionTimeline, processedAudioPads)
 	if err != nil {
 		return nil, fmt.Errorf("compiler: failed building audio mixer: %w", err)
 	}
@@ -157,21 +158,21 @@ func (c *Compiler) Compile(tl *timeline.Timeline, outputPath string) (*Compilati
 	finalAudioPad.ID = outALabel
 
 	// 5. Run Graph Optimization Passes
-	if err := c.pipeline.Execute(g); err != nil {
+	if err := compilerInstance.pipeline.Execute(graph); err != nil {
 		return nil, fmt.Errorf("compiler: graph optimization failed: %w", err)
 	}
 
 	// 6. Format filter_complex string
-	filterComplexStr, err := g.FormattedFilterComplex()
+	filterComplexStr, err := graph.FormattedFilterComplex()
 	if err != nil {
 		return nil, fmt.Errorf("compiler: failed serializing filter_complex: %w", err)
 	}
 
 	// 7. Emit CLI Arguments
-	args := BuildFFmpegArgs(uniqueInputs, filterComplexStr, outVLabel, outALabel, outputPath, c.encoding)
+	args := BuildFFmpegArgs(uniqueInputs, filterComplexStr, outVLabel, outALabel, outputPath, compilerInstance.encoding)
 
 	return &CompilationResult{
-		Graph:         g,
+		Graph:         graph,
 		Inputs:        uniqueInputs,
 		Args:          args,
 		FilterComplex: filterComplexStr,

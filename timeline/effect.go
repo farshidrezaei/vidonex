@@ -1,3 +1,4 @@
+// Package timeline provides declarative composition models for video timelines, tracks, clips, and transitions.
 package timeline
 
 // Effect is an interface implemented by all visual and audio effects attached to clips or tracks.
@@ -18,10 +19,12 @@ type DrawTextEffect struct {
 	Y         string // FFmpeg expression (e.g. "(h-text_h)/2")
 }
 
+// Type returns the effect filter identifier name.
 func (e *DrawTextEffect) Type() string {
 	return "drawtext"
 }
 
+// Validate checks the semantic parameters of the drawtext effect.
 func (e *DrawTextEffect) Validate() error {
 	return nil
 }
@@ -32,10 +35,12 @@ type BlurEffect struct {
 	Power  int
 }
 
+// Type returns the blur effect filter identifier.
 func (e *BlurEffect) Type() string {
 	return "blur"
 }
 
+// Validate checks the blur effect parameters.
 func (e *BlurEffect) Validate() error {
 	return nil
 }
@@ -47,10 +52,12 @@ type ChromaKeyEffect struct {
 	Blend      float64 // 0.0 to 1.0 (default 0.1)
 }
 
+// Type returns the chromakey effect filter identifier.
 func (e *ChromaKeyEffect) Type() string {
 	return "chromakey"
 }
 
+// Validate checks the chromakey effect parameters.
 func (e *ChromaKeyEffect) Validate() error {
 	return nil
 }

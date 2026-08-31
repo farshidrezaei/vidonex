@@ -105,7 +105,6 @@ func TestMockExecutorTable(t *testing.T) {
 		name         string
 		steps        int
 		simulateErr  error
-		cancelEarly  bool
 		expectedRuns int
 		shouldErr    bool
 	}{
@@ -113,7 +112,6 @@ func TestMockExecutorTable(t *testing.T) {
 			name:         "successful 4 step run",
 			steps:        4,
 			simulateErr:  nil,
-			cancelEarly:  false,
 			expectedRuns: 1,
 			shouldErr:    false,
 		},
@@ -121,7 +119,6 @@ func TestMockExecutorTable(t *testing.T) {
 			name:         "simulated error",
 			steps:        4,
 			simulateErr:  context.DeadlineExceeded,
-			cancelEarly:  false,
 			expectedRuns: 1,
 			shouldErr:    true,
 		},
@@ -136,7 +133,7 @@ func TestMockExecutorTable(t *testing.T) {
 			ctx := context.Background()
 			var receivedEvents int
 
-			err := mock.Run(ctx, "ffmpeg", []string{"-i", "a.mp4", "b.mp4"}, 10*time.Second, func(ev executor.ProgressEvent) {
+			err := mock.Run(ctx, "ffmpeg", []string{"-i", "a.mp4", "b.mp4"}, 10*time.Second, func(_ executor.ProgressEvent) {
 				receivedEvents++
 			})
 

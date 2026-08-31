@@ -1,3 +1,4 @@
+// Package types defines exact mathematical, geometric, and temporal primitives for Vidonyx.
 package types
 
 import (
@@ -16,12 +17,18 @@ type Color struct {
 
 // Common color constants.
 var (
+	// ColorTransparent represents fully transparent black (Alpha = 0).
 	ColorTransparent = Color{R: 0, G: 0, B: 0, A: 0}
-	ColorBlack       = Color{R: 0, G: 0, B: 0, A: 255}
-	ColorWhite       = Color{R: 255, G: 255, B: 255, A: 255}
-	ColorRed         = Color{R: 255, G: 0, B: 0, A: 255}
-	ColorGreen       = Color{R: 0, G: 255, B: 0, A: 255}
-	ColorBlue        = Color{R: 0, G: 0, B: 255, A: 255}
+	// ColorBlack represents solid opaque black.
+	ColorBlack = Color{R: 0, G: 0, B: 0, A: 255}
+	// ColorWhite represents solid opaque white.
+	ColorWhite = Color{R: 255, G: 255, B: 255, A: 255}
+	// ColorRed represents solid opaque red.
+	ColorRed = Color{R: 255, G: 0, B: 0, A: 255}
+	// ColorGreen represents solid opaque green.
+	ColorGreen = Color{R: 0, G: 255, B: 0, A: 255}
+	// ColorBlue represents solid opaque blue.
+	ColorBlue = Color{R: 0, G: 0, B: 255, A: 255}
 )
 
 // RGB constructs an opaque Color (Alpha=255).

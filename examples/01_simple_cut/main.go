@@ -1,3 +1,4 @@
+// Package main demonstrates sequential video cutting and timeline trimming with Vidonyx.
 package main
 
 import (
@@ -53,8 +54,8 @@ func main() {
 
 	// 4. Render
 	ctx := context.Background()
-	_, err = c.Render(ctx, tl, "output_simple_cut.mp4", func(ev executor.ProgressEvent) {
-		fmt.Printf("Rendering Progress: %.1f%%\n", ev.Percentage)
+	_, err = c.Render(ctx, tl, "output_simple_cut.mp4", func(event executor.ProgressEvent) {
+		fmt.Printf("Rendering Progress: %.1f%%\n", event.Percentage)
 	})
 	if err != nil {
 		log.Fatalf("Render failed: %v", err)
