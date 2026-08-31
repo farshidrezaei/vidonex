@@ -1,0 +1,21 @@
+codecov:
+  require_ci_to_pass: false
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%
+        informational: true
+    patch:
+      default:
+        target: auto
+        threshold: 5%
+        informational: true
+
+ignore:
+  - "tests/**"
+  - "examples/**"
+  - "cmd/**"
+  - "internal/cli/**"

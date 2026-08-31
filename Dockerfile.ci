@@ -1,0 +1,22 @@
+# Dockerfile.ci — Reproducible E2E test environment with FFmpeg
+#
+# Usage (local):
+#   docker build -f Dockerfile.ci -t vidonyx-ci .
+#   docker run --rm vidonyx-ci go test -race -v -timeout 180s ./tests/e2e/...
+
+FROM golang:1.26-bookworm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+# Cache module downloads
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# Default: run all tests
+CMD ["go", "test", "-race", "-v", "-timeout", "180s", "./..."]
