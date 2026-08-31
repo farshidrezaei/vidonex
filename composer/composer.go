@@ -8,6 +8,7 @@ import (
 
 	"github.com/farshidrezaei/vidonyx/compiler"
 	"github.com/farshidrezaei/vidonyx/executor"
+	"github.com/farshidrezaei/vidonyx/presets"
 	"github.com/farshidrezaei/vidonyx/timeline"
 )
 
@@ -41,6 +42,20 @@ func WithLogger(logger *slog.Logger) Option {
 func WithEncoding(options compiler.EncodingOptions) Option {
 	return func(composerInstance *Composer) {
 		composerInstance.encoding = options
+	}
+}
+
+// WithPreset applies platform preset encoding parameters.
+func WithPreset(preset presets.PlatformPreset) Option {
+	return func(composerInstance *Composer) {
+		composerInstance.encoding = preset.Encoding
+	}
+}
+
+// WithHardwareAcceleration configures GPU encoder acceleration.
+func WithHardwareAcceleration(accelerator presets.HardwareAccelerator, useHEVC bool) Option {
+	return func(composerInstance *Composer) {
+		presets.ConfigureHardwareEncoding(&composerInstance.encoding, accelerator, useHEVC)
 	}
 }
 
