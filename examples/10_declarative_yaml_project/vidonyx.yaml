@@ -1,0 +1,67 @@
+version: "1.0"
+canvas:
+  preset: "1080p"
+  background_color: "black"
+fps: "30"
+output: "rendered_project.mp4"
+
+tracks:
+  - id: "background_video"
+    kind: "video"
+    clips:
+      - id: "intro_clip"
+        source: "./media/intro.mp4"
+        start: "0s"
+        duration: "5s"
+        fade_in: "500ms"
+
+  - id: "voiceover"
+    kind: "audio"
+    clips:
+      - id: "narration"
+        source: "./audio/voiceover.mp3"
+        start: "1s"
+        duration: "3.5s"
+
+  - id: "soundtrack"
+    kind: "audio"
+    duck_under: "voiceover"
+    ducking:
+      threshold: 0.12
+      ratio: 4.5
+      attack_ms: 25
+      release_ms: 350
+    clips:
+      - id: "bgm"
+        source: "./audio/soundtrack.mp3"
+        start: "0s"
+        duration: "5s"
+        volume: 0.7
+
+  - id: "captions"
+    kind: "subtitle"
+    subtitles:
+      srt_content: |
+        1
+        00:00:01,000 --> 00:00:04,500
+        Welcome to Vidonyx Declarative Video Engine!
+      style:
+        font_size: 44
+        color: "yellow"
+        box: true
+        box_color: "black"
+        alignment: "bottom-center"
+        margin_bottom: 60
+
+  - id: "waveform_overlay"
+    kind: "waveform"
+    waveform:
+      source_audio: "voiceover"
+      mode: "p2p"
+      color: "#00F0B4"
+      scale: "sqrt"
+      width: 800
+      height: 120
+      position:
+        x: 140
+        y: 840

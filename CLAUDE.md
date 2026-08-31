@@ -36,6 +36,10 @@ go run ./examples/06_audio_ducking/main.go
 go run ./examples/07_platform_presets/main.go
 go run ./examples/08_podcast_audio_waveform/main.go
 go run ./examples/09_green_screen_studio/main.go
+go run ./examples/10_declarative_yaml_project/main.go
+
+# Run CLI Tool
+./vidonyx --help
 ```
 
 ---
