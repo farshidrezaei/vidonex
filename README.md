@@ -126,14 +126,25 @@ func main() {
 
 	// Execute Render with Live Progress
 	ctx := context.Background()
-	_, err = c.Render(ctx, tl, "output.mp4", func(ev executor.ProgressEvent) {
-		fmt.Printf("Rendering: %.1f%% (Speed: %.2fx, FPS: %.1f)\n", ev.Percentage, ev.Speed, ev.FPS)
+	_, err = c.Render(ctx, tl, "output.mp4", func(event executor.ProgressEvent) {
+		fmt.Printf("Rendering: %.1f%% (Speed: %.2fx, FPS: %.1f)\n", event.Percentage, event.Speed, event.FPS)
 	})
 	if err != nil {
 		log.Fatalf("Render failed: %v", err)
 	}
 }
 ```
+
+---
+
+## Mandatory Development Contracts
+
+Vidonyx adheres to strict, production-grade development contracts for humans and AI agents. See [CONTRACTS.md](CONTRACTS.md) for full specifications:
+
+1. **Descriptive Naming**: No cryptic abbreviations (`compositionTimeline`, `durationSeconds`, `sourceOutputPad`).
+2. **Table-Driven Tests**: All unit and feature tests must be table-driven and cover all edge cases.
+3. **Mandatory Quality Passes**: Zero warnings on `golangci-lint run ./...` and 100% clean passes on `go test -race ./...`.
+4. **Cutting-Edge Go Idioms**: Go iterators (`iter.Seq`), `log/slog`, `errors.Join`, and exact fractional arithmetic (`types.Rational`).
 
 ---
 
@@ -156,6 +167,7 @@ Run the complete test suite with the Go race detector:
 
 ```bash
 go test -race -v ./...
+golangci-lint run ./...
 ```
 
 ---
