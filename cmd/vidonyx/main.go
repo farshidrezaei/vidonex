@@ -1,3 +1,4 @@
+// Package main implements the Vidonyx standalone command-line video composition interface.
 package main
 
 import (
@@ -14,6 +15,7 @@ import (
 
 	"github.com/farshidrezaei/vidonyx/composer"
 	"github.com/farshidrezaei/vidonyx/executor"
+	"github.com/farshidrezaei/vidonyx/internal/cli"
 	"github.com/farshidrezaei/vidonyx/presets"
 	"github.com/farshidrezaei/vidonyx/probe"
 	"github.com/farshidrezaei/vidonyx/spec"
@@ -77,10 +79,10 @@ func executeRenderCommand(arguments []string) {
 		outputPathOverride = *outputLongFlag
 	}
 
-	ui := NewUI(os.Stdout)
+	ui := cli.NewUI(os.Stdout)
 	ui.PrintBanner()
 
-	logger := SetupLogger(*logLevelFlag, *logFormatFlag, os.Stderr)
+	logger := cli.SetupLogger(*logLevelFlag, *logFormatFlag, os.Stderr)
 	logger.Debug("starting render command", "spec_file", specPath)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -166,7 +168,7 @@ func executeRenderCommand(arguments []string) {
 	// Step 4: Render
 	ui.PrintStep(4, 4, "🎬", fmt.Sprintf("Rendering Composition -> %s", finalOutputPath))
 
-	progressBar := NewProgressBar(os.Stdout, compositionTimeline.Duration())
+	progressBar := cli.NewProgressBar(os.Stdout, compositionTimeline.Duration())
 	renderStartTime := time.Now()
 
 	renderResult, err := composerInstance.Render(ctx, compositionTimeline, finalOutputPath, func(event executor.ProgressEvent) {
@@ -204,8 +206,8 @@ func executeValidateCommand(arguments []string) {
 	}
 
 	specPath := fs.Args()[0]
-	ui := NewUI(os.Stdout)
-	SetupLogger(*logLevelFlag, "text", os.Stderr)
+	ui := cli.NewUI(os.Stdout)
+	cli.SetupLogger(*logLevelFlag, "text", os.Stderr)
 
 	specification, err := spec.ParseFile(specPath)
 	if err != nil {

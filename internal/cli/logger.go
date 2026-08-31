@@ -1,5 +1,4 @@
-// Package main implements the Vidonyx command-line video composition interface.
-package main
+package cli
 
 import (
 	"io"

@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -82,8 +82,8 @@ func (bar *ProgressBar) Update(event executor.ProgressEvent) {
 			percentage,
 			event.Speed,
 			event.FPS,
-			formatDuration(elapsed),
-			formatDuration(eta),
+			FormatDuration(elapsed),
+			FormatDuration(eta),
 		)
 	} else {
 		// Non-TTY (CI / Cloud logs): print milestone percentages
@@ -94,7 +94,7 @@ func (bar *ProgressBar) Update(event executor.ProgressEvent) {
 				currentMilestone,
 				event.Speed,
 				event.FPS,
-				formatDuration(elapsed),
+				FormatDuration(elapsed),
 			)
 		}
 	}
@@ -110,7 +110,8 @@ func (bar *ProgressBar) Finish() {
 	}
 }
 
-func formatDuration(duration time.Duration) string {
+// FormatDuration formats a duration into MM:SS format.
+func FormatDuration(duration time.Duration) string {
 	duration = duration.Round(time.Second)
 	totalSeconds := int(duration.Seconds())
 	minutes := totalSeconds / 60

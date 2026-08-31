@@ -1,4 +1,5 @@
-package main
+// Package cli provides private terminal UI, live progress telemetry, and structured logging helpers for the Vidonyx CLI tool.
+package cli
 
 import (
 	"fmt"
@@ -87,7 +88,7 @@ func (ui *UI) PrintError(err error) {
 
 // PrintSummaryCard prints an executive completion card.
 func (ui *UI) PrintSummaryCard(outputPath string, fileSizeBytes int64, renderDuration, videoDuration time.Duration) {
-	formattedSize := formatFileSize(fileSizeBytes)
+	formattedSize := FormatFileSize(fileSizeBytes)
 	speedRatio := 0.0
 	if renderDuration > 0 {
 		speedRatio = videoDuration.Seconds() / renderDuration.Seconds()
@@ -105,7 +106,8 @@ func (ui *UI) PrintSummaryCard(outputPath string, fileSizeBytes int64, renderDur
 	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorCyan, "└"+border+"┘"))
 }
 
-func formatFileSize(bytes int64) string {
+// FormatFileSize formats raw bytes into human readable binary units.
+func FormatFileSize(bytes int64) string {
 	const unit = 1024
 	if bytes < unit {
 		return fmt.Sprintf("%d B", bytes)
