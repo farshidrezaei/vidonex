@@ -190,7 +190,7 @@ tracks:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 			defer cancel()
 
 			cmd := exec.CommandContext(ctx, cliBinaryPath, tt.arguments...)

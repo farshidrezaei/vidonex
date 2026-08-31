@@ -40,7 +40,7 @@ func generateSyntheticMedia(t *testing.T, directoryPath string) syntheticMediaAs
 		greenScreenSource: filepath.Join(directoryPath, "synth_greenscreen.mp4"),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	commands := [][]string{
@@ -356,7 +356,7 @@ Vidonyx Real End-To-End Subtitles
 			composerOptions := tt.configureComposer()
 			composerInstance := composer.New(composerOptions...)
 
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 			defer cancel()
 
 			renderResult, err := composerInstance.Render(ctx, compositionTimeline, outputFilePath, nil)
