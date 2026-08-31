@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/farshidrezaei/vidonyx/animation"
+	"github.com/farshidrezaei/vidonyx/chromakey"
 	"github.com/farshidrezaei/vidonyx/compiler"
 	"github.com/farshidrezaei/vidonyx/ducking"
 	"github.com/farshidrezaei/vidonyx/subtitles"
@@ -42,6 +43,37 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-map [out_a]",
 				"-c:v libx264",
 				"out_single.mp4",
+			},
+		},
+		{
+			name: "green screen studio clip with despill",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+
+				bgTrack := timeline.NewTrack("bg", timeline.TrackKindVideo).SetZIndex(0)
+				bgTrack.AddClip(timeline.NewClip("bg_clip", "futuristic_room.mp4", 0, 8*time.Second))
+
+				presenterTrack := timeline.NewTrack("presenter", timeline.TrackKindOverlay).SetZIndex(1)
+				presenterClip := timeline.NewClip("host", "studio_green.mp4", 0, 8*time.Second).
+					WithChromaKey(chromakey.Options{
+						KeyColor:    chromakey.StudioGreenScreen,
+						Similarity:  0.30,
+						Blend:       0.10,
+						Despill:     true,
+						DespillType: chromakey.DespillGreen,
+					})
+				presenterTrack.AddClip(presenterClip)
+
+				tl.AddTrack(bgTrack, presenterTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_greenscreen.mp4",
+			expectedInputCount: 2,
+			expectedArgSnippets: []string{
+				"chromakey=color=0x00FF00:similarity=0.30:blend=0.10",
+				"despill=type=green:expand=0.00",
+				"out_greenscreen.mp4",
 			},
 		},
 		{

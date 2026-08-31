@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/farshidrezaei/vidonyx/chromakey"
 	"github.com/farshidrezaei/vidonyx/effects"
 	"github.com/farshidrezaei/vidonyx/filtergraph"
 	"github.com/farshidrezaei/vidonyx/timeline"
 )
 
 // ProcessClipVideo processes a single clip's video pipeline:
-// Trim -> Speed (setpts) -> Fade In/Out -> Opacity / Animated Opacity -> Animated Scale -> Normalized Stream
+// Trim -> Speed (setpts) -> ChromaKey -> Fade In/Out -> Opacity / Animated Opacity -> Animated Scale -> Normalized Stream
 func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip, _ *timeline.Timeline) (*filtergraph.Pad, error) {
 	currentPad := rawInputPad
 
@@ -42,7 +43,16 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	}
 	currentPad = ptsOutput
 
-	// 2. Fade In & Fade Out
+	// 2. Chroma Keying (Green/Blue screen removal + Despill)
+	if clip.ChromaKeyOptions != nil {
+		chromaPad, err := chromakey.ApplyChromaKey(graph, fmt.Sprintf("chroma_%s", clip.ID), currentPad, *clip.ChromaKeyOptions)
+		if err != nil {
+			return nil, fmt.Errorf("failed applying chromakey to clip %q: %w", clip.ID, err)
+		}
+		currentPad = chromaPad
+	}
+
+	// 3. Fade In & Fade Out
 	if clip.FadeInDuration > 0 {
 		fadeInNode := graph.NewNode(fmt.Sprintf("fade_in_%s", clip.ID), "fade")
 		fadeInNode.SetParam("t", "in")
@@ -73,7 +83,7 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = fadeOutOutput
 	}
 
-	// 3. Opacity (Static or Animated Keyframe Track)
+	// 4. Opacity (Static or Animated Keyframe Track)
 	if clip.OpacityTrack != nil || (clip.Opacity < 1.0 && clip.Opacity >= 0.0) {
 		formatYuva := graph.NewNode(fmt.Sprintf("format_yuva_%s", clip.ID), "format")
 		formatYuva.SetParam("pix_fmts", "yuva420p")
@@ -98,7 +108,7 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = mixerOutput
 	}
 
-	// 4. Clip scale & position handling (Static or Animated Keyframe Track)
+	// 5. Clip scale & position handling (Static or Animated Keyframe Track)
 	if clip.ScaleTrack != nil {
 		scaleNode := graph.NewNode(fmt.Sprintf("scale_anim_%s", clip.ID), "scale")
 		scaleExpr := clip.ScaleTrack.ToFFmpegExpression()
@@ -170,13 +180,13 @@ func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	}
 
 	if clip.FadeOutDuration > 0 {
-		afadeOutStart := clip.Duration.Seconds() - clip.FadeOutDuration.Seconds()
-		if afadeOutStart < 0 {
-			afadeOutStart = 0
+		fadeOutStart := clip.Duration.Seconds() - clip.FadeOutDuration.Seconds()
+		if fadeOutStart < 0 {
+			fadeOutStart = 0
 		}
 		afadeOutNode := graph.NewNode(fmt.Sprintf("afade_out_%s", clip.ID), "afade")
 		afadeOutNode.SetParam("t", "out")
-		afadeOutNode.SetParam("st", fmt.Sprintf("%.4f", afadeOutStart))
+		afadeOutNode.SetParam("st", fmt.Sprintf("%.4f", fadeOutStart))
 		afadeOutNode.SetParam("d", fmt.Sprintf("%.4f", clip.FadeOutDuration.Seconds()))
 		afadeOutInput := afadeOutNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
 		afadeOutOutput := afadeOutNode.AddOutput(graph.NextPadID("afade_out_out"), filtergraph.StreamTypeAudio)
