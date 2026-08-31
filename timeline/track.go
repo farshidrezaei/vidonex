@@ -6,6 +6,7 @@ import (
 
 	"github.com/farshidrezaei/vidonyx/ducking"
 	"github.com/farshidrezaei/vidonyx/subtitles"
+	"github.com/farshidrezaei/vidonyx/waveform"
 )
 
 // TrackKind specifies the primary media layer type of a track.
@@ -22,6 +23,8 @@ const (
 	TrackKindText
 	// TrackKindSubtitle represents dedicated subtitle and caption streams.
 	TrackKindSubtitle
+	// TrackKindWaveform represents animated audio waveform visualizer overlays.
+	TrackKindWaveform
 )
 
 // String returns the human-readable name of the track kind.
@@ -37,6 +40,8 @@ func (kind TrackKind) String() string {
 		return "text"
 	case TrackKindSubtitle:
 		return "subtitle"
+	case TrackKindWaveform:
+		return "waveform"
 	default:
 		return "unknown"
 	}
@@ -44,16 +49,18 @@ func (kind TrackKind) String() string {
 
 // Track defines a sequence or layer of clips within a timeline.
 type Track struct {
-	ID                string
-	Kind              TrackKind
-	ZIndex            int
-	Muted             bool
-	Volume            float64
-	Clips             []*Clip
-	Transitions       []*Transition
-	SubtitleTrack     *subtitles.SubtitleTrack
-	DucksUnderTrackID string
-	DuckingOptions    *ducking.Options
+	ID                     string
+	Kind                   TrackKind
+	ZIndex                 int
+	Muted                  bool
+	Volume                 float64
+	Clips                  []*Clip
+	Transitions            []*Transition
+	SubtitleTrack          *subtitles.SubtitleTrack
+	DucksUnderTrackID      string
+	DuckingOptions         *ducking.Options
+	WaveformSourceTrackID  string
+	WaveformOptions        *waveform.Options
 }
 
 // NewTrack creates a new Track with default volume.
@@ -76,6 +83,25 @@ func NewSubtitleTrack(id string, subtitleTrack *subtitles.SubtitleTrack) *Track 
 		Clips:         make([]*Clip, 0),
 		Transitions:   make([]*Transition, 0),
 		SubtitleTrack: subtitleTrack,
+	}
+}
+
+// NewWaveformTrack creates an animated waveform visualizer track driven by an audio source track.
+func NewWaveformTrack(id string, audioSourceTrackID string, customOptions ...waveform.Options) *Track {
+	var opts waveform.Options
+	if len(customOptions) > 0 {
+		opts = customOptions[0]
+	} else {
+		opts = waveform.DefaultOptions()
+	}
+	return &Track{
+		ID:                    id,
+		Kind:                  TrackKindWaveform,
+		ZIndex:                1,
+		Clips:                 make([]*Clip, 0),
+		Transitions:           make([]*Transition, 0),
+		WaveformSourceTrackID: audioSourceTrackID,
+		WaveformOptions:       &opts,
 	}
 }
 

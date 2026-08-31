@@ -10,6 +10,7 @@ import (
 	"github.com/farshidrezaei/vidonyx/subtitles"
 	"github.com/farshidrezaei/vidonyx/timeline"
 	"github.com/farshidrezaei/vidonyx/visualizer"
+	"github.com/farshidrezaei/vidonyx/waveform"
 )
 
 // CompilationResult contains the compiled artifacts: DAG, CLI arguments, and diagram representations.
@@ -194,6 +195,29 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					return nil, fmt.Errorf("compiler: failed applying ducking: %w", err)
 				}
 				trackAudioPadMap[track.ID] = duckedMusicPad
+			}
+		}
+	}
+
+	// Process animated audio waveforms
+	for _, track := range compositionTimeline.Tracks {
+		if track.Kind == timeline.TrackKindWaveform && track.WaveformSourceTrackID != "" {
+			if sourceAudioPad, exists := trackAudioPadMap[track.WaveformSourceTrackID]; exists && track.WaveformOptions != nil {
+				waveVideoPad, err := waveform.ApplyWaveformVisualizer(graph, fmt.Sprintf("waveform_%s", track.ID), sourceAudioPad, *track.WaveformOptions)
+				if err != nil {
+					return nil, fmt.Errorf("compiler: failed generating waveform: %w", err)
+				}
+				waveClip := &timeline.Clip{
+					ID:            fmt.Sprintf("wave_clip_%s", track.ID),
+					TimelineStart: 0,
+					Duration:      compositionTimeline.Duration(),
+					Position:      track.WaveformOptions.Position,
+				}
+				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
+					Clip:   waveClip,
+					ZIndex: track.ZIndex,
+					Pad:    waveVideoPad,
+				})
 			}
 		}
 	}

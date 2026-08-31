@@ -11,6 +11,7 @@ import (
 	"github.com/farshidrezaei/vidonyx/subtitles"
 	"github.com/farshidrezaei/vidonyx/timeline"
 	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonyx/waveform"
 )
 
 func TestCompiler_CompositionsTable(t *testing.T) {
@@ -41,6 +42,39 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-map [out_a]",
 				"-c:v libx264",
 				"out_single.mp4",
+			},
+		},
+		{
+			name: "podcast audiogram with audio waveform visualizer",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+
+				bgTrack := timeline.NewTrack("bg", timeline.TrackKindVideo)
+				bgTrack.AddClip(timeline.NewClip("poster", "cover.jpg", 0, 10*time.Second))
+
+				audioTrack := timeline.NewTrack("voice", timeline.TrackKindAudio)
+				audioTrack.AddClip(timeline.NewClip("speech", "podcast.mp3", 0, 10*time.Second))
+
+				waveTrack := timeline.NewWaveformTrack("wave_layer", "voice", waveform.Options{
+					Size:     types.NewSize(1000, 200),
+					Mode:     waveform.ModePeakToPeak,
+					Scale:    "sqrt",
+					Position: types.Point{X: 460, Y: 800},
+				})
+
+				tl.AddTrack(bgTrack, audioTrack, waveTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_audiogram.mp4",
+			expectedInputCount: 2,
+			expectedArgSnippets: []string{
+				"showwaves=s=1000x200",
+				"mode=p2p",
+				"scale=sqrt",
+				"format=pix_fmts=yuva420p",
+				"overlay=x=460:y=800",
+				"out_audiogram.mp4",
 			},
 		},
 		{
