@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/farshidrezaei/vidonyx/animation"
 	"github.com/farshidrezaei/vidonyx/compiler"
 	"github.com/farshidrezaei/vidonyx/timeline"
 	"github.com/farshidrezaei/vidonyx/types"
@@ -38,6 +39,59 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-map [out_a]",
 				"-c:v libx264",
 				"out_single.mp4",
+			},
+		},
+		{
+			name: "clip with fade in and fade out",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+				tr := timeline.NewTrack("v0", timeline.TrackKindVideo)
+				clip := timeline.NewClip("c1", "input.mp4", 0, 10*time.Second).
+					WithFadeIn(1 * time.Second).
+					WithFadeOut(2 * time.Second)
+				tr.AddClip(clip)
+				tl.AddTrack(tr)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_fade.mp4",
+			expectedInputCount: 1,
+			expectedArgSnippets: []string{
+				"fade=t=in:st=0:d=1.0000",
+				"fade=t=out:st=8.0000:d=2.0000",
+				"afade=t=in:st=0:d=1.0000",
+				"afade=t=out:st=8.0000:d=2.0000",
+			},
+		},
+		{
+			name: "clip with animated position and scale tracks",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+				tr := timeline.NewTrack("v0", timeline.TrackKindVideo)
+
+				posTrack := animation.NewPositionTrack().
+					AddKeyframe(0, types.Point{X: 100, Y: 100}, animation.EasingLinear).
+					AddKeyframe(5*time.Second, types.Point{X: 500, Y: 400}, animation.EasingEaseInOutQuad)
+
+				scaleTrack := animation.NewFloatKeyframeTrack().
+					AddKeyframe(0, 1.0, animation.EasingLinear).
+					AddKeyframe(5*time.Second, 1.5, animation.EasingEaseInQuad)
+
+				clip := timeline.NewClip("c1", "input.mp4", 0, 5*time.Second).
+					WithPositionTrack(posTrack).
+					WithScaleTrack(scaleTrack)
+
+				tr.AddClip(clip)
+				tl.AddTrack(tr)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_anim.mp4",
+			expectedInputCount: 1,
+			expectedArgSnippets: []string{
+				"scale=w=iw*(if(lt(t,",
+				"eval=frame",
+				"overlay=eval=frame:x=if(lt(t,",
 			},
 		},
 		{

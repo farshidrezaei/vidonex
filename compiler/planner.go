@@ -10,7 +10,7 @@ import (
 )
 
 // ProcessClipVideo processes a single clip's video pipeline:
-// Trim -> Speed (setpts) -> Opacity -> Custom Effects -> Normalized Stream
+// Trim -> Speed (setpts) -> Fade In/Out -> Opacity / Animated Opacity -> Animated Scale -> Normalized Stream
 func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip, _ *timeline.Timeline) (*filtergraph.Pad, error) {
 	currentPad := rawInputPad
 
@@ -42,8 +42,39 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	}
 	currentPad = ptsOutput
 
-	// 2. Opacity
-	if clip.Opacity < 1.0 && clip.Opacity >= 0.0 {
+	// 2. Fade In & Fade Out
+	if clip.FadeInDuration > 0 {
+		fadeInNode := graph.NewNode(fmt.Sprintf("fade_in_%s", clip.ID), "fade")
+		fadeInNode.SetParam("t", "in")
+		fadeInNode.SetParam("st", "0")
+		fadeInNode.SetParam("d", fmt.Sprintf("%.4f", clip.FadeInDuration.Seconds()))
+		fadeInInput := fadeInNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		fadeInOutput := fadeInNode.AddOutput(graph.NextPadID("fade_in_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, fadeInInput); err != nil {
+			return nil, err
+		}
+		currentPad = fadeInOutput
+	}
+
+	if clip.FadeOutDuration > 0 {
+		fadeOutStart := clip.Duration.Seconds() - clip.FadeOutDuration.Seconds()
+		if fadeOutStart < 0 {
+			fadeOutStart = 0
+		}
+		fadeOutNode := graph.NewNode(fmt.Sprintf("fade_out_%s", clip.ID), "fade")
+		fadeOutNode.SetParam("t", "out")
+		fadeOutNode.SetParam("st", fmt.Sprintf("%.4f", fadeOutStart))
+		fadeOutNode.SetParam("d", fmt.Sprintf("%.4f", clip.FadeOutDuration.Seconds()))
+		fadeOutInput := fadeOutNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		fadeOutOutput := fadeOutNode.AddOutput(graph.NextPadID("fade_out_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, fadeOutInput); err != nil {
+			return nil, err
+		}
+		currentPad = fadeOutOutput
+	}
+
+	// 3. Opacity (Static or Animated Keyframe Track)
+	if clip.OpacityTrack != nil || (clip.Opacity < 1.0 && clip.Opacity >= 0.0) {
 		formatYuva := graph.NewNode(fmt.Sprintf("format_yuva_%s", clip.ID), "format")
 		formatYuva.SetParam("pix_fmts", "yuva420p")
 		yuvaInput := formatYuva.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
@@ -53,7 +84,12 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		}
 
 		mixerNode := graph.NewNode(fmt.Sprintf("opacity_%s", clip.ID), "colorchannelmixer")
-		mixerNode.SetParam("aa", fmt.Sprintf("%.2f", clip.Opacity))
+		if clip.OpacityTrack != nil {
+			mixerNode.SetParam("aa", clip.OpacityTrack.ToFFmpegExpression())
+		} else {
+			mixerNode.SetParam("aa", fmt.Sprintf("%.2f", clip.Opacity))
+		}
+
 		mixerInput := mixerNode.AddInput(yuvaOutput.ID, filtergraph.StreamTypeVideo)
 		mixerOutput := mixerNode.AddOutput(graph.NextPadID("opacity_out"), filtergraph.StreamTypeVideo)
 		if err := graph.Connect(yuvaOutput, mixerInput); err != nil {
@@ -62,8 +98,20 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = mixerOutput
 	}
 
-	// 3. Clip scale & position handling
-	if clip.Scale != 1.0 && clip.Scale > 0 {
+	// 4. Clip scale & position handling (Static or Animated Keyframe Track)
+	if clip.ScaleTrack != nil {
+		scaleNode := graph.NewNode(fmt.Sprintf("scale_anim_%s", clip.ID), "scale")
+		scaleExpr := clip.ScaleTrack.ToFFmpegExpression()
+		scaleNode.SetParam("w", fmt.Sprintf("iw*(%s)", scaleExpr))
+		scaleNode.SetParam("h", fmt.Sprintf("ih*(%s)", scaleExpr))
+		scaleNode.SetParam("eval", "frame")
+		scaleInput := scaleNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		scaleOutput := scaleNode.AddOutput(graph.NextPadID("scale_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, scaleInput); err != nil {
+			return nil, err
+		}
+		currentPad = scaleOutput
+	} else if clip.Scale != 1.0 && clip.Scale > 0 {
 		scaleNode := graph.NewNode(fmt.Sprintf("scale_%s", clip.ID), "scale")
 		scaleNode.SetParam("w", fmt.Sprintf("iw*%.4f", clip.Scale))
 		scaleNode.SetParam("h", fmt.Sprintf("ih*%.4f", clip.Scale))
@@ -79,7 +127,7 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 }
 
 // ProcessClipAudio processes a single clip's audio pipeline:
-// Trim -> atempo (speed) -> Volume -> Delay (adelay to TimelineStart)
+// Trim -> atempo (speed) -> afade (in/out) -> Volume -> Delay (adelay to TimelineStart)
 func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, clip *timeline.Clip) (*filtergraph.Pad, error) {
 	currentPad := rawInputPad
 
@@ -107,7 +155,38 @@ func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	}
 	currentPad = aptsOutput
 
-	// 2. Volume
+	// 2. Audio Fade In & Fade Out
+	if clip.FadeInDuration > 0 {
+		afadeInNode := graph.NewNode(fmt.Sprintf("afade_in_%s", clip.ID), "afade")
+		afadeInNode.SetParam("t", "in")
+		afadeInNode.SetParam("st", "0")
+		afadeInNode.SetParam("d", fmt.Sprintf("%.4f", clip.FadeInDuration.Seconds()))
+		afadeInInput := afadeInNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
+		afadeInOutput := afadeInNode.AddOutput(graph.NextPadID("afade_in_out"), filtergraph.StreamTypeAudio)
+		if err := graph.Connect(currentPad, afadeInInput); err != nil {
+			return nil, err
+		}
+		currentPad = afadeInOutput
+	}
+
+	if clip.FadeOutDuration > 0 {
+		afadeOutStart := clip.Duration.Seconds() - clip.FadeOutDuration.Seconds()
+		if afadeOutStart < 0 {
+			afadeOutStart = 0
+		}
+		afadeOutNode := graph.NewNode(fmt.Sprintf("afade_out_%s", clip.ID), "afade")
+		afadeOutNode.SetParam("t", "out")
+		afadeOutNode.SetParam("st", fmt.Sprintf("%.4f", afadeOutStart))
+		afadeOutNode.SetParam("d", fmt.Sprintf("%.4f", clip.FadeOutDuration.Seconds()))
+		afadeOutInput := afadeOutNode.AddInput(currentPad.ID, filtergraph.StreamTypeAudio)
+		afadeOutOutput := afadeOutNode.AddOutput(graph.NextPadID("afade_out_out"), filtergraph.StreamTypeAudio)
+		if err := graph.Connect(currentPad, afadeOutInput); err != nil {
+			return nil, err
+		}
+		currentPad = afadeOutOutput
+	}
+
+	// 3. Volume
 	if clip.Volume != 1.0 && clip.Volume >= 0.0 {
 		volumeNode := graph.NewNode(fmt.Sprintf("volume_%s", clip.ID), "volume")
 		volumeNode.SetParam("volume", fmt.Sprintf("%.2f", clip.Volume))
@@ -119,7 +198,7 @@ func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = volumeOutput
 	}
 
-	// 3. adelay (to position audio on the timeline)
+	// 4. adelay (to position audio on the timeline)
 	if clip.TimelineStart > 0 {
 		delayMilliseconds := clip.TimelineStart.Milliseconds()
 		delayNode := graph.NewNode(fmt.Sprintf("delay_%s", clip.ID), "adelay")
@@ -233,9 +312,15 @@ func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timelin
 	for index, item := range processedVideoPads {
 		overlayNode := graph.NewNode(fmt.Sprintf("overlay_%d_%s", index, item.Clip.ID), "overlay")
 
-		// Position coordinates
-		xExpression := fmt.Sprintf("%d", item.Clip.Position.X)
-		yExpression := fmt.Sprintf("%d", item.Clip.Position.Y)
+		var xExpression, yExpression string
+		if item.Clip.PositionTrack != nil {
+			xExpression, yExpression = item.Clip.PositionTrack.ToFFmpegExpressions()
+			overlayNode.SetParam("eval", "frame")
+		} else {
+			xExpression = fmt.Sprintf("%d", item.Clip.Position.X)
+			yExpression = fmt.Sprintf("%d", item.Clip.Position.Y)
+		}
+
 		overlayNode.SetParam("x", xExpression)
 		overlayNode.SetParam("y", yExpression)
 

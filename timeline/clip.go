@@ -3,24 +3,30 @@ package timeline
 import (
 	"time"
 
+	"github.com/farshidrezaei/vidonyx/animation"
 	"github.com/farshidrezaei/vidonyx/types"
 )
 
 // Clip represents a media element placed at a specific time range in a track.
 type Clip struct {
-	ID            string
-	Source        string // Filepath or URL
-	TimelineStart time.Duration
-	Duration      time.Duration
-	SourceStart   time.Duration // Trim in offset within the source media
-	Speed         float64       // Playback rate multiplier (default 1.0)
-	Volume        float64       // Audio volume multiplier (default 1.0)
-	Opacity       float64       // Visual opacity 0.0 (transparent) to 1.0 (opaque)
-	Position      types.Point   // Absolute (X, Y) coordinate on canvas
-	Alignment     types.Alignment
-	Scale         float64  // Scale factor (1.0 = original size)
-	Rotation      float64  // Rotation in degrees (e.g. 90.0, 180.0)
-	Effects       []Effect // Attached filters and visual transformations
+	ID              string
+	Source          string // Filepath or URL
+	TimelineStart   time.Duration
+	Duration        time.Duration
+	SourceStart     time.Duration // Trim in offset within the source media
+	Speed           float64       // Playback rate multiplier (default 1.0)
+	Volume          float64       // Audio volume multiplier (default 1.0)
+	Opacity         float64       // Visual opacity 0.0 (transparent) to 1.0 (opaque)
+	Position        types.Point   // Absolute (X, Y) coordinate on canvas
+	Alignment       types.Alignment
+	Scale           float64  // Scale factor (1.0 = original size)
+	Rotation        float64  // Rotation in degrees (e.g. 90.0, 180.0)
+	FadeInDuration  time.Duration
+	FadeOutDuration time.Duration
+	PositionTrack   *animation.PositionTrack
+	ScaleTrack      *animation.FloatKeyframeTrack
+	OpacityTrack    *animation.FloatKeyframeTrack
+	Effects         []Effect // Attached filters and visual transformations
 }
 
 // NewClip creates a Clip with sensible defaults.
@@ -69,15 +75,45 @@ func (clip *Clip) WithOpacity(opacity float64) *Clip {
 	return clip
 }
 
+// WithFadeIn configures an opacity and audio fade-in transition at the start of the clip.
+func (clip *Clip) WithFadeIn(duration time.Duration) *Clip {
+	clip.FadeInDuration = duration
+	return clip
+}
+
+// WithFadeOut configures an opacity and audio fade-out transition at the end of the clip.
+func (clip *Clip) WithFadeOut(duration time.Duration) *Clip {
+	clip.FadeOutDuration = duration
+	return clip
+}
+
 // WithPosition sets the exact (X, Y) canvas coordinates.
 func (clip *Clip) WithPosition(position types.Point) *Clip {
 	clip.Position = position
 	return clip
 }
 
+// WithPositionTrack attaches an animated position keyframe track.
+func (clip *Clip) WithPositionTrack(track *animation.PositionTrack) *Clip {
+	clip.PositionTrack = track
+	return clip
+}
+
 // WithScale sets the size scale multiplier.
 func (clip *Clip) WithScale(scale float64) *Clip {
 	clip.Scale = scale
+	return clip
+}
+
+// WithScaleTrack attaches an animated scale keyframe track.
+func (clip *Clip) WithScaleTrack(track *animation.FloatKeyframeTrack) *Clip {
+	clip.ScaleTrack = track
+	return clip
+}
+
+// WithOpacityTrack attaches an animated opacity keyframe track.
+func (clip *Clip) WithOpacityTrack(track *animation.FloatKeyframeTrack) *Clip {
+	clip.OpacityTrack = track
 	return clip
 }
 
