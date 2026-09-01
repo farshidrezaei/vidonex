@@ -92,15 +92,27 @@ The Filtergraph package is a standalone graph library modeling FFmpeg filter top
 
 ### 2.5. Multi-Stage Compiler (`compiler/`)
 
-1. **Input Indexing**: Discovers all media sources across clips and generates optimal `-i <path>` CLI flags with stable indices (`0:v`, `0:a`, `1:v`, etc.).
-2. **Clip Video Pipeline**: Injects `trim`, `setpts`, `format=yuva420p` + `colorchannelmixer` (for opacity), and `scale` (for transform scaling).
-3. **Stream Normalization**: Injects `scale=w:h:force_original_aspect_ratio=decrease`, `pad`, `setsar=1`, `fps`, and `format=yuv420p` for video; and `aresample=48000`, `aformat=sample_fmts=fltp:channel_layouts=stereo` for audio.
-4. **Compositor**: Stacks visual layers on top of a synthesized background canvas (`color=c=...:s=...:r=...:d=...`) using `overlay` filters enabled during active clip time intervals (`enable='between(t, start, end)'`).
+1. **Input Indexing**: Discovers all media sources across clips and generates optimal `-i <path>` CLI flags with stable indices (`0:v`, `0:a`, `1:v`, etc.), applying `-loop 1` for static images.
+2. **Clip Video Pipeline**: Injects `trim`, `setpts` (with timeline start offset `PTS-STARTPTS+<TimelineStart>/TB` to cleanly preserve timeline gaps), `format=yuva420p` + `colorchannelmixer` (for opacity), and `scale` (for transform scaling).
+3. **Stream Normalization**: Injects `format=yuva420p`, `scale=w:h:force_original_aspect_ratio=decrease`, `pad=color=black@0.0`, `setsar=1`, `fps`, and `format=yuva420p` to maintain 100% alpha transparency for overlays and transparent PNGs.
+4. **Compositor**: Stacks visual layers on top of a synthesized background canvas (`color=c=...:s=...:r=...:d=...`) using `overlay` filters enabled during active clip time intervals (`enable='between(t, start, end)'`), finishing with a final `format=yuv420p` node for standard MP4 player compatibility.
 5. **Audio Mixer**: Aligns audio clips using `adelay` and combines all streams into a master stereo mix via `amix`.
 
 ---
 
-### 2.6. Execution & Telemetry (`executor/`)
+### 2.6. Embedded Server & Web Studio Workstation (`server/` & `ui/`)
+
+1. **Embedded Persistence (`server/db/`)**: High-performance SQLite persistence (`mattn/go-sqlite3`) managing projects, timeline specifications, assets, and render job queue states.
+2. **RESTful API & WebSocket Hub (`server/api/` & `server/ws/`)**: Exposes project management, live asset probing (`ffprobe`), file uploading, and real-time WebSocket progress broadcasting.
+3. **Web Studio Workstation (`ui/`)**:
+   - **Nuxt 4 + Nuxt UI (Vue 3, Pinia, Tailwind CSS)**: Modern non-linear video editing workstation.
+   - **Multi-Track Timeline**: Features clip thumbnail filmstrips, audio waveform SVG textures, and strict native duration boundary enforcement for video and audio assets.
+   - **Interactive Viewport Gizmo**: 8-handle transformation with magnetic canvas snapping and keyboard arrow keys nudging.
+   - **Graph Visualizer**: Interactive Mermaid.js DAG inspection modal.
+
+---
+
+### 2.7. Execution & Telemetry (`executor/`)
 
 - **`CommandExecutor` Interface**: Abstracts binary process invocation.
 - **`OSExecutor`**: Invokes FFmpeg via `os/exec.CommandContext`, attaching `-progress pipe:1` to stream real-time progress without blocking.
@@ -113,3 +125,20 @@ The Filtergraph package is a standalone graph library modeling FFmpeg filter top
 
 - **Mermaid.js Generator (`ToMermaid`)**: Outputs standard GitHub/Markdown flowchart syntax.
 - **Graphviz DOT Generator (`ToDOT`)**: Outputs Graphviz `.dot` files for high-resolution visual layout rendering.
+
+---
+
+### 2.8. Embedded Server & Persistence (`server/`)
+
+- **Pure-Go SQLite Persistence (`server/db/`)**: Zero-CGO SQLite database with WAL mode storing project workspaces, uploaded media assets, technical metadata, and asynchronous render jobs.
+- **REST API Endpoints (`server/api/`)**: Project CRUD, media asset upload/probing, spec validation, graph visualization, and render orchestration.
+- **Live WebSocket Telemetry Hub (`server/ws/`)**: Thread-safe broadcaster dispatching real-time FFmpeg progress telemetry (`percentage`, `fps`, `current_time`, `speed`, `bitrate`, `total_size`).
+
+---
+
+### 2.9. Nuxt 4 Web Studio Workstation (`ui/`)
+
+- **Framework & Tooling**: Nuxt 4, Vue 3 Composition API, Nuxt UI, Nuxt i18n (LTR English & RTL Persian), Pinia state stores, and Tailwind CSS.
+- **Pro Multi-Track Timeline**: Dynamic video/audio/overlay/subtitle/waveform tracks, clip dragging, In/Out trimming, splitting (`S`), adjacent clip crossfades (`XFade`), and magnetic snapping.
+- **Interactive Viewport & Transform Gizmo**: Direct on-canvas 8-point resize, translation, rotation, and center guidelines.
+- **Domain Inspectors**: Dedicated controllers for Chroma Key, Sidechain Ducking, Podcast Waveforms, SRT/VTT Subtitles, Ken Burns Keyframes, and Mermaid DAG visualization.

@@ -15,7 +15,13 @@
 - 🔄 **Graph Optimization Passes**:
   - **Auto-Split Injection (`AutoSplitPass`)**: Automatically inserts `split` or `asplit` filters when an output stream feeds multiple downstream filters.
   - **Dead-Code Elimination (`DeadCodeEliminationPass`)**: Prunes unreferenced nodes and dangling pads before generating CLI commands.
-  - **Normalization**: Auto-injects resolution, aspect ratio (SAR=1), frame rate (FPS), and pixel format (`yuv420p` / `yuva420p`) coercions.
+  - **Alpha-Preserving Normalization**: Preserves 100% alpha transparency (`yuva420p`) across overlays, transparent PNGs, and ChromaKey layers, finishing with standard `yuv420p` canvas export.
+- ⏱ **Timeline Gap & Offset Synchronization**: Precise Presentation Timestamp (`setpts`) and `adelay` offsetting ensuring non-linear timelines with arbitrary gaps, cuts, and multi-track intervals render with frame-accurate timing.
+- 🎨 **Web Studio Workstation (Nuxt 4 + Nuxt UI)**:
+  - Interactive multi-track timeline with clip thumbnail filmstrips, waveform previews, and strict native duration boundary enforcement.
+  - Viewport Transform Gizmo with magnetic canvas alignment guides and keyboard arrow keys precision nudge (`1px` / `10px`).
+  - Searchable Keyboard Shortcuts Cheatsheet and context menus for instant workflow efficiency.
+  - Multi-language support (English & Persian) with auto-detecting RTL/LTR typography.
 - 📐 **Ken Burns & Dynamic Keyframe Animations**: Mathematical easing curves (Linear, Quad, Cubic, Sine) for dynamic 2D motion paths, scaling, and opacity.
 - 💬 **Subtitles & Animated Caption Burn-in**: Parsers for SubRip (`.srt`) and WebVTT (`.vtt`) with TikTok/Reels bounding box styling.
 - 🎚 **Smart Audio Ducking**: Sidechain compression automatically lowers background music whenever dialogue or voiceover tracks are active.
@@ -25,7 +31,7 @@
 - 📊 **Visual Debugging**: Built-in export to **Mermaid.js** and **Graphviz (DOT)** diagrams for instant graph visualization.
 - ⏱ **Zero-Drift Rational Time**: High-precision fractional time arithmetic (`types.Rational`) preventing floating-point precision drift.
 - 🔌 **Pluggable & Mockable Runtime**: `CommandExecutor` and `MediaProber` interfaces for 100% deterministic testing and CI/CD without requiring local binaries.
-- 📡 **Real-time Telemetry**: Streaming progress parsing from FFmpeg's `-progress pipe:1`.
+- 📡 **Embedded Server & Real-Time Telemetry**: Embedded SQLite persistence, RESTful project APIs, and WebSocket streaming progress from FFmpeg's `-progress pipe:1`.
 
 ---
 
@@ -161,7 +167,30 @@ func main() {
 | [`executor`](./executor/) | Subprocess execution & live telemetry | `CommandExecutor`, `OSExecutor`, `MockExecutor`, `ParseProgressStream()` |
 | [`visualizer`](./visualizer/) | Flowchart generation | `ToMermaid()`, `ToDOT()` |
 | [`spec`](./spec/) | Declarative YAML/JSON project parsing & relative path resolution | `ParseFile()`, `ParseYAML()`, `ParseJSON()`, `ToTimeline()` |
+| [`server`](./server/) | Pure-Go SQLite persistence, REST API, & WebSocket telemetry server | `Server`, `New()`, `Start()`, `Stop()` |
+| [`ui`](./ui/) | Modern Nuxt 4 + Nuxt UI Web Studio Workstation (SPA) | Vue 3, Pinia, i18n (FA/EN), Transform Gizmo, Timeline |
 | [`composer`](./composer/) | Unified high-level facade | `Composer`, `New()`, `Compile()`, `Render()` |
+
+---
+
+## 🎨 Vidonyx Web Studio (GUI)
+
+Vidonyx includes a modern, high-performance web workstation built with **Nuxt 4, Vue 3, Nuxt UI, Nuxt i18n, TypeScript, and WebSocket**:
+
+- 🎬 **Pro Multi-Track Timeline**: Layer video, audio, overlay, subtitle, and waveform tracks with drag-and-drop, trim handles, adjacent clip transitions (XFade), and magnetic snapping.
+- 📐 **Interactive Viewport with Transform Gizmo**: Direct on-canvas 8-point resize, position dragging, rotation, and smart alignment guides.
+- 🎛 **Full Feature Inspectors**: Chroma Key, Sidechain Ducking, Podcast Waveform, Caption Subtitle Editor, Ken Burns Keyframes, and live Mermaid.js filtergraph DAG visualizer.
+- 💾 **Pure-Go SQLite Persistence**: Auto-saving project workspace with zero CGO dependencies.
+
+### Launching the Studio:
+
+```bash
+# Start backend server and open Web Studio on http://localhost:8080
+vidonyx serve --port 8080
+
+# Or run frontend dev mode
+cd ui && pnpm dev
+```
 
 ---
 

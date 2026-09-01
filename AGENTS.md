@@ -60,7 +60,9 @@ This guide is optimized for autonomous AI coding agents (and human engineers) wo
 | `executor` | Subprocess & Live Telemetry | `CommandExecutor`, `OSExecutor`, `MockExecutor`, `ParseProgressStream()` |
 | `visualizer` | Graph Visualization | `ToMermaid()`, `ToDOT()` |
 | `spec` | Declarative YAML/JSON Parser & Path Resolver | `ParseFile()`, `ParseYAML()`, `ParseJSON()`, `ToTimeline()` |
-| `cmd/vidonyx` | Standalone CLI Tool | `render`, `validate`, `graph`, `probe`, `version` |
+| `server` | Embedded SQLite Persistence, REST & WebSocket Server | `Server`, `New()`, `Start()`, `Stop()` |
+| `ui` | Nuxt 4 + Nuxt UI Web Studio Workstation | Vue 3, Pinia, i18n, Viewport Gizmo, Multi-Track Timeline |
+| `cmd/vidonyx` | Standalone CLI Tool | `serve`, `render`, `validate`, `graph`, `probe`, `version` |
 | `composer` | High-Level Facade | `Composer`, `New()`, `Render()`, `Compile()` |
 | `tests/e2e` | Real-FFmpeg E2E Test Suite | `TestEndToEnd_FullCompositionSuiteTable`, `TestCLI_EndToEndSuiteTable` |
 | `examples` | Concrete Recipes | `01` through `10` |
