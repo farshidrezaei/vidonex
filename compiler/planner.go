@@ -29,12 +29,22 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	}
 	currentPad = trimOutput
 
-	// SetPTS based on speed and start offset
+	// SetPTS based on speed and start offset (accurately shifts frames to TimelineStart to handle gaps and start offsets)
 	ptsNode := graph.NewNode(fmt.Sprintf("pts_video_%s", clip.ID), "setpts")
+	timelineStartSeconds := clip.TimelineStart.Seconds()
+
 	if clip.Speed > 0 && clip.Speed != 1.0 {
-		ptsNode.SetParam("expr", fmt.Sprintf("(PTS-STARTPTS)/%.4f", clip.Speed))
+		if timelineStartSeconds > 0 {
+			ptsNode.SetParam("expr", fmt.Sprintf("((PTS-STARTPTS)/%.4f)+%.4f/TB", clip.Speed, timelineStartSeconds))
+		} else {
+			ptsNode.SetParam("expr", fmt.Sprintf("(PTS-STARTPTS)/%.4f", clip.Speed))
+		}
 	} else {
-		ptsNode.SetParam("expr", "PTS-STARTPTS")
+		if timelineStartSeconds > 0 {
+			ptsNode.SetParam("expr", fmt.Sprintf("PTS-STARTPTS+%.4f/TB", timelineStartSeconds))
+		} else {
+			ptsNode.SetParam("expr", "PTS-STARTPTS")
+		}
 	}
 	ptsInput := ptsNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
 	ptsOutput := ptsNode.AddOutput(graph.NextPadID("pts_out_video"), filtergraph.StreamTypeVideo)
@@ -372,7 +382,16 @@ func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timelin
 		currentCanvas = outputCanvas
 	}
 
-	return currentCanvas, nil
+	// Format final output to yuv420p for standard MP4 encoding compatibility
+	finalFormatNode := graph.NewNode("final_format_v", "format")
+	finalFormatNode.SetParam("pix_fmts", "yuv420p")
+	finalFormatInput := finalFormatNode.AddInput(currentCanvas.ID, filtergraph.StreamTypeVideo)
+	finalFormatOutput := finalFormatNode.AddOutput(graph.NextPadID("final_canvas_yuv"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentCanvas, finalFormatInput); err != nil {
+		return nil, err
+	}
+
+	return finalFormatOutput, nil
 }
 
 // BuildAudioMixer mixes all processed audio streams into a single stereo output.

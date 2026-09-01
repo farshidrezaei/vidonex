@@ -4,6 +4,8 @@ package compiler
 import (
 	"fmt"
 	"log/slog"
+	"path/filepath"
+	"strings"
 
 	"github.com/farshidrezaei/vidonyx/ducking"
 	"github.com/farshidrezaei/vidonyx/filtergraph"
@@ -12,6 +14,17 @@ import (
 	"github.com/farshidrezaei/vidonyx/visualizer"
 	"github.com/farshidrezaei/vidonyx/waveform"
 )
+
+// isImageSource reports whether a media source file path is an image.
+func isImageSource(sourcePath string) bool {
+	ext := strings.ToLower(filepath.Ext(sourcePath))
+	switch ext {
+	case ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".tiff", ".svg":
+		return true
+	default:
+		return false
+	}
+}
 
 // CompilationResult contains the compiled artifacts: DAG, CLI arguments, and diagram representations.
 type CompilationResult struct {
@@ -101,8 +114,15 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					IsInput:    false,
 				}
 
-				// Clip video pipeline (trim, speed, opacity, scale)
-				clipVideoPad, err := ProcessClipVideo(graph, rawVideoIn, clip, compositionTimeline)
+				clipForVideo := clip
+				if len(track.Transitions) > 0 {
+					clipForVideoCopy := *clip
+					clipForVideoCopy.TimelineStart = 0
+					clipForVideo = &clipForVideoCopy
+				}
+
+				// Clip video pipeline (trim, speed, opacity, scale, PTS timeline start offset)
+				clipVideoPad, err := ProcessClipVideo(graph, rawVideoIn, clipForVideo, compositionTimeline)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed processing video clip %q: %w", clip.ID, err)
 				}
@@ -116,8 +136,8 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 				trackVideoPads = append(trackVideoPads, normalizedVideoPad)
 			}
 
-			// Handle Audio
-			if (track.Kind == timeline.TrackKindAudio || track.Kind == timeline.TrackKindVideo) && !track.Muted {
+			// Handle Audio (Skip for static image sources without audio)
+			if (track.Kind == timeline.TrackKindAudio || track.Kind == timeline.TrackKindVideo) && !track.Muted && !isImageSource(clip.Source) {
 				rawAudioIn := &filtergraph.Pad{
 					ID:         fmt.Sprintf("%d:a", inputIndex),
 					StreamType: filtergraph.StreamTypeAudio,
@@ -152,6 +172,14 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 				return nil, err
 			}
 			if len(track.Clips) > 0 {
+				if track.Clips[0].TimelineStart > 0 {
+					ptsChainNode := graph.NewNode(fmt.Sprintf("pts_chain_%s", track.ID), "setpts")
+					ptsChainNode.SetParam("expr", fmt.Sprintf("PTS-STARTPTS+%.4f/TB", track.Clips[0].TimelineStart.Seconds()))
+					ptsIn := ptsChainNode.AddInput(chainedVideoPad.ID, filtergraph.StreamTypeVideo)
+					ptsOut := ptsChainNode.AddOutput(graph.NextPadID("pts_chain_out"), filtergraph.StreamTypeVideo)
+					_ = graph.Connect(chainedVideoPad, ptsIn)
+					chainedVideoPad = ptsOut
+				}
 				syntheticChainedClip := &timeline.Clip{
 					ID:            fmt.Sprintf("chained_%s", track.ID),
 					TimelineStart: track.Clips[0].TimelineStart,

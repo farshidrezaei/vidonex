@@ -39,7 +39,11 @@ func BuildFFmpegArgs(inputs []string, filterComplex string, outVLabel, outALabel
 
 	// Inputs
 	for _, inPath := range inputs {
-		args = append(args, "-i", inPath)
+		if isImageSource(inPath) {
+			args = append(args, "-loop", "1", "-i", inPath)
+		} else {
+			args = append(args, "-i", inPath)
+		}
 	}
 
 	// Filter complex
