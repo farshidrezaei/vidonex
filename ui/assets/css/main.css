@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root {
+  --font-sans: 'Inter', 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background-color: #0b0f19;
+  color: #f3f4f6;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Custom Professional Dark Video Editor Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* NLE Timeline grid & snapping styles */
+.timeline-grid {
+  background-size: 100px 100%;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+.timeline-subgrid {
+  background-size: 20px 100%;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+/* Animated Shimmer Stripes for Drag Preview */
+@keyframes shimmerStripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+
+.timeline-drag-shimmer {
+  background-size: 40px 40px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(99, 102, 241, 0.15) 10px,
+    rgba(129, 140, 248, 0.3) 10px,
+    rgba(129, 140, 248, 0.3) 20px
+  );
+  animation: shimmerStripes 0.8s linear infinite;
+}
+
+.timeline-drag-incompatible {
+  background-size: 40px 40px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(239, 68, 68, 0.2),
+    rgba(239, 68, 68, 0.2) 10px,
+    rgba(248, 113, 113, 0.35) 10px,
+    rgba(248, 113, 113, 0.35) 20px
+  );
+  animation: shimmerStripes 0.8s linear infinite;
+}
+
+/* Checkerboard for Transparent Video Canvas */
+.canvas-checkerboard {
+  background-color: #18181b;
+  background-image:
+    linear-gradient(45deg, #27272a 25%, transparent 25%),
+    linear-gradient(-45deg, #27272a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #27272a 75%),
+    linear-gradient(-45deg, transparent 75%, #27272a 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}

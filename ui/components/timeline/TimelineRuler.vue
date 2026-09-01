@@ -1,0 +1,76 @@
+<template>
+  <div
+    class="h-7 border-b border-gray-800 bg-gray-950 relative select-none cursor-pointer"
+    :style="{ width: `${totalWidth}px` }"
+    @mousedown="handleRulerClick"
+  >
+    <!-- Major Time Marks -->
+    <div
+      v-for="mark in timeMarks"
+      :key="mark.time"
+      class="absolute top-0 bottom-0 border-l border-gray-700/80 flex flex-col justify-between pl-1 pointer-events-none"
+      :style="{ left: `${mark.position}px` }"
+    >
+      <span class="text-[10px] font-mono text-gray-400 font-medium tracking-tight">
+        {{ mark.label }}
+      </span>
+      <div class="w-px h-1.5 bg-gray-700"></div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useTimelineStore } from '~/stores/timeline'
+import { usePlaybackStore } from '~/stores/playback'
+
+const timelineStore = useTimelineStore()
+const playbackStore = usePlaybackStore()
+
+const totalWidth = computed(() => playbackStore.duration * timelineStore.pixelsPerSecond)
+
+const timeMarks = computed(() => {
+  const marks = []
+  const duration = playbackStore.duration
+  const pps = timelineStore.pixelsPerSecond
+
+  // Dynamic interval: 1s, 2s, 5s, 10s depending on zoom
+  let interval = 1
+  if (pps < 30) interval = 5
+  else if (pps < 60) interval = 2
+  else interval = 1
+
+  for (let t = 0; t <= duration; t += interval) {
+    const m = Math.floor(t / 60)
+    const s = Math.floor(t % 60)
+    const label = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+    marks.push({
+      time: t,
+      position: t * pps,
+      label,
+    })
+  }
+
+  return marks
+})
+
+function handleRulerClick(event: MouseEvent) {
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const clickX = event.clientX - rect.left
+  const targetTime = Math.max(0, clickX / timelineStore.pixelsPerSecond)
+  playbackStore.seek(targetTime)
+
+  const onMouseMove = (moveEvent: MouseEvent) => {
+    const moveX = moveEvent.clientX - rect.left
+    const newTime = Math.max(0, moveX / timelineStore.pixelsPerSecond)
+    playbackStore.seek(newTime)
+  }
+
+  const onMouseUp = () => {
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+  }
+
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
+</script>

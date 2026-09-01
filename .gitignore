@@ -13,6 +13,22 @@ vendor/
 bin/
 dist/
 
+# ── Node & Frontend UI build artifacts ──
+node_modules/
+.nuxt/
+.output/
+.nitro/
+.cache/
+ui/node_modules/
+ui/.nuxt/
+ui/.output/
+ui/.nitro/
+ui/.cache/
+ui/dist
+ui/dist/
+dist/
+dist
+
 # ── Test & coverage ──
 *.prof
 *.coverprofile

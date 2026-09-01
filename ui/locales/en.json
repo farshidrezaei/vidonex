@@ -1,0 +1,208 @@
+{
+  "app": {
+    "title": "Vidonyx Studio",
+    "tagline": "Declarative Video Composition Workstation",
+    "save": "Save",
+    "saved": "All changes saved",
+    "saving": "Saving...",
+    "export": "Render & Export",
+    "view_graph": "View Filtergraph",
+    "settings": "Settings",
+    "new_project": "New Project",
+    "open_project": "Open Project",
+    "delete_project": "Delete",
+    "duplicate_project": "Duplicate",
+    "undo": "Undo",
+    "redo": "Redo",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode",
+    "language": "Language"
+  },
+  "project": {
+    "title": "Project Settings",
+    "name": "Project Name",
+    "description": "Description",
+    "aspect_ratio": "Aspect Ratio",
+    "resolution": "Resolution",
+    "width": "Width",
+    "height": "Height",
+    "frame_rate": "Frame Rate",
+    "background_color": "Background Color",
+    "presets": {
+      "youtube_16_9": "YouTube / Landscape (16:9 - 1080p)",
+      "youtube_4k": "YouTube 4K Ultra HD (16:9 - 3840x2160)",
+      "tiktok_9_16": "TikTok / Shorts / Reels (9:16 - 1080x1920)",
+      "instagram_square": "Instagram Square (1:1 - 1080x1080)",
+      "cinema_wide": "Cinema Anamorphic (21:9 - 2560x1080)"
+    }
+  },
+  "media": {
+    "title": "Media Library",
+    "upload": "Upload Media",
+    "dropzone": "Drag & drop video, audio, or image files here, or click to browse",
+    "empty": "No media assets uploaded yet",
+    "add_to_timeline": "Add to Timeline",
+    "probe_details": "Inspect Metadata",
+    "delete": "Delete Asset",
+    "duration": "Duration",
+    "resolution": "Resolution",
+    "size": "File Size",
+    "video_tracks": "Video Streams",
+    "audio_tracks": "Audio Channels",
+    "fps": "FPS",
+    "sample_rate": "Sample Rate"
+  },
+  "timeline": {
+    "title": "Timeline",
+    "tracks": "Tracks",
+    "add_track": "Add Track",
+    "track_types": {
+      "video": "Video Track",
+      "audio": "Audio Track",
+      "overlay": "Overlay Track",
+      "subtitle": "Subtitle Track",
+      "waveform": "Waveform Track"
+    },
+    "split_at_playhead": "Split Clip (S)",
+    "delete_selected": "Delete (Del)",
+    "add_transition": "Add Transition",
+    "zoom_in": "Zoom In",
+    "zoom_out": "Zoom Out",
+    "fit_timeline": "Fit to Screen",
+    "snap_toggle": "Snapping",
+    "mute_track": "Mute",
+    "unmute_track": "Unmute",
+    "lock_track": "Lock",
+    "unlock_track": "Unlock",
+    "hide_track": "Hide",
+    "show_track": "Show",
+    "volume": "Volume",
+    "transitions": {
+      "fade": "Fade In / Out",
+      "dissolve": "Cross Dissolve",
+      "wipeleft": "Wipe Left",
+      "wiperight": "Wipe Right",
+      "circleopen": "Circle Open"
+    }
+  },
+  "viewport": {
+    "title": "Preview Viewport",
+    "play": "Play",
+    "pause": "Pause",
+    "step_forward": "Next Frame",
+    "step_backward": "Previous Frame",
+    "jump_start": "Jump to Start",
+    "jump_end": "Jump to End",
+    "loop": "Loop Playback",
+    "fit_screen": "Fit View",
+    "transform_gizmo": "Transform Controls",
+    "snap_guides": "Smart Guides",
+    "coordinates": "X: {x}px | Y: {y}px",
+    "dimensions": "W: {w}px | H: {h}px"
+  },
+  "inspector": {
+    "title": "Properties Inspector",
+    "no_selection": "Select a clip or track to view and edit properties",
+    "tabs": {
+      "transform": "Transform",
+      "effects": "Effects",
+      "audio": "Audio",
+      "chroma_key": "Chroma Key",
+      "ducking": "Ducking",
+      "waveform": "Waveform",
+      "subtitles": "Subtitles",
+      "keyframes": "Motion / Keyframes"
+    },
+    "transform": {
+      "position": "Position (X, Y)",
+      "scale": "Scale (%)",
+      "rotation": "Rotation (deg)",
+      "opacity": "Opacity (%)",
+      "alignment": "Anchor Alignment",
+      "speed": "Playback Speed",
+      "in_point": "In Point (Trim)",
+      "duration": "Duration",
+      "fade_in": "Fade In",
+      "fade_out": "Fade Out"
+    },
+    "chroma_key": {
+      "enable": "Enable Chroma Key",
+      "key_color": "Key Color",
+      "similarity": "Color Similarity",
+      "blend": "Edge Blend",
+      "despill": "Suppress Color Spill"
+    },
+    "ducking": {
+      "enable": "Auto Audio Ducking",
+      "target_track": "Duck Under Voiceover Track",
+      "threshold": "Threshold (dB)",
+      "duck_amount": "Attenuation (dB)",
+      "attack": "Attack Time (ms)",
+      "release": "Release Time (ms)"
+    },
+    "waveform": {
+      "mode": "Waveform Style",
+      "modes": {
+        "peak_to_peak": "Peak to Peak",
+        "bars": "Equalizer Bars",
+        "circular": "Circular Wave",
+        "wave": "Smooth Wave"
+      },
+      "color": "Primary Color",
+      "secondary_color": "Gradient Color",
+      "height": "Height (px)",
+      "line_width": "Bar / Line Width"
+    },
+    "subtitles": {
+      "import_srt": "Import SRT File",
+      "import_vtt": "Import VTT File",
+      "export_srt": "Export SRT",
+      "font_size": "Font Size",
+      "font_family": "Font Family",
+      "text_color": "Text Color",
+      "outline_color": "Outline Color",
+      "outline_width": "Outline Width",
+      "background_box": "Background Box",
+      "box_color": "Box Color",
+      "cues": "Subtitle Cues",
+      "add_cue": "Add Subtitle Cue"
+    },
+    "keyframes": {
+      "ken_burns": "Ken Burns Pan & Zoom Animation",
+      "easing": "Easing Curve",
+      "start_frame": "Start Frame Rect",
+      "end_frame": "End Frame Rect"
+    }
+  },
+  "render": {
+    "title": "Render & Export Video",
+    "output_format": "Output Container",
+    "preset": "Platform Encoding Preset",
+    "gpu_acceleration": "Hardware GPU Accelerator",
+    "gpus": {
+      "none": "Software Encoder (CPU - libx264)",
+      "nvenc": "NVIDIA NVENC (h264_nvenc / hevc_nvenc)",
+      "videotoolbox": "Apple Silicon VideoToolbox",
+      "qsv": "Intel QuickSync (QSV)",
+      "vaapi": "Linux VAAPI"
+    },
+    "crf": "Quality CRF (Lower is better)",
+    "bitrate": "Target Bitrate",
+    "start_render": "Start Rendering",
+    "rendering_status": "Rendering in progress...",
+    "progress": "Progress: {percent}%",
+    "fps": "Rendering Speed: {fps} FPS",
+    "current_time": "Processed: {time}s",
+    "speed": "Multiplier: {speed}x",
+    "eta": "Estimated Time Remaining: {eta}s",
+    "completed": "Render Completed Successfully!",
+    "download_file": "Download Rendered Video",
+    "cancel_render": "Cancel Job"
+  },
+  "graph": {
+    "title": "FFmpeg Filtergraph DAG Visualizer",
+    "subtitle": "Real-time Intermediate Representation DAG compiled from your composition timeline.",
+    "copy_mermaid": "Copy Mermaid Code",
+    "export_svg": "Export Diagram"
+  }
+}

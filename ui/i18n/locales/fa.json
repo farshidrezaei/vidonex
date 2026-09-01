@@ -1,0 +1,208 @@
+{
+  "app": {
+    "title": "استودیو ویدونیکس",
+    "tagline": "استودیو مدرن و تعاملی تدوین و کامپوزیشن ویدیو",
+    "save": "ذخیره",
+    "saved": "تغییرات ذخیره شد",
+    "saving": "در حال ذخیره...",
+    "export": "رندر و خروجی نهایی",
+    "view_graph": "مشاهده گراف فیلترها",
+    "settings": "تنظیمات",
+    "new_project": "پروژه جدید",
+    "open_project": "باز کردن پروژه",
+    "delete_project": "حذف",
+    "duplicate_project": "تکثیر",
+    "undo": "واگرد (Ctrl+Z)",
+    "redo": "ازنو (Ctrl+Y)",
+    "dark_mode": "حالت تیره",
+    "light_mode": "حالت روشن",
+    "language": "زبان"
+  },
+  "project": {
+    "title": "تنظیمات پروژه",
+    "name": "نام پروژه",
+    "description": "توضیحات",
+    "aspect_ratio": "نسبت تصویر (Aspect Ratio)",
+    "resolution": "رزولوشن تصویر",
+    "width": "عرض (Width)",
+    "height": "ارتفاع (Height)",
+    "frame_rate": "نرخ فریم (FPS)",
+    "background_color": "رنگ پس‌زمینه بوم",
+    "presets": {
+      "youtube_16_9": "یوتیوب / افقی (16:9 - 1080p)",
+      "youtube_4k": "یوتیوب 4K الترا اچ‌دی (16:9 - 3840x2160)",
+      "tiktok_9_16": "تیک‌تاک / ریلز اینستاگرام (9:16 - 1080x1920)",
+      "instagram_square": "پست مربعی اینستاگرام (1:1 - 1080x1080)",
+      "cinema_wide": "سینمایی عریض (21:9 - 2560x1080)"
+    }
+  },
+  "media": {
+    "title": "کتابخانه فایل‌ها و مدیا",
+    "upload": "آپلود فایل",
+    "dropzone": "فایل‌های ویدیو، صدا یا عکس را به اینجا بکشید یا برای انتخاب کلیک کنید",
+    "empty": "هنوز فایلی در این پروژه اضافه نشده است",
+    "add_to_timeline": "افزودن به تایم‌لاین",
+    "probe_details": "مشاهده مشخصات فنی (Probe)",
+    "delete": "حذف فایل",
+    "duration": "مدت زمان",
+    "resolution": "رزولوشن",
+    "size": "حجم فایل",
+    "video_tracks": "ترک‌های ویدیو",
+    "audio_tracks": "کانال‌های صدا",
+    "fps": "فریم‌ریت",
+    "sample_rate": "سمپل‌ریت صدا"
+  },
+  "timeline": {
+    "title": "تایم‌لاین تدوین",
+    "tracks": "لایه‌ها و ترک‌ها",
+    "add_track": "افزودن ترک جدید",
+    "track_types": {
+      "video": "ترک ویدیو (Video)",
+      "audio": "ترک صدا (Audio)",
+      "overlay": "ترک لایه رو (Overlay)",
+      "subtitle": "ترک زیرنویس (Subtitle)",
+      "waveform": "ترک امواج صوتی (Waveform)"
+    },
+    "split_at_playhead": "برش کلیپ در مکان فعلی (S)",
+    "delete_selected": "حذف کلیپ انتخاب‌شده (Del)",
+    "add_transition": "افزودن ترنزیشن",
+    "zoom_in": "بزرگ‌نمایی تایم‌لاین (+)",
+    "zoom_out": "کوچک‌نمایی تایم‌لاین (-)",
+    "fit_timeline": "انطباق با صفحه",
+    "snap_toggle": "اتصال مغناطیسی (Snap)",
+    "mute_track": "بی‌صدا کردن ترک",
+    "unmute_track": "وصل کردن صدای ترک",
+    "lock_track": "قفل کردن لایه",
+    "unlock_track": "باز کردن قفل",
+    "hide_track": "مخفی‌سازی",
+    "show_track": "نمایش لایه",
+    "volume": "حجم صدا",
+    "transitions": {
+      "fade": "فید محو شدن (Fade)",
+      "dissolve": "دیزاو نرم (Cross Dissolve)",
+      "wipeleft": "حرکت از راست به چپ (Wipe Left)",
+      "wiperight": "حرکت از چپ به راست (Wipe Right)",
+      "circleopen": "باز شدن دایره‌ای (Circle Open)"
+    }
+  },
+  "viewport": {
+    "title": "پیش‌نمایش بوم (Viewport)",
+    "play": "پخش",
+    "pause": "توقف",
+    "step_forward": "یک فریم جلوتر",
+    "step_backward": "یک فریم عقب‌تر",
+    "jump_start": "پرش به ابتدای تایم‌لاین",
+    "jump_end": "پرش به انتهای تایم‌لاین",
+    "loop": "تکرار مداوم",
+    "fit_screen": "اندازه مناسب صفحه",
+    "transform_gizmo": "ابزار ترنسفورم و جابجایی",
+    "snap_guides": "خطوط راهنمای تراز هوشمند",
+    "coordinates": "موقعیت: X={x}px | Y={y}px",
+    "dimensions": "ابعاد: W={w}px | H={h}px"
+  },
+  "inspector": {
+    "title": "پنل مشخصات و تنظیمات",
+    "no_selection": "یک کلیپ یا ترک را در تایم‌لاین انتخاب کنید تا تنظیمات آن نمایش داده شود",
+    "tabs": {
+      "transform": "ترنسفورم و مکان",
+      "effects": "افکت‌ها",
+      "audio": "تنظیمات صدا",
+      "chroma_key": "پرده سبز (Chroma Key)",
+      "ducking": "دکینگ صدا (Ducking)",
+      "waveform": "امواج صوتی (Waveform)",
+      "subtitles": "زیرنویس",
+      "keyframes": "انیمیشن و کین‌برنز"
+    },
+    "transform": {
+      "position": "موقعیت مکانی (X, Y)",
+      "scale": "مقیاس و اندازه (%)",
+      "rotation": "زاویه چرخش (درجه)",
+      "opacity": "میزان شفافیت / مات بودن (%)",
+      "alignment": "نقطه تراز (Anchor)",
+      "speed": "سرعت پخش کلیپ",
+      "in_point": "شروع برش (Trim In)",
+      "duration": "مدت زمان نمایش",
+      "fade_in": "زمان فید این (ورود)",
+      "fade_out": "زمان فید اوت (خروج)"
+    },
+    "chroma_key": {
+      "enable": "فعال‌سازی حذف پرده سبز / آبی",
+      "key_color": "رنگ کلیدی برای حذف",
+      "similarity": "میزان شباهت و دقت رنگ (Similarity)",
+      "blend": "میزان نرمی لبه‌ها (Blend)",
+      "despill": "حذف بازتاب رنگ سبز روی سوژه (Despill)"
+    },
+    "ducking": {
+      "enable": "دکینگ خودکار صدا (Sidechain Ducking)",
+      "target_track": "کم شدن صدای این ترک هنگام صحبت در ترک وویس‌اور",
+      "threshold": "آستانه تحریک (Threshold dB)",
+      "duck_amount": "میزان کاهش صدا (Attenuation dB)",
+      "attack": "سرعت کم شدن صدا (Attack ms)",
+      "release": "سرعت بازگشت صدا (Release ms)"
+    },
+    "waveform": {
+      "mode": "مدل نمایش امواج صوتی",
+      "modes": {
+        "peak_to_peak": "قله به قله قرینه (Peak to Peak)",
+        "bars": "میله‌های اکولایزر (Bars)",
+        "circular": "دایره‌ای متحرک (Circular)",
+        "wave": "موج پیوسته صوتی (Smooth Wave)"
+      },
+      "color": "رنگ اصلی موج",
+      "secondary_color": "رنگ دوم / گرادینت",
+      "height": "ارتفاع ویژوالایزر (پیکسل)",
+      "line_width": "ضخامت خطوط و میله‌ها"
+    },
+    "subtitles": {
+      "import_srt": "ایمپورت فایل SRT",
+      "import_vtt": "ایمپورت فایل VTT",
+      "export_srt": "اکسپورت زیرنویس SRT",
+      "font_size": "اندازه قلم فونت",
+      "font_family": "نام فونت",
+      "text_color": "رنگ متن",
+      "outline_color": "رنگ حاشیه متن",
+      "outline_width": "ضخامت خط دور متن",
+      "background_box": "کادر پس‌زمینه پشت متن",
+      "box_color": "رنگ کادر پس‌زمینه",
+      "cues": "بخش‌های زمانی زیرنویس",
+      "add_cue": "افزودن خط جدید زیرنویس"
+    },
+    "keyframes": {
+      "ken_burns": "افکت انیمیشن حرکتی کین‌برنز (Ken Burns)",
+      "easing": "منحنی شتاب و نرمی (Easing)",
+      "start_frame": "کادر فریم آغازین",
+      "end_frame": "کادر فریم پایانی"
+    }
+  },
+  "render": {
+    "title": "رندر و تولید ویدیوی نهایی",
+    "output_format": "فرمت ویدیوی خروجی",
+    "preset": "پریست آماده پلتفرم",
+    "gpu_acceleration": "شتاب‌دهنده سخت‌افزاری کارت گرافیک (GPU)",
+    "gpus": {
+      "none": "پردازنده معمولی (CPU - libx264)",
+      "nvenc": "کارت گرافیک انویدیا NVIDIA NVENC",
+      "videotoolbox": "چیپست‌های اپل سیلیکون VideoToolbox",
+      "qsv": "گرافیک اینتل Intel QuickSync",
+      "vaapi": "لینوکس سخت‌افزاری Linux VAAPI"
+    },
+    "crf": "کیفیت فشرده‌سازی CRF (عدد کمتر = کیفیت بالاتر)",
+    "bitrate": "بیت‌ریت هدف (Target Bitrate)",
+    "start_render": "شروع فرآیند رندر FFmpeg",
+    "rendering_status": "در حال رندر و پردازش فیلترگراف...",
+    "progress": "درصد پیشرفت: {percent}%",
+    "fps": "سرعت رندر: {fps} فریم بر ثانیه",
+    "current_time": "زمان پردازش‌شده: {time} ثانیه",
+    "speed": "ضریب سرعت: {speed} برابر",
+    "eta": "زمان تقریبی باقی‌مانده: {eta} ثانیه",
+    "completed": "رندر ویدیو با موفقیت کامل شد!",
+    "download_file": "دانلود فایل ویدیوی نهایی",
+    "cancel_render": "لغو عملیات رندر"
+  },
+  "graph": {
+    "title": "ویژوالایزر نمودار گراف فیلترهای FFmpeg",
+    "subtitle": "نمودار زنده DAG تولیدشده توسط کامپایلر Vidonyx که اتصالات پدها و نودهای پردازش ویدیو و صدا را نشان می‌دهد.",
+    "copy_mermaid": "کپی کد Mermaid",
+    "export_svg": "ذخیره دیاگرام"
+  }
+}
