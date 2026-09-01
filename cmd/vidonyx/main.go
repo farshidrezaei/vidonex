@@ -4,8 +4,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -18,6 +20,7 @@ import (
 	"github.com/farshidrezaei/vidonyx/internal/cli"
 	"github.com/farshidrezaei/vidonyx/presets"
 	"github.com/farshidrezaei/vidonyx/probe"
+	"github.com/farshidrezaei/vidonyx/server"
 	"github.com/farshidrezaei/vidonyx/spec"
 )
 
@@ -34,6 +37,8 @@ func main() {
 	command := strings.ToLower(os.Args[1])
 
 	switch command {
+	case "serve", "studio", "ui":
+		executeServeCommand(os.Args[2:])
 	case "render":
 		executeRenderCommand(os.Args[2:])
 	case "validate":
@@ -389,6 +394,61 @@ func reorderFlags(arguments []string) []string {
 	return append(flags, positionals...)
 }
 
+func executeServeCommand(arguments []string) {
+	fs := flag.NewFlagSet("serve", flag.ExitOnError)
+	portFlag := fs.Int("port", 8080, "HTTP server listening port")
+	hostFlag := fs.String("host", "0.0.0.0", "HTTP server listening host")
+	dataDirFlag := fs.String("data-dir", "", "Data directory for database, media, and exports")
+	staticDirFlag := fs.String("static-dir", "ui/dist", "Directory containing built Web Studio UI static files")
+	logLevelFlag := fs.String("log-level", "info", "Log verbosity level (debug, info, warn, error)")
+	logFormatFlag := fs.String("log-format", "text", "Log format (text, json)")
+
+	if err := fs.Parse(reorderFlags(arguments)); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed parsing flags: %v\n", err)
+		os.Exit(1)
+	}
+
+	ui := cli.NewUI(os.Stdout)
+	ui.PrintBanner()
+
+	logger := cli.SetupLogger(*logLevelFlag, *logFormatFlag, os.Stderr)
+
+	staticDirectory := *staticDirFlag
+	if staticDirectory == "ui/dist" {
+		if _, err := os.Stat("ui/.output/public"); err == nil {
+			staticDirectory = "ui/.output/public"
+		}
+	}
+
+	serverInstance, err := server.New(server.Config{
+		Port:            *portFlag,
+		Host:            *hostFlag,
+		DataDirectory:   *dataDirFlag,
+		StaticDirectory: staticDirectory,
+		Logger:          logger,
+	})
+	if err != nil {
+		ui.PrintError(fmt.Errorf("failed creating server: %w", err))
+		os.Exit(1)
+	}
+
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer shutdownCancel()
+		_ = serverInstance.Stop(shutdownCtx)
+	}()
+
+	fmt.Printf("\n✨ Vidonyx Web Studio running on http://localhost:%d\n\n", *portFlag)
+	if err := serverInstance.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		ui.PrintError(fmt.Errorf("server error: %w", err))
+		os.Exit(1)
+	}
+}
+
 func printUsage() {
 	usage := `
 Vidonyx - Declarative Video Composition & FFmpeg Filtergraph Engine
@@ -397,11 +457,19 @@ USAGE:
   vidonyx <command> [arguments] [flags]
 
 COMMANDS:
+  serve    [flags]              Launch the Vidonyx Web Studio GUI server
   render   <project.yaml|json>  Compile and render video composition
   validate <project.yaml|json>  Validate specification syntax and constraints
   graph    <project.yaml|json>  Export Mermaid.js or Graphviz DOT filtergraph diagram
   probe    <media.mp4>          Inspect media container and stream properties
   version                       Show Vidonyx engine version
+
+SERVE FLAGS:
+  --port <number>               HTTP port (default: 8080)
+  --host <string>               Listening host (default: 0.0.0.0)
+  --data-dir <path>             Custom data directory (default: ~/.vidonyx)
+  --static-dir <path>           Static assets directory (default: ui/dist)
+  --log-level <level>           Log verbosity (debug, info, warn, error)
 
 RENDER FLAGS:
   -o, --output <path>           Output file path (overrides project spec)
@@ -411,6 +479,7 @@ RENDER FLAGS:
   --dry-run                     Compile filtergraph without executing FFmpeg
 
 EXAMPLES:
+  vidonyx serve --port 8080
   vidonyx render project.yaml -o final.mp4
   vidonyx render project.yaml --gpu nvenc --log-level debug
   vidonyx validate project.yaml
