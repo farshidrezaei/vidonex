@@ -12,56 +12,56 @@
     <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-indigo-500 pointer-events-none"></div>
     <div
       class="absolute -top-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-indigo-500 cursor-grab active:cursor-grabbing hover:scale-125 transition-transform"
-      @mousedown="handleRotate"
+      @mousedown.stop="handleRotate"
     ></div>
 
     <!-- 8 Resize Handles -->
     <!-- Top-Left -->
     <div
       class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-indigo-500 cursor-nwse-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('tl', $event)"
+      @mousedown.stop="handleResize('tl', $event)"
     ></div>
 
     <!-- Top-Center -->
     <div
       class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-2 border-indigo-500 cursor-ns-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('tc', $event)"
+      @mousedown.stop="handleResize('tc', $event)"
     ></div>
 
     <!-- Top-Right -->
     <div
       class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-indigo-500 cursor-nesw-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('tr', $event)"
+      @mousedown.stop="handleResize('tr', $event)"
     ></div>
 
     <!-- Middle-Right -->
     <div
       class="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-white border-2 border-indigo-500 cursor-ew-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('mr', $event)"
+      @mousedown.stop="handleResize('mr', $event)"
     ></div>
 
     <!-- Bottom-Right -->
     <div
       class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-indigo-500 cursor-nwse-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('br', $event)"
+      @mousedown.stop="handleResize('br', $event)"
     ></div>
 
     <!-- Bottom-Center -->
     <div
       class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-2 border-indigo-500 cursor-ns-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('bc', $event)"
+      @mousedown.stop="handleResize('bc', $event)"
     ></div>
 
     <!-- Bottom-Left -->
     <div
       class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-indigo-500 cursor-nesw-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('bl', $event)"
+      @mousedown.stop="handleResize('bl', $event)"
     ></div>
 
     <!-- Middle-Left -->
     <div
       class="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-white border-2 border-indigo-500 cursor-ew-resize hover:scale-125 transition-transform"
-      @mousedown="handleResize('ml', $event)"
+      @mousedown.stop="handleResize('ml', $event)"
     ></div>
   </div>
 </template>

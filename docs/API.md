@@ -124,7 +124,9 @@ clip := timeline.NewClip("clip_id", "path/to/media.mp4", 0, 10*time.Second).
     WithVolume(0.8).                             // 80% audio volume
     WithOpacity(0.9).                            // 90% visual opacity
     WithPosition(types.Point{X: 100, Y: 100}).   // Canvas placement
-    WithScale(0.5)                               // 50% scale
+    WithScale(0.5).                              // 50% scale
+    WithRotation(332.0).                         // 332 degrees rotation
+    WithBlendMode("multiply")                    // Compositing blend mode
 ```
 
 ---

@@ -1,47 +1,50 @@
 <template>
   <div class="h-full flex flex-col bg-gray-950/90 relative overflow-hidden select-none">
     <!-- Viewport Canvas Stage -->
-    <div ref="stageRef" class="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+    <div ref="stageRef" class="flex-1 flex items-center justify-center p-10 relative overflow-hidden">
       <!-- Scaled Aspect Ratio Canvas Screen -->
       <div
-        class="canvas-stage relative shadow-2xl transition-all rounded-sm overflow-hidden flex items-center justify-center"
+        class="canvas-stage relative shadow-2xl transition-all rounded-sm flex items-center justify-center"
         :style="screenStyle"
       >
-        <!-- Canvas Background (Color or Checkerboard) -->
-        <div
-          class="absolute inset-0"
-          :class="projectStore.backgroundColor === 'transparent' ? 'canvas-checkerboard' : ''"
-          :style="{ backgroundColor: projectStore.backgroundColor }"
-        ></div>
-
-        <!-- Render Active Visual Clips at Playhead -->
-        <div
-          v-for="clip in activeVisualClips"
-          :key="clip.id"
-          class="absolute pointer-events-auto select-none flex items-center justify-center"
-          :style="getClipRenderStyle(clip)"
-          @click.stop="timelineStore.selectedClipId = clip.id"
-        >
-          <!-- Video / Image Asset Element -->
-          <img
-            v-if="isImage(clip.source)"
-            :src="`/api/media/files/${clip.source}`"
-            class="w-full h-full object-cover pointer-events-none select-none rounded-sm"
-            alt=""
-          />
-          <video
-            v-else-if="clip.source"
-            :src="`/api/media/files/${clip.source}`"
-            class="w-full h-full object-cover pointer-events-none select-none rounded-sm"
-            :currentTime="getClipCurrentTime(clip)"
-            muted
-            playsinline
-          ></video>
+        <!-- Canvas Screen Frame (Clipped Media & Background) -->
+        <div class="absolute inset-0 overflow-hidden rounded-sm pointer-events-none">
+          <!-- Canvas Background (Color or Checkerboard) -->
           <div
-            v-else
-            class="w-full h-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-xs font-mono text-indigo-300"
+            class="absolute inset-0 pointer-events-auto"
+            :class="projectStore.backgroundColor === 'transparent' ? 'canvas-checkerboard' : ''"
+            :style="{ backgroundColor: projectStore.backgroundColor }"
+          ></div>
+
+          <!-- Render Active Visual Clips at Playhead -->
+          <div
+            v-for="clip in activeVisualClips"
+            :key="clip.id"
+            class="absolute pointer-events-auto select-none flex items-center justify-center"
+            :style="getClipRenderStyle(clip)"
+            @click.stop="timelineStore.selectedClipId = clip.id"
           >
-            {{ clip.id }}
+            <!-- Video / Image Asset Element -->
+            <img
+              v-if="isImage(clip.source)"
+              :src="`/api/media/files/${clip.source}`"
+              class="w-full h-full object-cover pointer-events-none select-none rounded-sm"
+              alt=""
+            />
+            <video
+              v-else-if="clip.source"
+              :src="`/api/media/files/${clip.source}`"
+              class="w-full h-full object-cover pointer-events-none select-none rounded-sm"
+              :currentTime="getClipCurrentTime(clip)"
+              muted
+              playsinline
+            ></video>
+            <div
+              v-else
+              class="w-full h-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-xs font-mono text-indigo-300"
+            >
+              {{ clip.id }}
+            </div>
           </div>
         </div>
 
@@ -128,8 +131,8 @@ const stageRef = ref<HTMLDivElement | null>(null)
 const stageDimensions = useElementSize(stageRef)
 
 const displayDimensions = computed(() => {
-  const availableW = Math.max(100, stageDimensions.width.value - 48)
-  const availableH = Math.max(100, stageDimensions.height.value - 48)
+  const availableW = Math.max(100, stageDimensions.width.value - 80)
+  const availableH = Math.max(100, stageDimensions.height.value - 80)
 
   const canvasW = projectStore.canvasWidth
   const canvasH = projectStore.canvasHeight
@@ -186,6 +189,7 @@ function getClipRenderStyle(clip: ClipSpec) {
     height: `${bounds.height}px`,
     transform: `rotate(${bounds.rotation}deg)`,
     opacity: bounds.opacity,
+    mixBlendMode: (clip.blend_mode && clip.blend_mode !== 'normal') ? clip.blend_mode : 'normal',
     transformOrigin: 'center center',
   }
 }

@@ -100,9 +100,45 @@
     "coordinates": "X: {x}px | Y: {y}px",
     "dimensions": "W: {w}px | H: {h}px"
   },
+  "shortcuts": {
+    "button": "Shortcuts",
+    "title": "Keyboard Shortcuts",
+    "play_pause": "Play / Pause playback",
+    "split": "Split clip at playhead position",
+    "delete": "Delete selected clip or track",
+    "undo": "Undo last action",
+    "redo": "Redo last action",
+    "zoom_in": "Zoom in timeline view",
+    "zoom_out": "Zoom out timeline view",
+    "fit": "Fit timeline to screen width"
+  },
   "inspector": {
     "title": "Properties Inspector",
+    "empty": "Select a track or clip on the timeline to inspect and edit its properties.",
     "no_selection": "Select a clip or track to view and edit properties",
+    "timing": "Timing & Duration",
+    "transform": "Transform & Position",
+    "audio": "Audio Controls",
+    "start_time": "Start Time",
+    "duration": "Duration",
+    "alignment": "Anchor Alignment",
+    "scale": "Scale (%)",
+    "rotation": "Rotation (deg)",
+    "opacity": "Opacity (%)",
+    "blend_mode": "Blend Mode",
+    "volume": "Volume (%)",
+    "blend_modes": {
+      "normal": "Normal",
+      "multiply": "Multiply",
+      "screen": "Screen",
+      "overlay": "Overlay",
+      "add": "Add (Addition)",
+      "darken": "Darken",
+      "lighten": "Lighten",
+      "difference": "Difference",
+      "hardlight": "Hard Light",
+      "softlight": "Soft Light"
+    },
     "tabs": {
       "transform": "Transform",
       "effects": "Effects",
@@ -113,19 +149,8 @@
       "subtitles": "Subtitles",
       "keyframes": "Motion / Keyframes"
     },
-    "transform": {
-      "position": "Position (X, Y)",
-      "scale": "Scale (%)",
-      "rotation": "Rotation (deg)",
-      "opacity": "Opacity (%)",
-      "alignment": "Anchor Alignment",
-      "speed": "Playback Speed",
-      "in_point": "In Point (Trim)",
-      "duration": "Duration",
-      "fade_in": "Fade In",
-      "fade_out": "Fade Out"
-    },
     "chroma_key": {
+      "title": "Chroma Key (Green Screen)",
       "enable": "Enable Chroma Key",
       "key_color": "Key Color",
       "similarity": "Color Similarity",
@@ -133,6 +158,7 @@
       "despill": "Suppress Color Spill"
     },
     "ducking": {
+      "title": "Sidechain Audio Ducking",
       "enable": "Auto Audio Ducking",
       "target_track": "Duck Under Voiceover Track",
       "threshold": "Threshold (dB)",
@@ -141,6 +167,7 @@
       "release": "Release Time (ms)"
     },
     "waveform": {
+      "title": "Audio Waveform Visualizer",
       "mode": "Waveform Style",
       "modes": {
         "peak_to_peak": "Peak to Peak",
@@ -153,7 +180,8 @@
       "height": "Height (px)",
       "line_width": "Bar / Line Width"
     },
-    "subtitles": {
+    "subtitle": {
+      "title": "Subtitle Burn-In",
       "import_srt": "Import SRT File",
       "import_vtt": "Import VTT File",
       "export_srt": "Export SRT",
@@ -163,15 +191,60 @@
       "outline_color": "Outline Color",
       "outline_width": "Outline Width",
       "background_box": "Background Box",
+      "box": "Background Box",
       "box_color": "Box Color",
       "cues": "Subtitle Cues",
       "add_cue": "Add Subtitle Cue"
     },
-    "keyframes": {
+    "subtitles": {
+      "title": "Subtitle Burn-In",
+      "import_srt": "Import SRT File",
+      "import_vtt": "Import VTT File",
+      "export_srt": "Export SRT",
+      "font_size": "Font Size",
+      "font_family": "Font Family",
+      "text_color": "Text Color",
+      "outline_color": "Outline Color",
+      "outline_width": "Outline Width",
+      "background_box": "Background Box",
+      "box": "Background Box",
+      "box_color": "Box Color",
+      "cues": "Subtitle Cues",
+      "add_cue": "Add Subtitle Cue"
+    },
+    "motion": {
+      "title": "Motion & Keyframes",
+      "enable": "Enable Dynamic Motion Track",
       "ken_burns": "Ken Burns Pan & Zoom Animation",
+      "start_scale": "Start Scale (x)",
+      "end_scale": "End Scale (x)",
       "easing": "Easing Curve",
       "start_frame": "Start Frame Rect",
-      "end_frame": "End Frame Rect"
+      "end_frame": "End Frame Rect",
+      "easings": {
+        "linear": "Linear",
+        "easeInQuad": "Ease In Quad",
+        "easeOutQuad": "Ease Out Quad",
+        "easeInOutQuad": "Ease In/Out Quad",
+        "easeInOutCubic": "Ease In/Out Cubic"
+      }
+    },
+    "keyframes": {
+      "title": "Motion & Keyframes",
+      "enable": "Enable Dynamic Motion Track",
+      "ken_burns": "Ken Burns Pan & Zoom Animation",
+      "start_scale": "Start Scale (x)",
+      "end_scale": "End Scale (x)",
+      "easing": "Easing Curve",
+      "start_frame": "Start Frame Rect",
+      "end_frame": "End Frame Rect",
+      "easings": {
+        "linear": "Linear",
+        "easeInQuad": "Ease In Quad",
+        "easeOutQuad": "Ease Out Quad",
+        "easeInOutQuad": "Ease In/Out Quad",
+        "easeInOutCubic": "Ease In/Out Cubic"
+      }
     }
   },
   "render": {

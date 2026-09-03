@@ -2,7 +2,9 @@ package compiler
 
 import (
 	"fmt"
+	"math"
 	"sort"
+	"strings"
 
 	"github.com/farshidrezaei/vidonyx/chromakey"
 	"github.com/farshidrezaei/vidonyx/effects"
@@ -149,14 +151,41 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = ptsZoomOutput
 	} else if clip.Scale != 1.0 && clip.Scale > 0 {
 		scaleNode := graph.NewNode(fmt.Sprintf("scale_%s", clip.ID), "scale")
-		scaleNode.SetParam("w", fmt.Sprintf("iw*%.4f", clip.Scale))
-		scaleNode.SetParam("h", fmt.Sprintf("ih*%.4f", clip.Scale))
+		scaleNode.SetParam("w", fmt.Sprintf("ceil(iw*%.4f/2)*2", clip.Scale))
+		scaleNode.SetParam("h", fmt.Sprintf("ceil(ih*%.4f/2)*2", clip.Scale))
 		scaleInput := scaleNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
 		scaleOutput := scaleNode.AddOutput(graph.NextPadID("scale_out"), filtergraph.StreamTypeVideo)
 		if err := graph.Connect(currentPad, scaleInput); err != nil {
 			return nil, err
 		}
 		currentPad = scaleOutput
+	}
+
+	// 6. Clip rotation handling
+	if clip.Rotation != 0 {
+		rotateNode := graph.NewNode(fmt.Sprintf("rotate_%s", clip.ID), "rotate")
+		radians := clip.Rotation * math.Pi / 180.0
+		rotateNode.SetParam("a", fmt.Sprintf("%.6f", radians))
+		rotateNode.SetParam("ow", fmt.Sprintf("ceil(rotw(%.6f)/2)*2", radians))
+		rotateNode.SetParam("oh", fmt.Sprintf("ceil(roth(%.6f)/2)*2", radians))
+		rotateNode.SetParam("c", "black@0.0")
+
+		rotateInput := rotateNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		rotateOutput := rotateNode.AddOutput(graph.NextPadID("rotate_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, rotateInput); err != nil {
+			return nil, err
+		}
+		currentPad = rotateOutput
+
+		// Ensure yuva420p after rotation to retain alpha channel transparency
+		rotateFormatNode := graph.NewNode(fmt.Sprintf("rotate_fmt_%s", clip.ID), "format")
+		rotateFormatNode.SetParam("pix_fmts", "yuva420p")
+		rotateFormatInput := rotateFormatNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		rotateFormatOutput := rotateFormatNode.AddOutput(graph.NextPadID("rotate_fmt_out"), filtergraph.StreamTypeVideo)
+		if err := graph.Connect(currentPad, rotateFormatInput); err != nil {
+			return nil, err
+		}
+		currentPad = rotateFormatOutput
 	}
 
 	return currentPad, nil
@@ -336,50 +365,90 @@ func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timelin
 
 	currentCanvas := backgroundOutput
 
-	// Sort clips by Track Z-Index and TimelineStart
+	// Sort clips by Track Z-Index, Track Index, and TimelineStart
 	sort.SliceStable(processedVideoPads, func(i, j int) bool {
 		if processedVideoPads[i].ZIndex != processedVideoPads[j].ZIndex {
 			return processedVideoPads[i].ZIndex < processedVideoPads[j].ZIndex
 		}
+		if processedVideoPads[i].TrackIndex != processedVideoPads[j].TrackIndex {
+			return processedVideoPads[i].TrackIndex < processedVideoPads[j].TrackIndex
+		}
 		return processedVideoPads[i].Clip.TimelineStart < processedVideoPads[j].Clip.TimelineStart
 	})
 
-	// Overlay each clip on top of the canvas
+	// Overlay or blend each clip on top of the canvas
 	for index, item := range processedVideoPads {
-		overlayNode := graph.NewNode(fmt.Sprintf("overlay_%d_%s", index, item.Clip.ID), "overlay")
+		blendMode := strings.ToLower(item.Clip.BlendMode)
+		if blendMode == "add" {
+			blendMode = "addition"
+		}
 
-		var xExpression, yExpression string
-		if item.Clip.PositionTrack != nil {
-			posX, posY := item.Clip.PositionTrack.ToFFmpegExpressions()
-			xExpression = fmt.Sprintf("'%s'", posX)
-			yExpression = fmt.Sprintf("'%s'", posY)
-			overlayNode.SetParam("eval", "frame")
+		if blendMode != "" && blendMode != "normal" {
+			// Pad clip stream to canvas dimensions for pixel-wise blend mode filter
+			padNode := graph.NewNode(fmt.Sprintf("pad_blend_%d_%s", index, item.Clip.ID), "pad")
+			padNode.SetParam("w", compositionTimeline.Canvas.Width)
+			padNode.SetParam("h", compositionTimeline.Canvas.Height)
+			padNode.SetParam("x", fmt.Sprintf("(ow-iw)/2+(%d)", item.Clip.Position.X))
+			padNode.SetParam("y", fmt.Sprintf("(oh-ih)/2+(%d)", item.Clip.Position.Y))
+			padNode.SetParam("color", "black@0.0")
+
+			padInput := padNode.AddInput(item.Pad.ID, filtergraph.StreamTypeVideo)
+			padOutput := padNode.AddOutput(graph.NextPadID("pad_blend_out"), filtergraph.StreamTypeVideo)
+			if err := graph.Connect(item.Pad, padInput); err != nil {
+				return nil, err
+			}
+
+			blendNode := graph.NewNode(fmt.Sprintf("blend_%d_%s", index, item.Clip.ID), "blend")
+			blendNode.SetParam("all_mode", blendMode)
+
+			inputBase := blendNode.AddInput(currentCanvas.ID, filtergraph.StreamTypeVideo)
+			inputTop := blendNode.AddInput(padOutput.ID, filtergraph.StreamTypeVideo)
+			outputCanvas := blendNode.AddOutput(graph.NextPadID("blend_video_out"), filtergraph.StreamTypeVideo)
+
+			if err := graph.Connect(currentCanvas, inputBase); err != nil {
+				return nil, err
+			}
+			if err := graph.Connect(padOutput, inputTop); err != nil {
+				return nil, err
+			}
+
+			currentCanvas = outputCanvas
 		} else {
-			xExpression = fmt.Sprintf("%d", item.Clip.Position.X)
-			yExpression = fmt.Sprintf("%d", item.Clip.Position.Y)
+			overlayNode := graph.NewNode(fmt.Sprintf("overlay_%d_%s", index, item.Clip.ID), "overlay")
+
+			var xExpression, yExpression string
+			if item.Clip.PositionTrack != nil {
+				posX, posY := item.Clip.PositionTrack.ToFFmpegExpressions()
+				xExpression = fmt.Sprintf("'(main_w-overlay_w)/2+(%s)'", posX)
+				yExpression = fmt.Sprintf("'(main_h-overlay_h)/2+(%s)'", posY)
+				overlayNode.SetParam("eval", "frame")
+			} else {
+				xExpression = fmt.Sprintf("(main_w-overlay_w)/2+(%d)", item.Clip.Position.X)
+				yExpression = fmt.Sprintf("(main_h-overlay_h)/2+(%d)", item.Clip.Position.Y)
+			}
+
+			overlayNode.SetParam("x", xExpression)
+			overlayNode.SetParam("y", yExpression)
+
+			// Time interval enable expression
+			startSeconds := item.Clip.TimelineStart.Seconds()
+			endSeconds := item.Clip.TimelineEnd().Seconds()
+			overlayNode.SetParam("enable", fmt.Sprintf("'between(t,%.4f,%.4f)'", startSeconds, endSeconds))
+			overlayNode.SetParam("eof_action", "pass")
+
+			inputBase := overlayNode.AddInput(currentCanvas.ID, filtergraph.StreamTypeVideo)
+			inputOverlay := overlayNode.AddInput(item.Pad.ID, filtergraph.StreamTypeVideo)
+			outputCanvas := overlayNode.AddOutput(graph.NextPadID("composite_video"), filtergraph.StreamTypeVideo)
+
+			if err := graph.Connect(currentCanvas, inputBase); err != nil {
+				return nil, err
+			}
+			if err := graph.Connect(item.Pad, inputOverlay); err != nil {
+				return nil, err
+			}
+
+			currentCanvas = outputCanvas
 		}
-
-		overlayNode.SetParam("x", xExpression)
-		overlayNode.SetParam("y", yExpression)
-
-		// Time interval enable expression
-		startSeconds := item.Clip.TimelineStart.Seconds()
-		endSeconds := item.Clip.TimelineEnd().Seconds()
-		overlayNode.SetParam("enable", fmt.Sprintf("'between(t,%.4f,%.4f)'", startSeconds, endSeconds))
-		overlayNode.SetParam("eof_action", "pass")
-
-		inputBase := overlayNode.AddInput(currentCanvas.ID, filtergraph.StreamTypeVideo)
-		inputOverlay := overlayNode.AddInput(item.Pad.ID, filtergraph.StreamTypeVideo)
-		outputCanvas := overlayNode.AddOutput(graph.NextPadID("composite_video"), filtergraph.StreamTypeVideo)
-
-		if err := graph.Connect(currentCanvas, inputBase); err != nil {
-			return nil, err
-		}
-		if err := graph.Connect(item.Pad, inputOverlay); err != nil {
-			return nil, err
-		}
-
-		currentCanvas = outputCanvas
 	}
 
 	// Format final output to yuv420p for standard MP4 encoding compatibility
@@ -428,7 +497,8 @@ func BuildAudioMixer(graph *filtergraph.Graph, compositionTimeline *timeline.Tim
 
 // ClipVideoPad pairs a processed video pad with its Clip metadata and Track Z-Index.
 type ClipVideoPad struct {
-	Clip   *timeline.Clip
-	ZIndex int
-	Pad    *filtergraph.Pad
+	Clip       *timeline.Clip
+	ZIndex     int
+	TrackIndex int
+	Pad        *filtergraph.Pad
 }

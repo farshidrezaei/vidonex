@@ -21,7 +21,7 @@ func InjectVideoNormalizer(graph *filtergraph.Graph, inputPad *filtergraph.Pad, 
 		return nil, err
 	}
 
-	// Scale & Pad to canvas with letterboxing/pillarboxing
+	// Scale to canvas bounds with aspect ratio preservation
 	scaleNode := graph.NewNode(fmt.Sprintf("%s_scale", normalizerID), "scale")
 	scaleNode.SetParam("w", canvas.Width)
 	scaleNode.SetParam("h", canvas.Height)
@@ -33,26 +33,12 @@ func InjectVideoNormalizer(graph *filtergraph.Graph, inputPad *filtergraph.Pad, 
 		return nil, err
 	}
 
-	// Pad node with 100% transparent padding (black@0.0)
-	padNode := graph.NewNode(fmt.Sprintf("%s_pad", normalizerID), "pad")
-	padNode.SetParam("w", canvas.Width)
-	padNode.SetParam("h", canvas.Height)
-	padNode.SetParam("x", "(ow-iw)/2")
-	padNode.SetParam("y", "(oh-ih)/2")
-	padNode.SetParam("color", "black@0.0")
-
-	padInput := padNode.AddInput(scaleOutput.ID, filtergraph.StreamTypeVideo)
-	padOutput := padNode.AddOutput(graph.NextPadID("pad_out"), filtergraph.StreamTypeVideo)
-	if err := graph.Connect(scaleOutput, padInput); err != nil {
-		return nil, err
-	}
-
 	// SetSAR node
 	sarNode := graph.NewNode(fmt.Sprintf("%s_sar", normalizerID), "setsar")
 	sarNode.SetParam("sar", "1")
-	sarInput := sarNode.AddInput(padOutput.ID, filtergraph.StreamTypeVideo)
+	sarInput := sarNode.AddInput(scaleOutput.ID, filtergraph.StreamTypeVideo)
 	sarOutput := sarNode.AddOutput(graph.NextPadID("sar_out"), filtergraph.StreamTypeVideo)
-	if err := graph.Connect(padOutput, sarInput); err != nil {
+	if err := graph.Connect(scaleOutput, sarInput); err != nil {
 		return nil, err
 	}
 

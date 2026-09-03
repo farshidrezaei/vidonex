@@ -105,7 +105,7 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"mode=p2p",
 				"scale=sqrt",
 				"format=pix_fmts=yuva420p",
-				"overlay=x=460:y=800",
+				"overlay=x=(main_w-overlay_w)/2+(460):y=(main_h-overlay_h)/2+(800)",
 				"out_audiogram.mp4",
 			},
 		},
@@ -222,7 +222,7 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 			expectedArgSnippets: []string{
 				"zoompan=z='if(lt(in_time,",
 				"x='iw/2-(iw/zoom/2)'",
-				"overlay=eval=frame:x='if(lt(t,",
+				"overlay=eval=frame:x='(main_w-overlay_w)/2+(if(lt(t,",
 			},
 		},
 		{
@@ -272,7 +272,7 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 			expectedArgSnippets: []string{
 				"-i bg.mp4",
 				"-i cam.mp4",
-				"overlay=x=100:y=100",
+				"overlay=x=(main_w-overlay_w)/2+(100):y=(main_h-overlay_h)/2+(100)",
 				"between(t,1.0000,6.0000)",
 				"out_pip.mp4",
 			},
@@ -330,6 +330,57 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"-preset slow",
 				"-b:a 128k",
 				"out_hevc.mkv",
+			},
+		},
+		{
+			name: "clip with scale, rotation, and overlay positioning",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+
+				mainTrack := timeline.NewTrack("main", timeline.TrackKindVideo).SetZIndex(0)
+				mainTrack.AddClip(timeline.NewClip("bg", "bg.mp4", 0, 10*time.Second))
+
+				pipTrack := timeline.NewTrack("pip", timeline.TrackKindOverlay).SetZIndex(1)
+				pipTrack.AddClip(timeline.NewClip("fg", "cam.mp4", 0, 5*time.Second).
+					WithScale(0.34).
+					WithRotation(332.0).
+					WithPosition(types.Point{X: -232, Y: 220}))
+
+				tl.AddTrack(mainTrack, pipTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_rotated_pip.mp4",
+			expectedInputCount: 2,
+			expectedArgSnippets: []string{
+				"scale=w=ceil(iw*0.3400/2)*2:h=ceil(ih*0.3400/2)*2",
+				"rotate=a=5.794493:ow=ceil(rotw(5.794493)/2)*2:oh=ceil(roth(5.794493)/2)*2:c=black@0.0",
+				"overlay=x=(main_w-overlay_w)/2+(-232):y=(main_h-overlay_h)/2+(220)",
+				"out_rotated_pip.mp4",
+			},
+		},
+		{
+			name: "clip with blend mode compositing",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+
+				mainTrack := timeline.NewTrack("main", timeline.TrackKindVideo).SetZIndex(0)
+				mainTrack.AddClip(timeline.NewClip("bg", "bg.mp4", 0, 10*time.Second))
+
+				blendTrack := timeline.NewTrack("blend_layer", timeline.TrackKindOverlay).SetZIndex(1)
+				blendTrack.AddClip(timeline.NewClip("texture", "texture.mp4", 0, 5*time.Second).
+					WithBlendMode("multiply"))
+
+				tl.AddTrack(mainTrack, blendTrack)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_blend.mp4",
+			expectedInputCount: 2,
+			expectedArgSnippets: []string{
+				"pad=w=1920:h=1080:x=(ow-iw)/2+(0):y=(oh-ih)/2+(0)",
+				"blend=all_mode=multiply",
+				"out_blend.mp4",
 			},
 		},
 	}

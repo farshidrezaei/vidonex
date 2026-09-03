@@ -346,6 +346,36 @@ Vidonyx Real End-To-End Subtitles
 			expectedMaxDuration: 2200 * time.Millisecond,
 			verifyAudioPresence: true,
 		},
+		{
+			name: "10_clip_scale_rotation_and_blend_mode_overlay",
+			buildTimeline: func(assets syntheticMediaAssets) *timeline.Timeline {
+				compositionTimeline := timeline.New(
+					timeline.WithCanvas(types.Res720p),
+					timeline.WithFPS(types.FPS30),
+				)
+				bgTrack := timeline.NewTrack("bg", timeline.TrackKindVideo).SetZIndex(0)
+				bgTrack.AddClip(timeline.NewClip("bg_clip", assets.videoAlpha, 0, 2*time.Second))
+
+				overlayTrack := timeline.NewTrack("overlay_track", timeline.TrackKindOverlay).SetZIndex(1)
+				overlayClip := timeline.NewClip("scaled_rotated_clip", assets.videoBeta, 0, 2*time.Second).
+					WithScale(0.35).
+					WithRotation(332.0).
+					WithPosition(types.Point{X: -150, Y: 100}).
+					WithOpacity(0.85).
+					WithBlendMode("normal")
+				overlayTrack.AddClip(overlayClip)
+
+				compositionTimeline.AddTrack(bgTrack, overlayTrack)
+				return compositionTimeline
+			},
+			configureComposer: func() []composer.Option {
+				return nil
+			},
+			expectedCanvas:      types.Res720p,
+			expectedMinDuration: 1800 * time.Millisecond,
+			expectedMaxDuration: 2200 * time.Millisecond,
+			verifyAudioPresence: true,
+		},
 	}
 
 	for _, tt := range tests {

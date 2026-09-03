@@ -232,6 +232,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       rotation: 0,
       opacity: 1.0,
       volume: 1.0,
+      blend_mode: 'normal',
       position: {
         x: 0,
         y: 0,
@@ -419,6 +420,10 @@ export const useTimelineStore = defineStore('timeline', () => {
   }
 
   function toVideoSpec(): VideoSpec {
+    const exportedTracks = tracks.value.map((track, index) => ({
+      ...track,
+      z_index: track.z_index !== undefined ? track.z_index : index,
+    }))
     return {
       version: '1.0',
       canvas: {
@@ -427,7 +432,7 @@ export const useTimelineStore = defineStore('timeline', () => {
         frame_rate: projectStore.frameRate,
         background_color: projectStore.backgroundColor,
       },
-      tracks: JSON.parse(JSON.stringify(tracks.value)),
+      tracks: JSON.parse(JSON.stringify(exportedTracks)),
     }
   }
 

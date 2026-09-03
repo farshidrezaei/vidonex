@@ -81,3 +81,4 @@ Desktop.ini
 # ── Debug ──
 __debug_bin*
 *.log
+.codegraph/

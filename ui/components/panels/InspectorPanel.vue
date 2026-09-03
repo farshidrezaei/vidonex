@@ -91,7 +91,7 @@
             <div>
               <div class="flex justify-between text-gray-500 mb-1">
                 <span>{{ $t('inspector.scale') }}</span>
-                <span class="font-mono text-gray-300">{{ selectedClip.scale || 1.0 }}x</span>
+                <span class="font-mono text-gray-300">{{ selectedClip.scale ?? 1.0 }}x</span>
               </div>
               <input
                 v-model.number="selectedClip.scale"
@@ -106,7 +106,7 @@
             <div>
               <div class="flex justify-between text-gray-500 mb-1">
                 <span>{{ $t('inspector.rotation') }}</span>
-                <span class="font-mono text-gray-300">{{ selectedClip.rotation || 0 }}°</span>
+                <span class="font-mono text-gray-300">{{ selectedClip.rotation ?? 0 }}°</span>
               </div>
               <input
                 v-model.number="selectedClip.rotation"
@@ -134,6 +134,17 @@
               step="0.05"
               class="w-full h-1 bg-gray-800 rounded appearance-none accent-indigo-500"
               @input="commitChange('Update Opacity')"
+            />
+          </div>
+
+          <!-- Blend Mode Select -->
+          <div class="text-xs">
+            <label class="block text-gray-500 mb-1">{{ $t('inspector.blend_mode') }}</label>
+            <USelect
+              v-model="clipBlendMode"
+              :items="blendModeOptions"
+              size="sm"
+              @change="commitChange('Update Blend Mode')"
             />
           </div>
         </div>
@@ -249,6 +260,30 @@ const alignmentOptions = [
   { label: 'Bottom Left', value: 'bottom-left' },
   { label: 'Bottom Right', value: 'bottom-right' },
 ]
+
+const { t } = useI18n()
+
+const clipBlendMode = computed({
+  get: () => selectedClip.value?.blend_mode || 'normal',
+  set: (val: string) => {
+    if (selectedClip.value) {
+      selectedClip.value.blend_mode = val
+    }
+  },
+})
+
+const blendModeOptions = computed(() => [
+  { label: t('inspector.blend_modes.normal'), value: 'normal' },
+  { label: t('inspector.blend_modes.multiply'), value: 'multiply' },
+  { label: t('inspector.blend_modes.screen'), value: 'screen' },
+  { label: t('inspector.blend_modes.overlay'), value: 'overlay' },
+  { label: t('inspector.blend_modes.add'), value: 'add' },
+  { label: t('inspector.blend_modes.darken'), value: 'darken' },
+  { label: t('inspector.blend_modes.lighten'), value: 'lighten' },
+  { label: t('inspector.blend_modes.difference'), value: 'difference' },
+  { label: t('inspector.blend_modes.hardlight'), value: 'hardlight' },
+  { label: t('inspector.blend_modes.softlight'), value: 'softlight' },
+])
 
 function updatePosition() {
   timelineStore.pushHistoryState('Update Clip Position')

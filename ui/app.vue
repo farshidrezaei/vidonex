@@ -47,11 +47,31 @@ import { useTimelineStore } from '~/stores/timeline'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useGlobalShortcuts, isShortcutsModalOpen } from '~/composables/useGlobalShortcuts'
 
+const { locale } = useI18n()
 const projectStore = useProjectStore()
 const mediaStore = useMediaStore()
 const timelineStore = useTimelineStore()
 const { connect } = useWebSocket()
 const { registerGlobalListeners, unregisterGlobalListeners } = useGlobalShortcuts()
+
+// Synchronize document direction (RTL for 'fa', LTR for 'en') reactively on page load, refresh & language toggle
+useHead({
+  htmlAttrs: {
+    lang: computed(() => locale.value),
+    dir: computed(() => (locale.value === 'fa' ? 'rtl' : 'ltr')),
+  },
+})
+
+watch(
+  () => locale.value,
+  (newLocale) => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('dir', newLocale === 'fa' ? 'rtl' : 'ltr')
+      document.documentElement.setAttribute('lang', newLocale)
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(async () => {
   // Register global shortcuts capture listener

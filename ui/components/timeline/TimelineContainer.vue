@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col bg-gray-950 select-none overflow-hidden">
+  <div class="h-full flex flex-col bg-gray-950 select-none overflow-hidden" dir="ltr">
     <!-- Timeline Actions Toolbar -->
     <div class="h-10 border-b border-gray-800 px-3 bg-gray-950/80 flex items-center justify-between z-20">
       <!-- Left: Add Track, History, Edit Tools -->

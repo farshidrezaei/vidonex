@@ -59,6 +59,7 @@ type ClipSpec struct {
 	Opacity     *float64        `json:"opacity,omitempty" yaml:"opacity,omitempty"`
 	Scale       float64         `json:"scale,omitempty" yaml:"scale,omitempty"`
 	Rotation    float64         `json:"rotation,omitempty" yaml:"rotation,omitempty"`
+	BlendMode   string          `json:"blend_mode,omitempty" yaml:"blend_mode,omitempty"`
 	FadeIn      any             `json:"fade_in,omitempty" yaml:"fade_in,omitempty"`
 	FadeOut     any             `json:"fade_out,omitempty" yaml:"fade_out,omitempty"`
 	Position    *PositionSpec   `json:"position,omitempty" yaml:"position,omitempty"`

@@ -53,6 +53,7 @@ export interface ClipSpec {
   opacity?: number
   scale?: number
   rotation?: number
+  blend_mode?: string
   fade_in?: number | string
   fade_out?: number | string
   position?: PositionSpec

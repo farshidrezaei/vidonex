@@ -397,6 +397,9 @@ func buildClip(clipSpec ClipSpec) (*timeline.Clip, error) {
 	if clipSpec.Rotation != 0 {
 		clip.WithRotation(clipSpec.Rotation)
 	}
+	if clipSpec.BlendMode != "" {
+		clip.WithBlendMode(clipSpec.BlendMode)
+	}
 	if clipSpec.FadeIn != nil {
 		fadeInTime, fadeErr := ParseDurationValue(clipSpec.FadeIn)
 		if fadeErr != nil {

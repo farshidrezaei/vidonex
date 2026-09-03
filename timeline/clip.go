@@ -22,6 +22,8 @@ type Clip struct {
 	Alignment         types.Alignment
 	Scale             float64  // Scale factor (1.0 = original size)
 	Rotation          float64  // Rotation in degrees (e.g. 90.0, 180.0)
+	BlendMode         string   // Blending mode for compositing (e.g. "normal", "multiply", "screen", "overlay")
+	HasAudioStream    bool     // Indicates whether the source file contains audio (default true for non-image sources)
 	FadeInDuration    time.Duration
 	FadeOutDuration   time.Duration
 	PositionTrack     *animation.PositionTrack
@@ -34,17 +36,18 @@ type Clip struct {
 // NewClip creates a Clip with sensible defaults.
 func NewClip(id, source string, start, duration time.Duration) *Clip {
 	return &Clip{
-		ID:            id,
-		Source:        source,
-		TimelineStart: start,
-		Duration:      duration,
-		SourceStart:   0,
-		Speed:         1.0,
-		Volume:        1.0,
-		Opacity:       1.0,
-		Scale:         1.0,
-		Alignment:     types.AlignCenter,
-		Effects:       make([]Effect, 0),
+		ID:             id,
+		Source:         source,
+		TimelineStart:  start,
+		Duration:       duration,
+		SourceStart:    0,
+		Speed:          1.0,
+		Volume:         1.0,
+		Opacity:        1.0,
+		Scale:          1.0,
+		HasAudioStream: true,
+		Alignment:      types.AlignCenter,
+		Effects:        make([]Effect, 0),
 	}
 }
 
@@ -133,6 +136,18 @@ func (clip *Clip) WithOpacityTrack(track *animation.FloatKeyframeTrack) *Clip {
 // WithRotation sets the rotation in degrees.
 func (clip *Clip) WithRotation(degrees float64) *Clip {
 	clip.Rotation = degrees
+	return clip
+}
+
+// WithBlendMode sets the compositing blend mode.
+func (clip *Clip) WithBlendMode(mode string) *Clip {
+	clip.BlendMode = mode
+	return clip
+}
+
+// WithHasAudio sets whether the clip source contains an audio stream.
+func (clip *Clip) WithHasAudio(hasAudio bool) *Clip {
+	clip.HasAudioStream = hasAudio
 	return clip
 }
 

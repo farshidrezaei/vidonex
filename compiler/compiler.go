@@ -99,7 +99,7 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 	trackAudioPadMap := make(map[string]*filtergraph.Pad)
 
 	// 2. Process each track's clips
-	for _, track := range compositionTimeline.Tracks {
+	for trackIndex, track := range compositionTimeline.Tracks {
 		trackVideoPads := make([]*filtergraph.Pad, 0, len(track.Clips))
 		trackAudioPads := make([]*filtergraph.Pad, 0, len(track.Clips))
 
@@ -121,23 +121,23 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					clipForVideo = &clipForVideoCopy
 				}
 
-				// Clip video pipeline (trim, speed, opacity, scale, PTS timeline start offset)
-				clipVideoPad, err := ProcessClipVideo(graph, rawVideoIn, clipForVideo, compositionTimeline)
-				if err != nil {
-					return nil, fmt.Errorf("compiler: failed processing video clip %q: %w", clip.ID, err)
-				}
-
-				// Normalize clip stream to canvas bounds if needed
-				normalizedVideoPad, err := InjectVideoNormalizer(graph, clipVideoPad, compositionTimeline.Canvas, compositionTimeline.FPS)
+				// 1. Normalize clip stream to canvas bounds, SAR, FPS and yuva420p format
+				normalizedVideoPad, err := InjectVideoNormalizer(graph, rawVideoIn, compositionTimeline.Canvas, compositionTimeline.FPS)
 				if err != nil {
 					return nil, fmt.Errorf("compiler: failed normalizing video clip %q: %w", clip.ID, err)
 				}
 
-				trackVideoPads = append(trackVideoPads, normalizedVideoPad)
+				// 2. Clip video pipeline (trim, speed, chromakey, fade, opacity, scale, rotation)
+				clipVideoPad, err := ProcessClipVideo(graph, normalizedVideoPad, clipForVideo, compositionTimeline)
+				if err != nil {
+					return nil, fmt.Errorf("compiler: failed processing video clip %q: %w", clip.ID, err)
+				}
+
+				trackVideoPads = append(trackVideoPads, clipVideoPad)
 			}
 
-			// Handle Audio (Skip for static image sources without audio)
-			if (track.Kind == timeline.TrackKindAudio || track.Kind == timeline.TrackKindVideo) && !track.Muted && !isImageSource(clip.Source) {
+			// Handle Audio (Skip for static image sources or clips without audio streams)
+			if (track.Kind == timeline.TrackKindAudio || track.Kind == timeline.TrackKindVideo) && !track.Muted && !isImageSource(clip.Source) && clip.HasAudioStream {
 				rawAudioIn := &filtergraph.Pad{
 					ID:         fmt.Sprintf("%d:a", inputIndex),
 					StreamType: filtergraph.StreamTypeAudio,
@@ -186,18 +186,20 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 					Duration:      track.Duration() - track.Clips[0].TimelineStart,
 				}
 				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
-					Clip:   syntheticChainedClip,
-					ZIndex: track.ZIndex,
-					Pad:    chainedVideoPad,
+					Clip:       syntheticChainedClip,
+					ZIndex:     track.ZIndex,
+					TrackIndex: trackIndex,
+					Pad:        chainedVideoPad,
 				})
 			}
 		} else {
 			for index, clip := range track.Clips {
 				if index < len(trackVideoPads) {
 					processedVideoPads = append(processedVideoPads, &ClipVideoPad{
-						Clip:   clip,
-						ZIndex: track.ZIndex,
-						Pad:    trackVideoPads[index],
+						Clip:       clip,
+						ZIndex:     track.ZIndex,
+						TrackIndex: trackIndex,
+						Pad:        trackVideoPads[index],
 					})
 				}
 			}

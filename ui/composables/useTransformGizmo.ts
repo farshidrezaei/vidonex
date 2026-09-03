@@ -220,7 +220,8 @@ export function useTransformGizmo() {
     const initialScale = selectedClip.value.scale || 1.0
 
     // Center point in screen coordinates
-    const rect = (event.target as HTMLElement).closest('.canvas-stage')?.getBoundingClientRect()
+    const stage = document.querySelector('.canvas-stage')
+    const rect = stage?.getBoundingClientRect()
     const stageLeft = rect ? rect.left : 0
     const stageTop = rect ? rect.top : 0
 
@@ -268,7 +269,8 @@ export function useTransformGizmo() {
     event.stopPropagation()
 
     isRotating.value = true
-    const rect = (event.target as HTMLElement).closest('.canvas-stage')?.getBoundingClientRect()
+    const stage = document.querySelector('.canvas-stage')
+    const rect = stage?.getBoundingClientRect()
     const stageLeft = rect ? rect.left : 0
     const stageTop = rect ? rect.top : 0
 
@@ -284,13 +286,14 @@ export function useTransformGizmo() {
       const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
       let deltaAngle = currentAngle - initialAngle
       let newRotation = (initialClipRotation + deltaAngle) % 360
-      if (newRotation < 0) newRotation += 360
+      if (newRotation > 180) newRotation -= 360
+      if (newRotation < -180) newRotation += 360
 
-      // Snap to 0, 45, 90, 135, 180, 225, 270, 315, 360 degrees
-      const snapAngles = [0, 45, 90, 135, 180, 225, 270, 315, 360]
+      // Snap to 0, 45, 90, 135, 180, -45, -90, -135, -180 degrees
+      const snapAngles = [0, 45, 90, 135, 180, -45, -90, -135, -180]
       for (const snap of snapAngles) {
         if (Math.abs(newRotation - snap) < 4) {
-          newRotation = snap === 360 ? 0 : snap
+          newRotation = snap
           break
         }
       }
