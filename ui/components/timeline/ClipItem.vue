@@ -28,14 +28,42 @@
           <div class="absolute inset-0 bg-gradient-to-r from-gray-950/85 via-transparent to-gray-950/85"></div>
         </div>
 
-        <!-- Audio Waveform Visualization SVG for Audio Clips -->
+        <!-- Audio Waveform Visualization SVG for Audio / Waveform Clips -->
         <div
-          v-else-if="trackKind === 'audio'"
-          class="absolute inset-0 opacity-35 pointer-events-none flex items-center px-2 overflow-hidden"
+          v-else-if="trackKind === 'audio' || trackKind === 'waveform'"
+          class="absolute inset-0 pointer-events-none flex items-center px-1 overflow-hidden"
         >
-          <svg class="w-full h-8 text-emerald-400" preserveAspectRatio="none" viewBox="0 0 100 20">
-            <path d="M0,10 Q5,2 10,10 T20,10 T30,10 T40,2 T50,18 T60,5 T70,15 T80,8 T90,12 T100,10 L100,20 L0,20 Z" fill="currentColor" opacity="0.3" />
-            <path d="M0,10 Q5,2 10,10 T20,10 T30,10 T40,2 T50,18 T60,5 T70,15 T80,8 T90,12 T100,10" stroke="currentColor" stroke-width="1.5" fill="none" />
+          <svg
+            class="w-full h-6"
+            :class="trackKind === 'audio' ? 'text-emerald-400/50' : 'text-purple-400/50'"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <pattern
+                :id="`waveform-pattern-${clip.id}`"
+                width="48"
+                height="24"
+                patternUnits="userSpaceOnUse"
+              >
+                <!-- Subtle Center Baseline -->
+                <line x1="0" y1="12" x2="48" y2="12" stroke="currentColor" stroke-width="0.75" opacity="0.25" />
+
+                <!-- Symmetrical Bounded Waveform Bars -->
+                <rect x="1" y="7" width="2" height="10" rx="1" fill="currentColor" />
+                <rect x="5" y="4" width="2" height="16" rx="1" fill="currentColor" />
+                <rect x="9" y="8" width="2" height="8" rx="1" fill="currentColor" />
+                <rect x="13" y="2" width="2" height="20" rx="1" fill="currentColor" />
+                <rect x="17" y="5" width="2" height="14" rx="1" fill="currentColor" />
+                <rect x="21" y="9" width="2" height="6" rx="1" fill="currentColor" />
+                <rect x="25" y="3" width="2" height="18" rx="1" fill="currentColor" />
+                <rect x="29" y="6" width="2" height="12" rx="1" fill="currentColor" />
+                <rect x="33" y="1" width="2" height="22" rx="1" fill="currentColor" />
+                <rect x="37" y="7" width="2" height="10" rx="1" fill="currentColor" />
+                <rect x="41" y="4" width="2" height="16" rx="1" fill="currentColor" />
+                <rect x="45" y="8" width="2" height="8" rx="1" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" :fill="`url(#waveform-pattern-${clip.id})`" />
           </svg>
         </div>
 

@@ -141,6 +141,30 @@ export const useTimelineStore = defineStore('timeline', () => {
     playbackStore.duration = Math.max(10, Math.ceil(newDuration) + 2)
   }, { immediate: true })
 
+  let isInternalLoading = false
+  let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null
+
+  function saveCurrentTimeline() {
+    if (isInternalLoading) return
+    projectStore.saveCurrentProject(toVideoSpec())
+  }
+
+  function triggerAutoSave() {
+    if (isInternalLoading) return
+    if (autoSaveTimeout) clearTimeout(autoSaveTimeout)
+    autoSaveTimeout = setTimeout(() => {
+      saveCurrentTimeline()
+    }, 300)
+  }
+
+  watch(
+    tracks,
+    () => {
+      triggerAutoSave()
+    },
+    { deep: true }
+  )
+
   function pushHistoryState(description = 'Edit Timeline') {
     undoStack.value.push({
       tracks: JSON.stringify(tracks.value),
@@ -151,8 +175,8 @@ export const useTimelineStore = defineStore('timeline', () => {
     }
     redoStack.value = [] // Clear redo stack on new mutation
 
-    // Trigger auto-save
-    projectStore.saveCurrentProject(toVideoSpec())
+    // Trigger immediate auto-save
+    saveCurrentTimeline()
   }
 
   function undo() {
@@ -389,7 +413,8 @@ export const useTimelineStore = defineStore('timeline', () => {
     const track = tracks.value.find((t) => t.id === trackId)
     if (!track) return
 
-    pushHistoryState('Add transition')
+    const dur = Math.max(0.1, parseFloat(String(duration)) || 1.0)
+
     if (!track.transitions) {
       track.transitions = []
     }
@@ -399,7 +424,7 @@ export const useTimelineStore = defineStore('timeline', () => {
       from: fromClipId,
       to: toClipId,
       type,
-      duration,
+      duration: dur,
     }
 
     if (existingIndex !== -1) {
@@ -407,15 +432,32 @@ export const useTimelineStore = defineStore('timeline', () => {
     } else {
       track.transitions.push(newTransition)
     }
+
+    pushHistoryState(`Add transition ${type} (${dur}s)`)
+    saveCurrentTimeline()
   }
 
   function loadFromSpec(spec: VideoSpec) {
     if (spec.tracks && spec.tracks.length > 0) {
-      tracks.value = JSON.parse(JSON.stringify(spec.tracks))
+      isInternalLoading = true
+      const parsedTracks: TrackSpec[] = JSON.parse(JSON.stringify(spec.tracks))
+      for (const track of parsedTracks) {
+        if (track.transitions) {
+          for (const trans of track.transitions) {
+            if (trans.duration !== undefined) {
+              trans.duration = parseFloat(String(trans.duration)) || 1.0
+            }
+          }
+        }
+      }
+      tracks.value = parsedTracks
       selectedClipId.value = null
       selectedTrackId.value = tracks.value[0]?.id || null
       undoStack.value = []
       redoStack.value = []
+      setTimeout(() => {
+        isInternalLoading = false
+      }, 100)
     }
   }
 

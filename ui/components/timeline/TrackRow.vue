@@ -190,11 +190,13 @@ const adjacentClipPairs = computed(() => {
   for (let i = 0; i < sorted.length - 1; i++) {
     const current = sorted[i]
     const next = sorted[i + 1]
-    const currentEnd = (Number(current.start) || 0) + (Number(current.duration) || 0)
-    const nextStart = Number(next.start) || 0
+    if (current && next) {
+      const currentEnd = (Number(current.start) || 0) + (Number(current.duration) || 0)
+      const nextStart = Number(next.start) || 0
 
-    if (Math.abs(currentEnd - nextStart) < 0.5) {
-      pairs.push({ from: current, to: next })
+      if (Math.abs(currentEnd - nextStart) < 0.5) {
+        pairs.push({ from: current, to: next })
+      }
     }
   }
 
