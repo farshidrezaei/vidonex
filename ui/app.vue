@@ -91,13 +91,16 @@ onMounted(async () => {
 
   if (projectStore.currentProject) {
     await mediaStore.fetchAssets(projectStore.currentProject.id)
-    if (typeof projectStore.currentProject.specification === 'string') {
+    const specData = projectStore.currentProject.specification
+    if (typeof specData === 'string') {
       try {
-        const parsed = JSON.parse(projectStore.currentProject.specification)
+        const parsed = JSON.parse(specData)
         timelineStore.loadFromSpec(parsed)
-      } catch {
-        // Use initial tracks
+      } catch (err) {
+        console.error('Failed parsing project spec string:', err)
       }
+    } else if (specData && typeof specData === 'object') {
+      timelineStore.loadFromSpec(specData as any)
     }
   }
 })
