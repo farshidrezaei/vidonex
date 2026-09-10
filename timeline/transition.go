@@ -32,6 +32,8 @@ const (
 	TransitionSlideDown TransitionType = "slidedown"
 	// TransitionCircleCrop expands a circular crop into the next clip.
 	TransitionCircleCrop TransitionType = "circlecrop"
+	// TransitionCircleOpen opens a circle from the center into the next clip.
+	TransitionCircleOpen TransitionType = "circleopen"
 	// TransitionZoomIn zooms smoothly into the next clip.
 	TransitionZoomIn TransitionType = "zoomin"
 

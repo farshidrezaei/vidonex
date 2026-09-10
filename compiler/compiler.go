@@ -167,7 +167,7 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 
 		// If track has transitions, chain the track's clips together with xfade / acrossfade
 		if len(track.Transitions) > 0 && len(trackVideoPads) > 1 {
-			chainedVideoPad, err := ChainTrackTransitionsVideo(graph, trackVideoPads, track.Transitions, track.Clips)
+			chainedVideoPad, chainedDuration, err := ChainTrackTransitionsVideo(graph, trackVideoPads, track.Transitions, track.Clips, compositionTimeline.Canvas)
 			if err != nil {
 				return nil, err
 			}
@@ -183,7 +183,7 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 				syntheticChainedClip := &timeline.Clip{
 					ID:            fmt.Sprintf("chained_%s", track.ID),
 					TimelineStart: track.Clips[0].TimelineStart,
-					Duration:      track.Duration() - track.Clips[0].TimelineStart,
+					Duration:      chainedDuration,
 				}
 				processedVideoPads = append(processedVideoPads, &ClipVideoPad{
 					Clip:       syntheticChainedClip,
@@ -206,7 +206,7 @@ func (compilerInstance *Compiler) Compile(compositionTimeline *timeline.Timeline
 		}
 
 		if len(track.Transitions) > 0 && len(trackAudioPads) > 1 {
-			chainedAudioPad, err := ChainTrackTransitionsAudio(graph, trackAudioPads, track.Transitions)
+			chainedAudioPad, err := ChainTrackTransitionsAudio(graph, trackAudioPads, track.Transitions, track.Clips)
 			if err != nil {
 				return nil, err
 			}

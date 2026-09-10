@@ -5,11 +5,13 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/farshidrezaei/vidonyx/chromakey"
 	"github.com/farshidrezaei/vidonyx/effects"
 	"github.com/farshidrezaei/vidonyx/filtergraph"
 	"github.com/farshidrezaei/vidonyx/timeline"
+	"github.com/farshidrezaei/vidonyx/types"
 )
 
 // ProcessClipVideo processes a single clip's video pipeline:
@@ -279,75 +281,251 @@ func ProcessClipAudio(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 	return currentPad, nil
 }
 
-// ChainTrackTransitionsVideo connects adjacent video clips on a track using xfade transitions.
-func ChainTrackTransitionsVideo(graph *filtergraph.Graph, videoPads []*filtergraph.Pad, transitions []*timeline.Transition, clips []*timeline.Clip) (*filtergraph.Pad, error) {
-	if len(videoPads) == 0 {
-		return nil, nil
+// NormalizePadForTrackTransition scales and pads a video clip stream to uniform canvas dimensions,
+// ensuring SAR=1 and yuva420p format so that xfade and vconcat filters never fail due to parameter mismatches.
+func NormalizePadForTrackTransition(
+	graph *filtergraph.Graph,
+	inputPad *filtergraph.Pad,
+	clip *timeline.Clip,
+	canvas types.Size,
+) (*filtergraph.Pad, error) {
+	currentPad := inputPad
+
+	// 1. Only downscale if stream dimensions exceed canvas bounds (preserving existing clip.Scale and aspect ratio)
+	scaleNode := graph.NewNode(fmt.Sprintf("trans_fit_scale_%s", clip.ID), "scale")
+	scaleNode.SetParam("w", fmt.Sprintf("'if(gt(iw,%d),%d,iw)'", canvas.Width, canvas.Width))
+	scaleNode.SetParam("h", fmt.Sprintf("'if(gt(ih,%d),%d,ih)'", canvas.Height, canvas.Height))
+	scaleNode.SetParam("force_original_aspect_ratio", "decrease")
+
+	scaleInput := scaleNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+	scaleOutput := scaleNode.AddOutput(graph.NextPadID("trans_scale_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentPad, scaleInput); err != nil {
+		return nil, err
 	}
-	if len(videoPads) == 1 || len(transitions) == 0 {
-		return videoPads[0], nil
+	currentPad = scaleOutput
+
+	// 2. Pad to exact canvas dimensions with transparent background (black@0.0)
+	padNode := graph.NewNode(fmt.Sprintf("trans_fit_pad_%s", clip.ID), "pad")
+	padNode.SetParam("w", canvas.Width)
+	padNode.SetParam("h", canvas.Height)
+	padNode.SetParam("x", fmt.Sprintf("(ow-iw)/2+(%d)", clip.Position.X))
+	padNode.SetParam("y", fmt.Sprintf("(oh-ih)/2+(%d)", clip.Position.Y))
+	padNode.SetParam("color", "black@0.0")
+
+	padInput := padNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+	padOutput := padNode.AddOutput(graph.NextPadID("trans_pad_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentPad, padInput); err != nil {
+		return nil, err
+	}
+	currentPad = padOutput
+
+	// 3. Set SAR to 1
+	sarNode := graph.NewNode(fmt.Sprintf("trans_fit_sar_%s", clip.ID), "setsar")
+	sarNode.SetParam("sar", "1")
+	sarInput := sarNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+	sarOutput := sarNode.AddOutput(graph.NextPadID("trans_sar_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentPad, sarInput); err != nil {
+		return nil, err
+	}
+	currentPad = sarOutput
+
+	// 4. Format to yuva420p to retain alpha transparency
+	formatNode := graph.NewNode(fmt.Sprintf("trans_fit_fmt_%s", clip.ID), "format")
+	formatNode.SetParam("pix_fmts", "yuva420p")
+	formatInput := formatNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+	formatOutput := formatNode.AddOutput(graph.NextPadID("trans_fmt_out"), filtergraph.StreamTypeVideo)
+	if err := graph.Connect(currentPad, formatInput); err != nil {
+		return nil, err
 	}
 
-	currentStream := videoPads[0]
-	accumulatedDuration := clips[0].Duration.Seconds()
-
-	for index := 0; index < len(transitions) && index+1 < len(videoPads); index++ {
-		transition := transitions[index]
-		nextPad := videoPads[index+1]
-
-		transitionDuration := transition.Duration.Seconds()
-		transitionOffset := accumulatedDuration - transitionDuration
-		if transitionOffset < 0 {
-			transitionOffset = 0
-		}
-
-		xfadeFilter := effects.XFadeFilter{
-			Transition: transition.Type,
-			Duration:   transitionDuration,
-			Offset:     transitionOffset,
-		}
-
-		transitionNodeID := graph.NextPadID(fmt.Sprintf("xfade_trans_%d", index))
-		transitionedOutput, err := xfadeFilter.Apply(graph, transitionNodeID, currentStream, nextPad)
-		if err != nil {
-			return nil, fmt.Errorf("compiler: failed to apply xfade transition %q: %w", transition.ID, err)
-		}
-
-		currentStream = transitionedOutput
-		accumulatedDuration += clips[index+1].Duration.Seconds() - transitionDuration
-	}
-
-	return currentStream, nil
+	return formatOutput, nil
 }
 
-// ChainTrackTransitionsAudio connects adjacent audio clips on a track using acrossfade transitions.
-func ChainTrackTransitionsAudio(graph *filtergraph.Graph, audioPads []*filtergraph.Pad, transitions []*timeline.Transition) (*filtergraph.Pad, error) {
+// ChainTrackTransitionsVideo connects adjacent video clips on a track using xfade transitions or concat cuts.
+func ChainTrackTransitionsVideo(
+	graph *filtergraph.Graph,
+	videoPads []*filtergraph.Pad,
+	transitions []*timeline.Transition,
+	clips []*timeline.Clip,
+	canvas ...types.Size,
+) (*filtergraph.Pad, time.Duration, error) {
+	if len(videoPads) == 0 {
+		return nil, 0, nil
+	}
+	if len(videoPads) == 1 {
+		return videoPads[0], clips[0].Duration, nil
+	}
+
+	targetCanvas := types.Res1080p
+	if len(canvas) > 0 && canvas[0].Width > 0 && canvas[0].Height > 0 {
+		targetCanvas = canvas[0]
+	}
+
+	// Normalize all incoming video pads to targetCanvas dimensions and yuva420p format
+	// so that xfade and concat never fail due to resolution or pixel format mismatches.
+	normalizedPads := make([]*filtergraph.Pad, len(videoPads))
+	for index, pad := range videoPads {
+		clip := clips[index]
+		normalizedPad, err := NormalizePadForTrackTransition(graph, pad, clip, targetCanvas)
+		if err != nil {
+			return nil, 0, fmt.Errorf("compiler: failed normalizing video pad for transition %q: %w", clip.ID, err)
+		}
+		normalizedPads[index] = normalizedPad
+	}
+
+	transitionLookupMap := make(map[string]*timeline.Transition)
+	for _, transitionItem := range transitions {
+		if transitionItem != nil && transitionItem.ClipA != nil && transitionItem.ClipB != nil {
+			lookupKey := fmt.Sprintf("%s->%s", transitionItem.ClipA.ID, transitionItem.ClipB.ID)
+			transitionLookupMap[lookupKey] = transitionItem
+		}
+	}
+
+	currentStream := normalizedPads[0]
+	accumulatedDuration := clips[0].Duration
+
+	for index := 0; index < len(clips)-1 && index+1 < len(normalizedPads); index++ {
+		currentClip := clips[index]
+		nextClip := clips[index+1]
+		nextPad := normalizedPads[index+1]
+
+		lookupKey := fmt.Sprintf("%s->%s", currentClip.ID, nextClip.ID)
+		transitionItem, hasTransition := transitionLookupMap[lookupKey]
+
+		// Fallback for transitions configured without explicit clip references
+		if !hasTransition && index < len(transitions) && (transitions[index].ClipA == nil || transitions[index].ClipB == nil) {
+			transitionItem = transitions[index]
+			hasTransition = true
+		}
+
+		if hasTransition && transitionItem != nil {
+			transitionDuration := transitionItem.Duration
+			halfTransitionDuration := transitionDuration / 2
+			transitionOffset := accumulatedDuration - halfTransitionDuration
+			if transitionOffset < 0 {
+				transitionOffset = 0
+			}
+
+			// Pad outgoing stream so it remains available throughout [T_cut, T_cut + halfTransitionDuration]
+			tpadNode := graph.NewNode(fmt.Sprintf("tpad_trans_%s_%s", currentClip.ID, nextClip.ID), "tpad")
+			tpadNode.SetParam("stop_mode", "clone")
+			tpadNode.SetParam("stop_duration", fmt.Sprintf("%.4f", halfTransitionDuration.Seconds()))
+			tpadInput := tpadNode.AddInput(currentStream.ID, filtergraph.StreamTypeVideo)
+			tpadOutput := tpadNode.AddOutput(graph.NextPadID("tpad_trans_out"), filtergraph.StreamTypeVideo)
+			if err := graph.Connect(currentStream, tpadInput); err != nil {
+				return nil, 0, err
+			}
+
+			xfadeFilter := effects.XFadeFilter{
+				Transition: transitionItem.Type,
+				Duration:   transitionDuration.Seconds(),
+				Offset:     transitionOffset.Seconds(),
+			}
+
+			transitionNodeID := fmt.Sprintf("xfade_trans_%s_%s", currentClip.ID, nextClip.ID)
+			transitionedOutput, err := xfadeFilter.Apply(graph, transitionNodeID, tpadOutput, nextPad)
+			if err != nil {
+				return nil, 0, fmt.Errorf("compiler: failed to apply xfade transition %q: %w", transitionItem.ID, err)
+			}
+
+			currentStream = transitionedOutput
+			accumulatedDuration = transitionOffset + nextClip.Duration
+		} else {
+			// Connect adjacent clips with standard cut using concat
+			concatNode := graph.NewNode(fmt.Sprintf("vconcat_%s_%s", currentClip.ID, nextClip.ID), "concat")
+			concatNode.SetParam("n", "2")
+			concatNode.SetParam("v", "1")
+			concatNode.SetParam("a", "0")
+
+			concatInputA := concatNode.AddInput(currentStream.ID, filtergraph.StreamTypeVideo)
+			concatInputB := concatNode.AddInput(nextPad.ID, filtergraph.StreamTypeVideo)
+			concatOutput := concatNode.AddOutput(graph.NextPadID("cut_vconcat_out"), filtergraph.StreamTypeVideo)
+
+			if err := graph.Connect(currentStream, concatInputA); err != nil {
+				return nil, 0, err
+			}
+			if err := graph.Connect(nextPad, concatInputB); err != nil {
+				return nil, 0, err
+			}
+
+			currentStream = concatOutput
+			accumulatedDuration = accumulatedDuration + nextClip.Duration
+		}
+	}
+
+	return currentStream, accumulatedDuration, nil
+}
+
+// ChainTrackTransitionsAudio connects adjacent audio clips on a track using acrossfade transitions or concat cuts.
+func ChainTrackTransitionsAudio(
+	graph *filtergraph.Graph,
+	audioPads []*filtergraph.Pad,
+	transitions []*timeline.Transition,
+	clips []*timeline.Clip,
+) (*filtergraph.Pad, error) {
 	if len(audioPads) == 0 {
 		return nil, nil
 	}
-	if len(audioPads) == 1 || len(transitions) == 0 {
+	if len(audioPads) == 1 {
 		return audioPads[0], nil
+	}
+
+	transitionLookupMap := make(map[string]*timeline.Transition)
+	for _, transitionItem := range transitions {
+		if transitionItem != nil && transitionItem.ClipA != nil && transitionItem.ClipB != nil {
+			lookupKey := fmt.Sprintf("%s->%s", transitionItem.ClipA.ID, transitionItem.ClipB.ID)
+			transitionLookupMap[lookupKey] = transitionItem
+		}
 	}
 
 	currentStream := audioPads[0]
 
-	for index := 0; index < len(transitions) && index+1 < len(audioPads); index++ {
-		transition := transitions[index]
+	for index := 0; index < len(clips)-1 && index+1 < len(audioPads); index++ {
+		currentClip := clips[index]
+		nextClip := clips[index+1]
 		nextPad := audioPads[index+1]
 
-		acrossFadeFilter := effects.AcrossFadeFilter{
-			Duration: transition.Duration.Seconds(),
-			Curve1:   "tri",
-			Curve2:   "tri",
+		lookupKey := fmt.Sprintf("%s->%s", currentClip.ID, nextClip.ID)
+		transitionItem, hasTransition := transitionLookupMap[lookupKey]
+
+		if !hasTransition && index < len(transitions) && (transitions[index].ClipA == nil || transitions[index].ClipB == nil) {
+			transitionItem = transitions[index]
+			hasTransition = true
 		}
 
-		transitionNodeID := graph.NextPadID(fmt.Sprintf("acrossfade_trans_%d", index))
-		transitionedOutput, err := acrossFadeFilter.Apply(graph, transitionNodeID, currentStream, nextPad)
-		if err != nil {
-			return nil, fmt.Errorf("compiler: failed to apply acrossfade transition %q: %w", transition.ID, err)
-		}
+		if hasTransition && transitionItem != nil {
+			acrossFadeFilter := effects.AcrossFadeFilter{
+				Duration: transitionItem.Duration.Seconds(),
+				Curve1:   "tri",
+				Curve2:   "tri",
+			}
 
-		currentStream = transitionedOutput
+			transitionNodeID := fmt.Sprintf("acrossfade_trans_%s_%s", currentClip.ID, nextClip.ID)
+			transitionedOutput, err := acrossFadeFilter.Apply(graph, transitionNodeID, currentStream, nextPad)
+			if err != nil {
+				return nil, fmt.Errorf("compiler: failed to apply acrossfade transition %q: %w", transitionItem.ID, err)
+			}
+
+			currentStream = transitionedOutput
+		} else {
+			concatNode := graph.NewNode(fmt.Sprintf("aconcat_%s_%s", currentClip.ID, nextClip.ID), "concat")
+			concatNode.SetParam("n", "2")
+			concatNode.SetParam("v", "0")
+			concatNode.SetParam("a", "1")
+
+			concatInputA := concatNode.AddInput(currentStream.ID, filtergraph.StreamTypeAudio)
+			concatInputB := concatNode.AddInput(nextPad.ID, filtergraph.StreamTypeAudio)
+			concatOutput := concatNode.AddOutput(graph.NextPadID("cut_aconcat_out"), filtergraph.StreamTypeAudio)
+
+			if err := graph.Connect(currentStream, concatInputA); err != nil {
+				return nil, err
+			}
+			if err := graph.Connect(nextPad, concatInputB); err != nil {
+				return nil, err
+			}
+
+			currentStream = concatOutput
+		}
 	}
 
 	return currentStream, nil
@@ -355,12 +533,14 @@ func ChainTrackTransitionsAudio(graph *filtergraph.Graph, audioPads []*filtergra
 
 // BuildVideoCompositor builds the background canvas and overlays all video tracks by Z-index.
 func BuildVideoCompositor(graph *filtergraph.Graph, compositionTimeline *timeline.Timeline, processedVideoPads []*ClipVideoPad) (*filtergraph.Pad, error) {
+	effectiveCanvasDuration := compositionTimeline.Duration()
+
 	// 1. Generate base color background canvas
 	backgroundNode := graph.NewNode("bg_canvas", "color")
 	backgroundNode.SetParam("c", compositionTimeline.BackgroundColor.FFmpegColor())
 	backgroundNode.SetParam("s", compositionTimeline.Canvas.String())
 	backgroundNode.SetParam("r", compositionTimeline.FPS.FFmpegString())
-	backgroundNode.SetParam("d", fmt.Sprintf("%.4f", compositionTimeline.Duration().Seconds()))
+	backgroundNode.SetParam("d", fmt.Sprintf("%.4f", effectiveCanvasDuration.Seconds()))
 	backgroundOutput := backgroundNode.AddOutput(graph.NextPadID("base_canvas"), filtergraph.StreamTypeVideo)
 
 	currentCanvas := backgroundOutput

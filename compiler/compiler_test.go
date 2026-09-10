@@ -244,7 +244,7 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 			outputPath:         "out_trans.mp4",
 			expectedInputCount: 2,
 			expectedArgSnippets: []string{
-				"xfade=transition=dissolve:duration=1.00:offset=4.00",
+				"xfade=transition=dissolve:duration=1.00:offset=4.50",
 				"acrossfade=d=1.00:c1=tri:c2=tri",
 				"out_trans.mp4",
 			},
