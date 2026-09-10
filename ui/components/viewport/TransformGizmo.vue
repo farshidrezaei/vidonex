@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="selectedClip"
-    class="absolute pointer-events-auto border-2 border-indigo-500 cursor-move transition-shadow shadow-lg shadow-indigo-500/30"
+    class="absolute pointer-events-auto border-2 border-indigo-500 bg-indigo-500/5 hover:bg-indigo-500/10 cursor-move transition-shadow shadow-lg shadow-indigo-500/30 select-none"
     :style="gizmoStyle"
-    @mousedown="handleDrag"
+    @mousedown.stop.prevent="handleDrag"
   >
     <!-- Center Pivot Dot -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-400 pointer-events-none"></div>
@@ -115,6 +115,8 @@ const gizmoStyle = computed(() => {
 const displayScale = computed(() => (props.canvasWidth > 0 ? props.displayWidth / props.canvasWidth : 1))
 
 function handleDrag(event: MouseEvent) {
+  event.stopPropagation()
+  event.preventDefault()
   startDrag(event, displayScale.value)
 }
 

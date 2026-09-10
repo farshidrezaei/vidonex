@@ -14,15 +14,16 @@
             class="absolute inset-0 pointer-events-auto"
             :class="projectStore.backgroundColor === 'transparent' ? 'canvas-checkerboard' : ''"
             :style="{ backgroundColor: projectStore.backgroundColor }"
+            @mousedown="timelineStore.selectedClipId = null"
           ></div>
 
           <!-- Render Active Visual Clips at Playhead -->
           <div
             v-for="clip in activeVisualClips"
             :key="clip.id"
-            class="absolute pointer-events-auto select-none flex items-center justify-center"
+            class="absolute pointer-events-auto select-none flex items-center justify-center cursor-move"
             :style="getClipRenderStyle(clip)"
-            @click.stop="timelineStore.selectedClipId = clip.id"
+            @mousedown.stop="handleClipMouseDown(clip, $event)"
           >
             <!-- Video / Image Asset Element -->
             <img
@@ -119,13 +120,31 @@ import {
   showGuideTop,
   showGuideBottom,
   calculateClipBounds,
+  useTransformGizmo,
 } from '~/composables/useTransformGizmo'
-import type { ClipSpec } from '~/types/spec'
+import {
+  computeClipTransitionState,
+  getTransitionStyleModifiers,
+} from '~/composables/useTransitionPreview'
+import { useTimelineAudio } from '~/composables/useTimelineAudio'
+import type { ClipSpec, TrackSpec } from '~/types/spec'
 
 const projectStore = useProjectStore()
 const playbackStore = usePlaybackStore()
 const timelineStore = useTimelineStore()
 const mediaStore = useMediaStore()
+const { startDrag } = useTransformGizmo()
+
+// Initialize multi-track synchronized audio playback engine for live preview
+useTimelineAudio()
+
+function handleClipMouseDown(clip: ClipSpec, event: MouseEvent) {
+  event.stopPropagation()
+  event.preventDefault()
+  timelineStore.selectedClipId = clip.id
+  const displayScale = projectStore.canvasWidth > 0 ? displayDimensions.value.width / projectStore.canvasWidth : 1
+  startDrag(event, displayScale)
+}
 
 const stageRef = ref<HTMLDivElement | null>(null)
 const stageDimensions = useElementSize(stageRef)
@@ -154,6 +173,10 @@ const screenStyle = computed(() => ({
   height: `${displayDimensions.value.height}px`,
 }))
 
+function findTrackForClip(clipId: string): TrackSpec | undefined {
+  return timelineStore.tracks.find((t) => t.clips?.some((c) => c.id === clipId))
+}
+
 const activeVisualClips = computed(() => {
   const time = playbackStore.currentTime
   const visualTracks = timelineStore.tracks.filter((t) => t.kind === 'video' || t.kind === 'overlay')
@@ -163,7 +186,39 @@ const activeVisualClips = computed(() => {
     for (const clip of track.clips || []) {
       const start = Number(clip.start) || 0
       const duration = Number(clip.duration) || 0
-      if (time >= start && time <= start + duration) {
+
+      const end = start + duration
+      let isVisible = time >= start && time <= end
+
+      // Check if clip is active as an outgoing or incoming clip in a centered transition
+      if (!isVisible && track.transitions && track.transitions.length > 0) {
+        // 1. Outgoing clip remains visible during the transition's second half [cutTime, cutTime + halfDuration]
+        const outgoingTransition = track.transitions.find((t) => t.from === clip.id)
+        if (outgoingTransition) {
+          const transDuration = Math.max(0.01, Number(outgoingTransition.duration) || 1.0)
+          const halfDuration = transDuration / 2
+          const cutTime = end
+          if (time >= cutTime && time <= cutTime + halfDuration) {
+            isVisible = true
+          }
+        }
+
+        // 2. Incoming clip becomes visible during the transition's first half [cutTime - halfDuration, cutTime]
+        const incomingTransition = track.transitions.find((t) => t.to === clip.id)
+        if (incomingTransition) {
+          const partnerClip = track.clips?.find((c) => c.id === incomingTransition.from)
+          if (partnerClip) {
+            const cutTime = (Number(partnerClip.start) || 0) + (Number(partnerClip.duration) || 0)
+            const transDuration = Math.max(0.01, Number(incomingTransition.duration) || 1.0)
+            const halfDuration = transDuration / 2
+            if (time >= cutTime - halfDuration && time <= cutTime) {
+              isVisible = true
+            }
+          }
+        }
+      }
+
+      if (isVisible) {
         clips.push(clip)
       }
     }
@@ -182,16 +237,39 @@ function getClipRenderStyle(clip: ClipSpec) {
     mediaStore.assets
   )
 
-  return {
+  const track = findTrackForClip(clip.id)
+  const transitionInfo = track
+    ? computeClipTransitionState(clip, track, playbackStore.currentTime)
+    : { isActive: false, role: 'none' as const, progress: 0 }
+  const modifiers = getTransitionStyleModifiers(transitionInfo)
+
+  let opacity = bounds.opacity
+  if (modifiers.opacity !== undefined) {
+    opacity *= modifiers.opacity
+  }
+
+  let transform = `rotate(${bounds.rotation}deg)`
+  if (modifiers.transformExtra) {
+    transform = `${transform} ${modifiers.transformExtra}`
+  }
+
+  const style: Record<string, any> = {
     left: `${bounds.left}px`,
     top: `${bounds.top}px`,
     width: `${bounds.width}px`,
     height: `${bounds.height}px`,
-    transform: `rotate(${bounds.rotation}deg)`,
-    opacity: bounds.opacity,
+    transform,
+    opacity,
     mixBlendMode: (clip.blend_mode && clip.blend_mode !== 'normal') ? clip.blend_mode : 'normal',
     transformOrigin: 'center center',
+    zIndex: (track?.z_index || 0) + (modifiers.zIndexExtra || 0),
   }
+
+  if (modifiers.clipPath) {
+    style.clipPath = modifiers.clipPath
+  }
+
+  return style
 }
 
 function isImage(source?: string): boolean {
@@ -204,6 +282,7 @@ function getClipCurrentTime(clip: ClipSpec): number {
   const start = Number(clip.start) || 0
   const trim = Number(clip.trim) || 0
   const speed = Number(clip.speed) || 1.0
+
   const elapsed = (playbackStore.currentTime - start) * speed
   return Math.max(0, trim + elapsed)
 }

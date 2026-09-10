@@ -77,15 +77,16 @@ export function calculateClipBounds(
   }
 }
 
+// Global reactive gizmo transformation state
+export const isDragging = ref(false)
+export const isResizing = ref(false)
+export const isRotating = ref(false)
+export const activeHandle = ref<HandleType | null>(null)
+
 export function useTransformGizmo() {
   const timelineStore = useTimelineStore()
   const mediaStore = useMediaStore()
   const projectStore = useProjectStore()
-
-  const isDragging = ref(false)
-  const isResizing = ref(false)
-  const isRotating = ref(false)
-  const activeHandle = ref<HandleType | null>(null)
 
   const selectedClip = computed(() => timelineStore.selectedClip)
 
@@ -100,6 +101,8 @@ export function useTransformGizmo() {
 
   function startDrag(event: MouseEvent, displayScale: number) {
     if (!selectedClip.value) return
+    event.stopPropagation()
+    event.preventDefault()
     isDragging.value = true
 
     const startX = event.clientX
@@ -188,11 +191,11 @@ export function useTransformGizmo() {
         showGuideBottom.value = false
       }
 
-      if (!selectedClip.value.position) {
-        selectedClip.value.position = { x: Math.round(newX), y: Math.round(newY), alignment: 'center' }
-      } else {
-        selectedClip.value.position.x = Math.round(newX)
-        selectedClip.value.position.y = Math.round(newY)
+      selectedClip.value.position = {
+        ...(selectedClip.value.position || {}),
+        x: Math.round(newX),
+        y: Math.round(newY),
+        alignment: selectedClip.value.position?.alignment || 'center',
       }
     }
 
@@ -211,6 +214,7 @@ export function useTransformGizmo() {
   function startResize(handle: HandleType, event: MouseEvent, bounds: ClipBounds) {
     if (!selectedClip.value) return
     event.stopPropagation()
+    event.preventDefault()
 
     isResizing.value = true
     activeHandle.value = handle
@@ -267,6 +271,7 @@ export function useTransformGizmo() {
   function startRotate(event: MouseEvent, bounds: ClipBounds) {
     if (!selectedClip.value) return
     event.stopPropagation()
+    event.preventDefault()
 
     isRotating.value = true
     const stage = document.querySelector('.canvas-stage')
