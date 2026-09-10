@@ -129,6 +129,26 @@ clip := timeline.NewClip("clip_id", "path/to/media.mp4", 0, 10*time.Second).
     WithBlendMode("multiply")                    // Compositing blend mode
 ```
 
+### `Transition`
+```go
+trans := timeline.NewTransition("trans_1_2", timeline.TransitionDissolve, 1*time.Second, clip1, clip2)
+vTrack.AddTransition(trans)
+```
+Supported transition types:
+- `TransitionDissolve` (`"dissolve"`)
+- `TransitionFade` (`"fade"`)
+- `TransitionWipeLeft` (`"wipeleft"`)
+- `TransitionWipeRight` (`"wiperight"`)
+- `TransitionWipeUp` (`"wipeup"`)
+- `TransitionWipeDown` (`"wipedown"`)
+- `TransitionSlideLeft` (`"slideleft"`)
+- `TransitionSlideRight` (`"slideright"`)
+- `TransitionCircleCrop` (`"circlecrop"`)
+- `TransitionCircleOpen` (`"circleopen"`)
+- `TransitionZoomIn` (`"zoomin"`)
+- `TransitionAcrossFade` (`"acrossfade"`)
+```
+
 ---
 
 ## Package `filtergraph`
