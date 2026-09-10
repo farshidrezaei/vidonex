@@ -5,6 +5,8 @@
     "save": "Save",
     "saved": "All changes saved",
     "saving": "Saving...",
+    "cancel": "Cancel",
+    "apply": "Apply",
     "export": "Render & Export",
     "view_graph": "View Filtergraph",
     "settings": "Settings",
@@ -78,11 +80,28 @@
     "show_track": "Show",
     "volume": "Volume",
     "transitions": {
+      "modal_title": "Transition Settings",
+      "select_type": "Select Transition",
+      "duration_label": "Duration (Seconds)",
+      "none": "None",
+      "none_desc": "No transition (Cut)",
+      "remove": "Remove Transition",
       "fade": "Fade In / Out",
       "dissolve": "Cross Dissolve",
       "wipeleft": "Wipe Left",
       "wiperight": "Wipe Right",
-      "circleopen": "Circle Open"
+      "wipeup": "Wipe Up",
+      "wipedown": "Wipe Down",
+      "slideleft": "Slide Left",
+      "slideright": "Slide Right",
+      "circleopen": "Circle Open",
+      "duration": "Duration: {duration}s",
+      "duration_05": "0.5s (Fast)",
+      "duration_10": "1.0s (Normal)",
+      "duration_15": "1.5s (Smooth)",
+      "duration_20": "2.0s (Slow)",
+      "custom_duration": "Custom Duration...",
+      "enter_duration": "Enter transition duration in seconds (e.g. 0.75):"
     }
   },
   "viewport": {
@@ -269,8 +288,17 @@
     "speed": "Multiplier: {speed}x",
     "eta": "Estimated Time Remaining: {eta}s",
     "completed": "Render Completed Successfully!",
+    "completed_desc": "Your video was encoded and verified with Vidonyx engine.",
+    "preview_title": "Render Output Preview",
     "download_file": "Download Rendered Video",
-    "cancel_render": "Cancel Job"
+    "new_render": "New Export",
+    "done": "Done",
+    "cancel_render": "Cancel Job",
+    "error_title": "Render Execution Failed",
+    "show_details": "Details",
+    "hide_details": "Hide",
+    "copy_error": "Copy Error",
+    "copied": "Copied!"
   },
   "graph": {
     "title": "FFmpeg Filtergraph DAG Visualizer",

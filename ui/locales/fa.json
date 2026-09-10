@@ -5,6 +5,8 @@
     "save": "ذخیره",
     "saved": "تمام تغییرات ذخیره شد",
     "saving": "در حال ذخیره‌سازی...",
+    "cancel": "انصراف",
+    "apply": "اعمال",
     "export": "رندر و خروجی",
     "view_graph": "مشاهده گراف فیلترها",
     "settings": "تنظیمات",
@@ -78,11 +80,28 @@
     "show_track": "نمایش ترک",
     "volume": "میزان صدا",
     "transitions": {
+      "modal_title": "تنظیمات ترنزیشن",
+      "select_type": "انتخاب نوع ترنزیشن",
+      "duration_label": "مدت زمان ترنزیشن (ثانیه)",
+      "none": "بدون ترنزیشن (None)",
+      "none_desc": "کات مستقیم بدون افکت",
+      "remove": "حذف ترنزیشن",
       "fade": "فید ساده (Fade)",
       "dissolve": "دیزلو ترکیبی (Cross Dissolve)",
       "wipeleft": "حرکت به چپ (Wipe Left)",
       "wiperight": "حرکت به راست (Wipe Right)",
-      "circleopen": "باز شدن دایره‌ای (Circle Open)"
+      "wipeup": "حرکت به بالا (Wipe Up)",
+      "wipedown": "حرکت به پایین (Wipe Down)",
+      "slideleft": "اسلاید به چپ (Slide Left)",
+      "slideright": "اسلاید به راست (Slide Right)",
+      "circleopen": "باز شدن دایره‌ای (Circle Open)",
+      "duration": "مدت زمان: {duration} ثانیه",
+      "duration_05": "۰.۵ ثانیه (سریع)",
+      "duration_10": "۱.۰ ثانیه (معمولی)",
+      "duration_15": "۱.۵ ثانیه (نرم)",
+      "duration_20": "۲.۰ ثانیه (آرام)",
+      "custom_duration": "مدت زمان دلخواه...",
+      "enter_duration": "مدت زمان ترنزیشن را به ثانیه وارد کنید (مثلا ۰.۷۵):"
     }
   },
   "viewport": {
@@ -269,8 +288,17 @@
     "speed": "ضریب سرعت: {speed}x",
     "eta": "زمان تخمینی باقیمانده: {eta} ثانیه",
     "completed": "رندر ویدیو با موفقیت انجام شد!",
+    "completed_desc": "ویدیو شما با موتور Vidonyx با موفقیت رندر و اینکود شد.",
+    "preview_title": "پیش‌نمایش خروجی نهایی",
     "download_file": "دانلود فایل ویدیو رندر شده",
-    "cancel_render": "لغو عملیات رندر"
+    "new_render": "تنظیمات و رندر جدید",
+    "done": "تایید و بستن",
+    "cancel_render": "لغو عملیات رندر",
+    "error_title": "خطا در فرآیند رندر ویدیو",
+    "show_details": "مشاهده جزئیات",
+    "hide_details": "بستن جزئیات",
+    "copy_error": "کپی لاگ خطا",
+    "copied": "کپی شد!"
   },
   "graph": {
     "title": "نمایش گراف فیلترهای FFmpeg (DAG)",
