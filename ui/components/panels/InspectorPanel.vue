@@ -49,6 +49,70 @@
           </div>
         </div>
 
+        <!-- Section: Active Transitions for Selected Clip -->
+        <div v-if="clipTransitions.length > 0" class="space-y-3 pt-3 border-t border-gray-800/80">
+          <h4 class="text-xs font-medium text-amber-400 uppercase tracking-wider flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <UIcon name="i-heroicons-sparkles" class="w-3.5 h-3.5" />
+              Transitions
+            </span>
+            <span class="text-[10px] text-gray-500 font-mono">{{ clipTransitions.length }} active</span>
+          </h4>
+
+          <div
+            v-for="tItem in clipTransitions"
+            :key="tItem.from + tItem.to"
+            class="p-2.5 rounded-md bg-gray-900/80 border border-amber-500/20 space-y-2.5 text-xs shadow-inner"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <UIcon name="i-heroicons-sparkles" class="w-3.5 h-3.5 text-amber-400" />
+                <span class="font-medium text-amber-300 capitalize">{{ tItem.type }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-gray-400 font-mono px-1.5 py-0.5 bg-gray-800/80 rounded border border-gray-700">
+                  {{ tItem.from === selectedClip.id ? 'Outgoing ➔' : 'Incoming ➔' }}
+                </span>
+                <button
+                  class="text-gray-500 hover:text-red-400 transition"
+                  title="Remove Transition"
+                  @click="removeClipTransition(tItem)"
+                >
+                  <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Transition Duration Number Input & Range Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-gray-400">
+                <span>{{ $t('inspector.duration') }} (s)</span>
+                <span class="font-mono text-amber-300">{{ tItem.duration }}s</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <input
+                  v-model.number="tItem.duration"
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  max="10.0"
+                  class="w-16 bg-gray-950 border border-gray-800 rounded px-2 py-1 font-mono text-gray-200 text-xs focus:outline-none focus:border-amber-500"
+                  @change="commitTransitionChange(tItem)"
+                />
+                <input
+                  v-model.number="tItem.duration"
+                  type="range"
+                  step="0.1"
+                  min="0.1"
+                  max="5.0"
+                  class="flex-1 accent-amber-500 h-1 bg-gray-800 rounded cursor-pointer"
+                  @input="commitTransitionChange(tItem)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Section: Transform (Position, Scale, Rotation, Opacity) -->
         <div v-if="isVisualClip" class="space-y-3 pt-3 border-t border-gray-800/80">
           <h4 class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ $t('inspector.transform') }}</h4>
@@ -212,6 +276,30 @@ const timelineStore = useTimelineStore()
 
 const selectedClip = computed(() => timelineStore.selectedClip)
 const selectedTrack = computed(() => timelineStore.selectedTrack)
+
+const selectedClipTrack = computed(() => {
+  if (!timelineStore.selectedClipId) return null
+  return timelineStore.tracks.find((t) => t.clips?.some((c) => c.id === timelineStore.selectedClipId))
+})
+
+const clipTransitions = computed(() => {
+  const track = selectedClipTrack.value
+  if (!track || !track.transitions || !timelineStore.selectedClipId) return []
+  const clipId = timelineStore.selectedClipId
+  return track.transitions.filter((t) => t.from === clipId || t.to === clipId)
+})
+
+function commitTransitionChange(trans: any) {
+  timelineStore.pushHistoryState(`Update Transition Duration (${trans.duration}s)`)
+}
+
+function removeClipTransition(trans: any) {
+  const track = selectedClipTrack.value
+  if (track && track.transitions) {
+    track.transitions = track.transitions.filter((t) => !(t.from === trans.from && t.to === trans.to))
+    timelineStore.pushHistoryState('Remove Transition')
+  }
+}
 
 const selectedClipTrackKind = computed(() => {
   if (!timelineStore.selectedClipId) return null

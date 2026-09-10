@@ -2,7 +2,7 @@
   <UModal
     v-model:open="projectStore.isExportOpen"
     :title="$t('render.title')"
-    :ui="{ content: 'sm:max-w-xl bg-gray-950 border border-gray-800' }"
+    :ui="{ content: renderStore.completedDownloadUrl ? 'sm:max-w-2xl bg-gray-950 border border-gray-800' : 'sm:max-w-xl bg-gray-950 border border-gray-800' }"
   >
     <template #body>
       <!-- Configuration Form (When not rendering) -->
@@ -64,9 +64,52 @@
           </div>
         </div>
 
-        <!-- Error Alert -->
-        <div v-if="renderStore.renderError" class="p-3 bg-red-950/40 border border-red-800/80 rounded-lg text-xs text-red-300">
-          {{ renderStore.renderError }}
+        <!-- Collapsible Error Alert with Copy Button -->
+        <div
+          v-if="renderStore.renderError"
+          class="rounded-lg border border-red-800/80 bg-red-950/50 p-3 space-y-2 text-xs text-red-200 shadow-sm"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-start gap-2 min-w-0">
+              <UIcon name="i-heroicons-exclamation-circle" class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+              <div class="min-w-0">
+                <div class="font-semibold text-red-300">
+                  {{ $t('render.error_title') || 'Render Execution Failed' }}
+                </div>
+                <div class="text-[11px] text-red-300/80 font-mono truncate mt-0.5" :title="renderStore.renderError">
+                  {{ errorSummary }}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <!-- Copy Button -->
+              <button
+                type="button"
+                class="flex items-center gap-1 px-2 py-1 rounded bg-red-900/40 hover:bg-red-900/70 border border-red-700/50 text-[11px] text-red-200 transition cursor-pointer select-none"
+                :title="$t('render.copy_error') || 'Copy full error log'"
+                @click="copyErrorText"
+              >
+                <UIcon :name="isCopied ? 'i-heroicons-check' : 'i-heroicons-clipboard-document'" class="w-3.5 h-3.5 text-red-300" />
+                <span>{{ isCopied ? ($t('render.copied') || 'Copied!') : ($t('render.copy_error') || 'Copy') }}</span>
+              </button>
+
+              <!-- Collapse / Expand Toggle Button -->
+              <button
+                type="button"
+                class="flex items-center gap-1 px-2 py-1 rounded bg-red-900/40 hover:bg-red-900/70 border border-red-700/50 text-[11px] text-red-200 transition cursor-pointer select-none"
+                @click="isErrorDetailsOpen = !isErrorDetailsOpen"
+              >
+                <span>{{ isErrorDetailsOpen ? ($t('render.hide_details') || 'Hide') : ($t('render.show_details') || 'Details') }}</span>
+                <UIcon :name="isErrorDetailsOpen ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'" class="w-3.5 h-3.5 text-red-300" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded Full Error Log (Collapsible) -->
+          <div v-if="isErrorDetailsOpen" class="pt-2 border-t border-red-800/40">
+            <pre class="max-h-48 overflow-y-auto rounded bg-black/80 border border-red-900/50 p-2.5 text-[10px] font-mono text-red-300/90 whitespace-pre-wrap break-all select-all leading-relaxed">{{ renderStore.renderError }}</pre>
+          </div>
         </div>
 
         <UButton
@@ -116,35 +159,79 @@
         </UButton>
       </div>
 
-      <!-- Render Complete Success -->
-      <div v-else-if="renderStore.completedDownloadUrl" class="py-6 space-y-4 text-center">
-        <div class="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
-          <UIcon name="i-heroicons-check-badge" class="w-8 h-8" />
+      <!-- Render Complete Success with Video Player Preview -->
+      <div v-else-if="renderStore.completedDownloadUrl" class="py-3 space-y-4">
+        <!-- Status Header Banner -->
+        <div class="flex items-center justify-between p-3 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 shadow-sm">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+              <UIcon name="i-heroicons-check-badge" class="w-5 h-5 text-emerald-400" />
+            </div>
+            <div class="min-w-0">
+              <h4 class="text-xs font-semibold text-emerald-200 leading-tight">
+                {{ $t('render.completed') }}
+              </h4>
+              <p class="text-[11px] text-emerald-400/80 truncate mt-0.5">
+                {{ $t('render.completed_desc') }}
+              </p>
+            </div>
+          </div>
+
+          <div v-if="formattedFileSize" class="px-2 py-1 rounded bg-emerald-900/50 border border-emerald-700/40 text-[10px] font-mono text-emerald-200 flex-shrink-0">
+            {{ formattedFileSize }}
+          </div>
         </div>
 
-        <div class="space-y-1">
-          <h4 class="text-base font-semibold text-gray-100">{{ $t('render.completed') }}</h4>
-          <p class="text-xs text-gray-400">Your video was encoded and verified with Vidonyx engine.</p>
+        <!-- Video Player Preview Viewport -->
+        <div class="relative w-full rounded-xl overflow-hidden bg-black/95 border border-gray-800 shadow-2xl flex items-center justify-center min-h-[220px] max-h-[360px]">
+          <img
+            v-if="isGifFormat"
+            :src="renderStore.completedDownloadUrl"
+            alt="Rendered animation output"
+            class="max-h-[340px] w-auto max-w-full object-contain mx-auto"
+          />
+          <video
+            v-else
+            ref="previewVideoRef"
+            :src="renderStore.completedDownloadUrl"
+            controls
+            playsinline
+            preload="metadata"
+            class="max-h-[340px] w-auto max-w-full object-contain mx-auto focus:outline-none"
+          ></video>
         </div>
 
-        <div class="flex items-center justify-center gap-3 pt-2">
-          <a
-            :href="renderStore.completedDownloadUrl"
-            download
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs shadow-lg shadow-emerald-600/20 transition"
-          >
-            <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4" />
-            {{ $t('render.download_file') }}
-          </a>
-
+        <!-- Modal Actions Footer -->
+        <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-900">
           <UButton
             size="sm"
             color="neutral"
             variant="ghost"
-            @click="resetModal"
+            icon="i-heroicons-arrow-path"
+            @click="newRender"
           >
-            Done
+            {{ $t('render.new_render') }}
           </UButton>
+
+          <div class="flex items-center gap-2">
+            <a
+              :href="renderStore.completedDownloadUrl"
+              download
+              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs shadow-lg shadow-emerald-600/20 transition cursor-pointer select-none"
+            >
+              <UIcon name="i-heroicons-arrow-down-tray" class="w-4 h-4" />
+              <span>{{ $t('render.download_file') }}</span>
+            </a>
+
+            <UButton
+              size="sm"
+              color="neutral"
+              variant="soft"
+              @click="resetModal"
+            >
+              {{ $t('render.done') }}
+            </UButton>
+          </div>
         </div>
       </div>
     </template>
@@ -183,13 +270,83 @@ const presetOptions = [
   { label: 'TikTok / Shorts / Reels Vertical 1080p 60fps', value: 'tiktok' },
 ]
 
+const isErrorDetailsOpen = ref(false)
+const isCopied = ref(false)
+
+const errorSummary = computed(() => {
+  if (!renderStore.renderError) return ''
+  const trimmed = renderStore.renderError.trim()
+  const firstLine = trimmed.split('\n')[0] || ''
+  return firstLine.length > 110 ? firstLine.slice(0, 107) + '...' : firstLine
+})
+
+const previewVideoRef = ref<HTMLVideoElement | null>(null)
+
+const isGifFormat = computed(() => {
+  if (renderStore.selectedFormat === 'gif') return true
+  if (renderStore.completedDownloadUrl?.toLowerCase().endsWith('.gif')) return true
+  return false
+})
+
+const formattedFileSize = computed(() => {
+  if (!renderStore.totalSize || renderStore.totalSize <= 0) return null
+  const bytes = renderStore.totalSize
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+})
+
+function pausePreview() {
+  if (previewVideoRef.value) {
+    try {
+      previewVideoRef.value.pause()
+    } catch {
+      // Ignore pause failure
+    }
+  }
+}
+
+watch(() => projectStore.isExportOpen, (isOpen) => {
+  if (!isOpen) {
+    pausePreview()
+  }
+})
+
+async function copyErrorText() {
+  if (!renderStore.renderError) return
+  try {
+    await navigator.clipboard.writeText(renderStore.renderError)
+    isCopied.value = true
+    setTimeout(() => {
+      isCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed copying error log to clipboard:', err)
+  }
+}
+
 async function startRender() {
+  isErrorDetailsOpen.value = false
+  isCopied.value = false
+  pausePreview()
   const spec = timelineStore.toVideoSpec()
   await renderStore.startRender(spec)
 }
 
 function resetModal() {
+  pausePreview()
   renderStore.completedDownloadUrl = null
+  renderStore.renderError = null
+  isErrorDetailsOpen.value = false
+  isCopied.value = false
   projectStore.isExportOpen = false
+}
+
+function newRender() {
+  pausePreview()
+  renderStore.completedDownloadUrl = null
+  renderStore.renderError = null
+  isErrorDetailsOpen.value = false
+  isCopied.value = false
 }
 </script>
