@@ -10,8 +10,10 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
   ],
-  devtools: { enabled: true },
   ssr: false, // SPA Mode for smooth client-side real-time timeline editing and canvas gizmo
+  nitro: {
+    preset: 'static',
+  },
   app: {
     head: {
       title: 'Vidonyx Studio - Video Composition Workstation',

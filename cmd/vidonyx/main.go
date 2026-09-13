@@ -415,7 +415,11 @@ func executeServeCommand(arguments []string) {
 
 	staticDirectory := *staticDirFlag
 	if staticDirectory == "ui/dist" {
-		if _, err := os.Stat("ui/.output/public"); err == nil {
+		if _, err := os.Stat("ui/.output/public/index.html"); err == nil {
+			staticDirectory = "ui/.output/public"
+		} else if _, err := os.Stat("ui/dist/index.html"); err == nil {
+			staticDirectory = "ui/dist"
+		} else if _, err := os.Stat("ui/.output/public"); err == nil {
 			staticDirectory = "ui/.output/public"
 		}
 	}

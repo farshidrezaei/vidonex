@@ -193,10 +193,15 @@ func (s *Server) Start() error {
 				http.NotFound(w, r)
 				return
 			}
+			indexPath := filepath.Join(s.config.StaticDirectory, "index.html")
+			if r.URL.Path == "/" {
+				http.ServeFile(w, r, indexPath)
+				return
+			}
 			filePath := filepath.Join(s.config.StaticDirectory, filepath.Clean(r.URL.Path))
 			fileInfo, err := os.Stat(filePath)
-			if os.IsNotExist(err) || (err == nil && fileInfo.IsDir() && r.URL.Path != "/") {
-				http.ServeFile(w, r, filepath.Join(s.config.StaticDirectory, "index.html"))
+			if os.IsNotExist(err) || (err == nil && fileInfo.IsDir()) {
+				http.ServeFile(w, r, indexPath)
 				return
 			}
 			fileServer.ServeHTTP(w, r)

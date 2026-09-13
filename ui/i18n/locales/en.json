@@ -304,6 +304,8 @@
     "title": "FFmpeg Filtergraph DAG Visualizer",
     "subtitle": "Real-time Intermediate Representation DAG compiled from your composition timeline.",
     "copy_mermaid": "Copy Mermaid Code",
-    "export_svg": "Export Diagram"
+    "copied": "Copied!",
+    "export_svg": "Export Diagram",
+    "refresh": "Refresh"
   }
 }
