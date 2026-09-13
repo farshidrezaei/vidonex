@@ -167,18 +167,28 @@
 import { useMediaStore } from '~/stores/media'
 import { useProjectStore } from '~/stores/project'
 import { useTimelineStore } from '~/stores/timeline'
+import { useDesktop } from '~/composables/useDesktop'
 import type { MediaAsset } from '~/types/project'
 
 const mediaStore = useMediaStore()
 const projectStore = useProjectStore()
 const timelineStore = useTimelineStore()
+const { isDesktop, selectMediaFiles, importLocalMedia } = useDesktop()
 
 const isDraggingOver = ref(false)
 const dragGhostRef = ref<HTMLDivElement | null>(null)
 const ghostAsset = ref<MediaAsset | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 
-function triggerFileSelect() {
+async function triggerFileSelect() {
+  if (isDesktop.value && projectStore.currentProject) {
+    const selectedPaths = await selectMediaFiles()
+    if (selectedPaths && selectedPaths.length > 0) {
+      await importLocalMedia(projectStore.currentProject.id, selectedPaths)
+      await mediaStore.fetchAssets(projectStore.currentProject.id)
+      return
+    }
+  }
   fileInputRef.value?.click()
 }
 

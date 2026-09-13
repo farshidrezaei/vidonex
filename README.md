@@ -184,7 +184,7 @@ Vidonyx includes a modern, high-performance web workstation built with **Nuxt 4,
 - 🎛 **Full Feature Inspectors**: Chroma Key, Sidechain Ducking, Podcast Waveform, Caption Subtitle Editor, Ken Burns Keyframes, and interactive Mermaid.js filtergraph DAG visualizer modal with SVG export.
 - 💾 **Pure-Go SQLite Persistence**: Auto-saving project workspace with zero CGO dependencies and instant aspect-ratio canvas presets (16:9, 9:16 Reels/TikTok, 1:1 Square, 21:9 Cinema).
 
-### Launching the Studio:
+### Launching the Web Studio:
 
 ```bash
 # Start backend server and open Web Studio on http://localhost:8080
@@ -192,6 +192,21 @@ vidonyx serve --port 8080
 
 # Or run frontend dev mode
 cd ui && pnpm dev
+```
+
+### 🖥️ Native Desktop Application (Wails v2 + Nuxt 4):
+
+Vidonyx includes a native cross-platform desktop workstation powered by Wails v2:
+- **Zero Electron Bloat**: Sub-25MB standalone executable utilizing native OS WebViews (Edge WebView2 on Windows, WebKit on macOS, WebKitGTK on Linux).
+- **Direct Filesystem Access & Zero-Copy Import**: Instant native file pickers and multi-gigabyte video asset registration directly with local FFprobe metadata.
+- **Hardware Acceleration Auto-Detection**: Automatically identifies NVIDIA NVENC, Apple VideoToolbox, Intel QSV, or Linux VAAPI hardware encoders.
+
+```bash
+# Build desktop binary (Linux)
+go build -tags webkit2_41 -o bin/vidonyx-desktop ./cmd/vidonyx-desktop
+
+# Launch desktop workstation
+./bin/vidonyx-desktop
 ```
 
 ---

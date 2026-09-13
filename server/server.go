@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -71,10 +72,8 @@ func New(config Config) (*Server, error) {
 	return serverInstance, nil
 }
 
-// Start launches the WebSocket hub and starts listening on the configured HTTP port.
-func (s *Server) Start() error {
-	go s.websocketHub.Run()
-
+// Handler constructs and returns the HTTP handler (mux) including all REST, WebSocket, and file endpoints.
+func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 
 	// WebSocket endpoint
@@ -208,17 +207,59 @@ func (s *Server) Start() error {
 		})
 	}
 
-	handler := withCORS(mux)
+	return withCORS(mux)
+}
+
+// Start launches the WebSocket hub and starts listening on the configured HTTP port.
+func (s *Server) Start() error {
+	go s.websocketHub.Run()
 
 	address := fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)
 	s.httpServer = &http.Server{
 		Addr:              address,
-		Handler:           handler,
+		Handler:           s.Handler(),
 		ReadHeaderTimeout: 15 * time.Second,
 	}
 
 	s.logger.Info("vidonyx web studio server listening", "address", fmt.Sprintf("http://localhost:%d", s.config.Port))
 	return s.httpServer.ListenAndServe()
+}
+
+// StartListener starts listening on an existing net.Listener (useful for random available port selection in desktop).
+func (s *Server) StartListener(listener net.Listener) error {
+	go s.websocketHub.Run()
+
+	s.httpServer = &http.Server{
+		Handler:           s.Handler(),
+		ReadHeaderTimeout: 15 * time.Second,
+	}
+
+	return s.httpServer.Serve(listener)
+}
+
+// Database returns the underlying persistence database instance.
+func (s *Server) Database() *db.Database {
+	return s.database
+}
+
+// DataDirectory returns the root data storage directory path.
+func (s *Server) DataDirectory() string {
+	return s.config.DataDirectory
+}
+
+// MediaDirectory returns the media assets directory path.
+func (s *Server) MediaDirectory() string {
+	return filepath.Join(s.config.DataDirectory, "media")
+}
+
+// ExportDirectory returns the export videos directory path.
+func (s *Server) ExportDirectory() string {
+	return filepath.Join(s.config.DataDirectory, "exports")
+}
+
+// Config returns the configuration of the server.
+func (s *Server) Config() Config {
+	return s.config
 }
 
 // Stop gracefully shuts down the HTTP server and database connection.
