@@ -1,12 +1,21 @@
-# Vidonex
+<p align="center">
+  <img src=".github/assets/logo.png" width="140" alt="Vidonex Logo" />
+</p>
 
-[![CI](https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml/badge.svg)](https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/farshidrezaei/vidonex?color=indigo&logo=github)](https://github.com/farshidrezaei/vidonex/releases)
-[![Go Reference](https://pkg.go.dev/badge/github.com/farshidrezaei/vidonex.svg)](https://pkg.go.dev/github.com/farshidrezaei/vidonex)
-[![Go Report Card](https://goreportcard.com/badge/github.com/farshidrezaei/vidonex)](https://goreportcard.com/report/github.com/farshidrezaei/vidonex)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<h1 align="center">Vidonex</h1>
 
-**Vidonex** is an open-source, production-grade Go engine & desktop workstation for declarative, non-linear video editing (conceptually similar to Remotion, Editframe, or the CapCut backend, but written natively in idiomatic, high-performance Go).
+<p align="center">
+  <a href="https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml"><img src="https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/farshidrezaei/vidonex/releases"><img src="https://img.shields.io/github/v/release/farshidrezaei/vidonex?color=indigo&logo=github" alt="Release" /></a>
+  <a href="https://pkg.go.dev/github.com/farshidrezaei/vidonex"><img src="https://pkg.go.dev/badge/github.com/farshidrezaei/vidonex.svg" alt="Go Reference" /></a>
+  <a href="https://goreportcard.com/report/github.com/farshidrezaei/vidonex"><img src="https://goreportcard.com/badge/github.com/farshidrezaei/vidonex" alt="Go Report Card" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+</p>
+
+<p align="center">
+  <strong>Declarative Non-Linear Video Composition & FFmpeg Filtergraph Compiler Engine in Go</strong><br>
+  <em>Web Studio & Native Cross-Platform Desktop Workstation</em>
+</p>
 
 ---
 

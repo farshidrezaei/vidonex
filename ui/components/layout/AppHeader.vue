@@ -3,9 +3,7 @@
     <!-- Left: Branding & Project Title -->
     <div class="flex items-center gap-3">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <UIcon name="i-heroicons-film" class="w-5 h-5 text-white" />
-        </div>
+        <img src="/logo.png" alt="Vidonex Logo" class="w-8 h-8 rounded-lg object-contain shadow-lg shadow-indigo-500/20" />
         <span class="font-bold text-base tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
           {{ $t('app.title') }}
         </span>

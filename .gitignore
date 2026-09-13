@@ -48,7 +48,6 @@ coverage.txt
 *.aac
 *.flac
 *.ogg
-*.png
 *.jpg
 *.jpeg
 *.gif
@@ -56,6 +55,13 @@ coverage.txt
 *.tiff
 *.srt
 *.vtt
+
+# Exclude generated/test pngs but keep repository assets
+*.png
+!/.github/assets/**
+!/build/**/*.png
+!/build/appicon.png
+!/ui/public/**/*.png
 
 # ── Demo project ──
 demo_project/
@@ -82,3 +88,4 @@ Desktop.ini
 __debug_bin*
 *.log
 .codegraph/
+/icons/
