@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-7 border-b border-gray-800 bg-gray-950 relative select-none cursor-pointer"
+    class="h-7 border-b border-gray-800 bg-gray-950 sticky top-0 z-40 flex-shrink-0 select-none cursor-pointer"
     :style="{ width: `${totalWidth}px` }"
     @mousedown="handleRulerClick"
   >

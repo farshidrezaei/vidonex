@@ -130,16 +130,16 @@
     </div>
 
     <!-- Timeline Workspace (Split Layout) -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex overflow-hidden min-h-0">
       <!-- Left Column: Track Headers -->
-      <div class="w-56 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950 z-10">
+      <div class="w-56 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950 z-10 min-h-0">
         <!-- Ruler spacer -->
-        <div class="h-7 border-b border-gray-800 bg-gray-950/60 px-3 flex items-center">
+        <div class="h-7 border-b border-gray-800 bg-gray-950 px-3 flex items-center flex-shrink-0">
           <span class="text-[10px] font-mono text-gray-500 uppercase tracking-wider">{{ $t('timeline.tracks') }}</span>
         </div>
 
         <!-- Track Headers List -->
-        <div ref="trackHeadersScrollRef" class="flex-1 overflow-y-hidden">
+        <div ref="trackHeadersScrollRef" class="flex-1 overflow-y-hidden min-h-0">
           <TimelineTrackHeader
             v-for="track in timelineStore.tracks"
             :key="track.id"
@@ -151,7 +151,7 @@
       <!-- Right Column: Scrollable Tracks & Ruler Area -->
       <div
         ref="timelineScrollRef"
-        class="flex-1 flex flex-col overflow-x-auto overflow-y-auto relative timeline-grid"
+        class="flex-1 flex flex-col overflow-x-auto overflow-y-auto relative timeline-grid min-h-0"
         @scroll="handleTimelineScroll"
       >
         <!-- Time Ruler -->
