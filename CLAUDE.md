@@ -26,7 +26,7 @@ golangci-lint run ./...
 # Run Real-FFmpeg E2E test suite specifically
 go test -race -v ./tests/e2e/...
 
-# Run all 9 example recipes
+# Run all 10 example recipes
 go run ./examples/01_simple_cut/main.go
 go run ./examples/02_picture_in_picture/main.go
 go run ./examples/03_transitions/main.go
@@ -37,6 +37,10 @@ go run ./examples/07_platform_presets/main.go
 go run ./examples/08_podcast_audio_waveform/main.go
 go run ./examples/09_green_screen_studio/main.go
 go run ./examples/10_declarative_yaml_project/main.go
+
+# Run Web Studio & UI Frontend
+cd ui && pnpm dev     # Run Nuxt 4 development workstation
+cd ui && pnpm build   # Production static build & validation
 
 # Run CLI Tool
 ./vidonyx --help

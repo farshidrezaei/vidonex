@@ -228,3 +228,70 @@ result, err := c.Render(ctx, tl, "output.mp4", func(ev executor.ProgressEvent) {
     fmt.Printf("Progress: %.1f%% (Speed: %.2fx, FPS: %.1f)\n", ev.Percentage, ev.Speed, ev.FPS)
 })
 ```
+
+---
+
+## Package `server` & RESTful API
+
+Vidonyx includes an embedded pure-Go server with SQLite persistence, REST endpoints, and WebSocket telemetry.
+
+### Starting the Server programmatically:
+
+```go
+import "github.com/farshidrezaei/vidonyx/server"
+
+srv, err := server.New(server.Config{
+    Port:            8080,
+    Host:            "0.0.0.0",
+    DataDirectory:   "/path/to/.vidonyx",
+    StaticDirectory: "/path/to/ui/dist",
+    Logger:          slog.Default(),
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+if err := srv.Start(); err != nil {
+    log.Fatal(err)
+}
+```
+
+### REST API Endpoints:
+
+| Method | Route | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/projects` | List all saved projects |
+| `POST` | `/api/projects` | Create a new project workspace |
+| `GET` | `/api/projects/:id` | Get project details and JSON timeline specification |
+| `PUT` | `/api/projects/:id` | Update project metadata and video timeline specification |
+| `DELETE` | `/api/projects/:id` | Delete project workspace |
+| `GET` | `/api/projects/:id/assets`| List all uploaded media assets for project |
+| `POST` | `/api/media/upload` | Upload video, audio, or image asset (with auto ffprobe) |
+| `DELETE` | `/api/media/:id` | Delete media asset from disk and database |
+| `GET` | `/api/media/files/*` | Range-supported streaming media file server |
+| `POST` | `/api/spec/validate` | Validate declarative video timeline specification |
+| `POST` | `/api/spec/graph` | Generate Mermaid flowchart and Graphviz DOT from spec |
+| `POST` | `/api/render/start` | Start asynchronous render job with progress telemetry |
+| `GET` | `/api/render/:id` | Get render job status, progress percentage, and output |
+| `POST` | `/api/render/:id/cancel` | Cancel active background render process |
+| `GET` | `/api/exports/*` | Download completed rendered MP4 video exports |
+
+### WebSocket Telemetry (`/ws`):
+
+Clients can connect to `ws://localhost:8080/ws` to receive real-time render telemetry:
+
+```json
+{
+  "type": "render_progress",
+  "job_id": "job_abc123",
+  "data": {
+    "frame": 120,
+    "fps": 58.4,
+    "current_time": 4.0,
+    "percentage": 40.0,
+    "speed": 1.95,
+    "bitrate": "4500kbits/s",
+    "total_size": 2400000
+  }
+}
+```

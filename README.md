@@ -175,12 +175,14 @@ func main() {
 
 ## 🎨 Vidonyx Web Studio (GUI)
 
-Vidonyx includes a modern, high-performance web workstation built with **Nuxt 4, Vue 3, Nuxt UI, Nuxt i18n, TypeScript, and WebSocket**:
+Vidonyx includes a modern, high-performance web workstation built with **Nuxt 4, Vue 3, Nuxt UI v4, Nuxt i18n, TypeScript, and WebSocket**:
 
-- 🎬 **Pro Multi-Track Timeline**: Layer video, audio, overlay, subtitle, and waveform tracks with drag-and-drop, trim handles, adjacent clip transitions (XFade), and magnetic snapping.
-- 📐 **Interactive Viewport with Transform Gizmo**: Direct on-canvas 8-point resize, position dragging, rotation, and smart alignment guides.
-- 🎛 **Full Feature Inspectors**: Chroma Key, Sidechain Ducking, Podcast Waveform, Caption Subtitle Editor, Ken Burns Keyframes, and live Mermaid.js filtergraph DAG visualizer.
-- 💾 **Pure-Go SQLite Persistence**: Auto-saving project workspace with zero CGO dependencies.
+- 🎬 **Pro Multi-Track Timeline**: Layer video, audio, overlay, subtitle, and waveform tracks with drag-and-drop, trim handles, adjacent clip transitions (XFade ribbons), sticky time ruler, scrubbing playhead needle, split clip (`S`), duplicate (`Ctrl+D`), and magnetic snapping.
+- 📐 **Interactive Viewport with Hand Tool & Zoom**: Direct on-canvas 8-point resize, translation, rotation, smart alignment guides, zoom controls (wheel zoom, fit/reset, preset zoom menu), Spacebar hand pan tool, and full-screen preview.
+- 🔀 **Flexible Splitter Layout**: Customizable workspace layout powered by Nuxt UI `USplitter` with collapsible/resizable panels for Media Library, Viewport, Timeline, and Inspector.
+- ⏱ **Exact Content Duration & Atomic History**: Timeline and playback durations snap precisely to the last clip boundary without artificial padding, backed by an atomic snapshot-based Undo/Redo engine (`Ctrl+Z` / `Ctrl+Y`).
+- 🎛 **Full Feature Inspectors**: Chroma Key, Sidechain Ducking, Podcast Waveform, Caption Subtitle Editor, Ken Burns Keyframes, and interactive Mermaid.js filtergraph DAG visualizer modal with SVG export.
+- 💾 **Pure-Go SQLite Persistence**: Auto-saving project workspace with zero CGO dependencies and instant aspect-ratio canvas presets (16:9, 9:16 Reels/TikTok, 1:1 Square, 21:9 Cinema).
 
 ### Launching the Studio:
 

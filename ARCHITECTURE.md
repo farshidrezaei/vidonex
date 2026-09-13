@@ -105,10 +105,12 @@ The Filtergraph package is a standalone graph library modeling FFmpeg filter top
 1. **Embedded Persistence (`server/db/`)**: High-performance SQLite persistence (`mattn/go-sqlite3`) managing projects, timeline specifications, assets, and render job queue states.
 2. **RESTful API & WebSocket Hub (`server/api/` & `server/ws/`)**: Exposes project management, live asset probing (`ffprobe`), file uploading, and real-time WebSocket progress broadcasting.
 3. **Web Studio Workstation (`ui/`)**:
-   - **Nuxt 4 + Nuxt UI (Vue 3, Pinia, Tailwind CSS)**: Modern non-linear video editing workstation.
-   - **Multi-Track Timeline**: Features clip thumbnail filmstrips, audio waveform SVG textures, and strict native duration boundary enforcement for video and audio assets.
-   - **Interactive Viewport Gizmo**: 8-handle transformation with magnetic canvas snapping and keyboard arrow keys nudging.
-   - **Graph Visualizer**: Interactive Mermaid.js DAG inspection modal.
+   - **Nuxt 4 + Nuxt UI v4 (Vue 3, Pinia, Tailwind CSS)**: Modern non-linear video editing workstation.
+   - **Customizable Splitter Layout**: Dynamic resizable panes powered by Nuxt UI `USplitter` separating the Media Library, Inspector, Canvas Viewport, and Timeline.
+   - **Pro Multi-Track Timeline**: Features clip thumbnail filmstrips, audio waveform SVG textures, sticky time ruler, scrubbing needle line, split clip (`S`), duplicate (`Ctrl+D`), and adjacent clip crossfade (`XFade`) visual ribbons.
+   - **Interactive Viewport with Hand Tool & Zoom**: Direct on-canvas 8-point resize, position dragging, rotation, dynamic aspect-ratio fitting, smooth wheel zoom, Spacebar hand pan tool, and fullscreen mode.
+   - **Atomic Snapshot History & Exact Duration**: Bulletproof Undo/Redo stack with automatic synchronization of timeline and playback duration matching exact content bounds.
+   - **Graph Visualizer**: Interactive Mermaid.js DAG inspection modal with SVG export and refresh triggers.
 
 ---
 
@@ -121,24 +123,17 @@ The Filtergraph package is a standalone graph library modeling FFmpeg filter top
 
 ---
 
-### 2.7. Visualizers (`visualizer/`)
+### 2.8. Visualizers (`visualizer/`)
 
 - **Mermaid.js Generator (`ToMermaid`)**: Outputs standard GitHub/Markdown flowchart syntax.
 - **Graphviz DOT Generator (`ToDOT`)**: Outputs Graphviz `.dot` files for high-resolution visual layout rendering.
 
 ---
 
-### 2.8. Embedded Server & Persistence (`server/`)
+### 2.9. Nuxt 4 Web Studio Workstation Details (`ui/`)
 
-- **Pure-Go SQLite Persistence (`server/db/`)**: Zero-CGO SQLite database with WAL mode storing project workspaces, uploaded media assets, technical metadata, and asynchronous render jobs.
-- **REST API Endpoints (`server/api/`)**: Project CRUD, media asset upload/probing, spec validation, graph visualization, and render orchestration.
-- **Live WebSocket Telemetry Hub (`server/ws/`)**: Thread-safe broadcaster dispatching real-time FFmpeg progress telemetry (`percentage`, `fps`, `current_time`, `speed`, `bitrate`, `total_size`).
-
----
-
-### 2.9. Nuxt 4 Web Studio Workstation (`ui/`)
-
-- **Framework & Tooling**: Nuxt 4, Vue 3 Composition API, Nuxt UI, Nuxt i18n (LTR English & RTL Persian), Pinia state stores, and Tailwind CSS.
-- **Pro Multi-Track Timeline**: Dynamic video/audio/overlay/subtitle/waveform tracks, clip dragging, In/Out trimming, splitting (`S`), adjacent clip crossfades (`XFade`), and magnetic snapping.
-- **Interactive Viewport & Transform Gizmo**: Direct on-canvas 8-point resize, translation, rotation, and center guidelines.
+- **Framework & Tooling**: Nuxt 4, Vue 3 Composition API, Nuxt UI v4, Nuxt i18n (LTR English & RTL Persian), Pinia state stores, and Tailwind CSS.
+- **Pro Multi-Track Timeline**: Dynamic video/audio/overlay/subtitle/waveform tracks, clip dragging, In/Out trimming, splitting (`S`), adjacent clip crossfades (`XFade`), sticky time ruler, and magnetic snapping.
+- **Interactive Viewport & Transform Gizmo**: Direct on-canvas 8-point resize, translation, rotation, smart guidelines, Spacebar hand tool pan, wheel zoom, zoom presets, and instant 0ms latency rendering.
 - **Domain Inspectors**: Dedicated controllers for Chroma Key, Sidechain Ducking, Podcast Waveforms, SRT/VTT Subtitles, Ken Burns Keyframes, and Mermaid DAG visualization.
+- **Persistence & Synchronization**: Auto-saving project spec to embedded SQLite, aspect-ratio presets (16:9, 9:16, 1:1, 21:9), and exact media asset uploads.
