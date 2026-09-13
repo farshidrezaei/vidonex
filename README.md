@@ -1,52 +1,236 @@
 <p align="center">
-  <img src=".github/assets/logo.png" width="140" alt="Vidonex Logo" />
+  <img src=".github/assets/logo.png" width="130" alt="Vidonex Logo" />
 </p>
 
 <h1 align="center">Vidonex</h1>
 
 <p align="center">
-  <a href="https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml"><img src="https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://github.com/farshidrezaei/vidonex/releases"><img src="https://img.shields.io/github/v/release/farshidrezaei/vidonex?color=indigo&logo=github" alt="Release" /></a>
+  <a href="https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml"><img src="https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
+  <a href="https://github.com/farshidrezaei/vidonex/releases/latest"><img src="https://img.shields.io/github/v/release/farshidrezaei/vidonex?color=indigo&logo=github" alt="Latest Release" /></a>
   <a href="https://pkg.go.dev/github.com/farshidrezaei/vidonex"><img src="https://pkg.go.dev/badge/github.com/farshidrezaei/vidonex.svg" alt="Go Reference" /></a>
   <a href="https://goreportcard.com/report/github.com/farshidrezaei/vidonex"><img src="https://goreportcard.com/badge/github.com/farshidrezaei/vidonex" alt="Go Report Card" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
 </p>
 
 <p align="center">
-  <strong>Declarative Non-Linear Video Composition & FFmpeg Filtergraph Compiler Engine in Go</strong><br>
-  <em>Web Studio & Native Cross-Platform Desktop Workstation</em>
+  <strong>The Open-Source Non-Linear Video Editor & FFmpeg Filtergraph Compiler Engine</strong><br>
+  <em>Cross-Platform Desktop Workstation &bull; Standalone CLI &bull; Pure Go Engine SDK</em>
+</p>
+
+<p align="center">
+  <a href="#-vidonex-studio-desktop--web-workstation"><strong>Desktop Studio</strong></a> &bull;
+  <a href="#-quick-download--installation"><strong>Download</strong></a> &bull;
+  <a href="#-vidonex-cli-automation"><strong>CLI Tool</strong></a> &bull;
+  <a href="#-vidonex-go-engine-sdk"><strong>Go SDK</strong></a> &bull;
+  <a href="#-architecture"><strong>Architecture</strong></a> &bull;
+  <a href="#-recipes"><strong>Recipes</strong></a>
+</p>
+
+<p align="center">
+  <img src=".github/assets/studio-preview.png" width="920" alt="Vidonex Studio Workstation Preview" />
 </p>
 
 ---
 
-## 🌟 Key Capabilities
+## 🎬 Vidonex Studio (Desktop & Web Workstation)
 
-- 🎯 **Declarative Timeline Model**: Intuitive, type-safe builder for multi-track video, audio, overlay, waveform, subtitle, and effect layers.
-- ⚡ **Filtergraph DAG Compiler**: Compiles high-level timelines into valid, optimized FFmpeg Directed Acyclic Graphs (`-filter_complex`), eliminating brittle string concatenations.
-- 🔄 **Graph Optimization Passes**:
-  - **Auto-Split Injection (`AutoSplitPass`)**: Automatically inserts `split` or `asplit` filters when an output stream feeds multiple downstream filters.
-  - **Dead-Code Elimination (`DeadCodeEliminationPass`)**: Prunes unreferenced nodes and dangling pads before generating CLI commands.
-  - **Alpha-Preserving Normalization**: Preserves 100% alpha transparency (`yuva420p`) across overlays, transparent PNGs, and ChromaKey layers, finishing with standard `yuv420p` canvas export.
-- ⏱ **Timeline Gap & Offset Synchronization**: Precise Presentation Timestamp (`setpts`) and `adelay` offsetting ensuring non-linear timelines with arbitrary gaps, cuts, and multi-track intervals render with frame-accurate timing.
-- 🎨 **Web Studio Workstation (Nuxt 4 + Nuxt UI)**:
-  - Interactive multi-track timeline with clip thumbnail filmstrips, waveform previews, and strict native duration boundary enforcement.
-  - Viewport Transform Gizmo with magnetic canvas alignment guides and keyboard arrow keys precision nudge (`1px` / `10px`).
-  - Searchable Keyboard Shortcuts Cheatsheet and context menus for instant workflow efficiency.
-  - Multi-language support (English & Persian) with auto-detecting RTL/LTR typography.
-- 📐 **Ken Burns & Dynamic Keyframe Animations**: Mathematical easing curves (Linear, Quad, Cubic, Sine) for dynamic 2D motion paths, scaling, and opacity.
-- 💬 **Subtitles & Animated Caption Burn-in**: Parsers for SubRip (`.srt`) and WebVTT (`.vtt`) with TikTok/Reels bounding box styling.
-- 🎚 **Smart Audio Ducking**: Sidechain compression automatically lowers background music whenever dialogue or voiceover tracks are active.
-- 🌊 **Audio Waveform Visualizer**: Converts audio directly into animated, transparent waveforms (`showwaves`) for podcast audiograms and music visualization.
-- 🟢 **Studio Chroma Keying & Despill**: Professional green/blue screen removal with edge feathering and reflected light suppression.
-- 🚀 **Platform Presets & GPU Acceleration**: Out-of-the-box configurations for TikTok (9:16 vertical 60fps), YouTube 4K, and GPU acceleration (NVIDIA NVENC, Apple VideoToolbox, Intel QSV).
-- 📊 **Visual Debugging**: Built-in export to **Mermaid.js** and **Graphviz (DOT)** diagrams for instant graph visualization.
-- ⏱ **Zero-Drift Rational Time**: High-precision fractional time arithmetic (`types.Rational`) preventing floating-point precision drift.
-- 🔌 **Pluggable & Mockable Runtime**: `CommandExecutor` and `MediaProber` interfaces for 100% deterministic testing and CI/CD without requiring local binaries.
-- 📡 **Embedded Server & Real-Time Telemetry**: Embedded SQLite persistence, RESTful project APIs, and WebSocket streaming progress from FFmpeg's `-progress pipe:1`.
+**Vidonex Studio** is a professional, lightweight non-linear video editing workstation engineered with **Wails v2**, **Nuxt 4**, **Vue 3**, **Nuxt UI**, and **Tailwind CSS**. It delivers the speed and intuitive feel of CapCut and Premiere Pro without Electron bloatware.
+
+### ✨ Studio Highlights
+
+- 🎞️ **Multi-Track Timeline**: Layer video, audio, picture-in-picture overlays, subtitles, and animated waveforms with precise drag-and-drop, trim handles, adjacent clip transitions (XFade ribbons), playhead scrubbing, split clips (`S`), and magnetic snapping.
+- 📐 **Interactive Viewport with Transform Gizmo**: Direct on-canvas 8-point resize handles, rotational pivots, magnetic alignment guides, mouse-wheel zoom, and keyboard arrow nudging (`1px` fine / `10px` coarse).
+- 🔀 **Customizable Splitter Workspace**: Smooth panel resizing with collapsible drawers for Media Library, Viewport, Timeline, and Inspectors.
+- 🎛️ **Full-Suite Inspectors**:
+  - **ChromaKey & Despill**: Studio-grade green/blue screen isolation with color pickers and spill suppression.
+  - **Sidechain Audio Ducking**: Automatically attenuate background tracks whenever dialogue or voiceover occurs.
+  - **Audiogram Waveforms**: Generate synchronized neon waveforms from voice recordings for social media podcasts.
+  - **Captions & Subtitles**: Parse and edit SRT/VTT captions with custom fonts, margins, and highlight bounding boxes.
+  - **Keyframe Animation**: Animate position, scale, and opacity using smooth mathematical easing curves (Linear, Quad, Cubic, Sine).
+  - **DAG Graph Visualizer**: Interactive Mermaid.js visual representation of the underlying FFmpeg filter DAG with SVG export.
+- 🚀 **Zero-Copy Native Media Import**: Direct filesystem access with instant FFprobe metadata parsing for multi-gigabyte video libraries.
+- ⚡ **Auto Hardware Acceleration**: Automatically detects NVIDIA NVENC, Apple VideoToolbox, Intel QSV, and VAAPI encoders.
 
 ---
 
-## 🏗 Architecture Overview
+## 📥 Quick Download & Installation
+
+### Option 1: Native Desktop Executable (Recommended)
+
+Pre-built, standalone binaries are available on the [**GitHub Releases**](https://github.com/farshidrezaei/vidonex/releases/latest) page:
+
+| Platform | Architecture | Binary / Package |
+| :--- | :--- | :--- |
+| **Linux** | `x86_64` (glibc $\ge$ 2.31) | [`vidonex-linux-amd64`](https://github.com/farshidrezaei/vidonex/releases/latest) |
+| **macOS** | Universal (Apple Silicon M1/M2/M3/M4 & Intel) | [`vidonex-darwin-universal`](https://github.com/farshidrezaei/vidonex/releases/latest) |
+| **Windows** | `x86_64` (Windows 10/11) | [`vidonex-windows-amd64.exe`](https://github.com/farshidrezaei/vidonex/releases/latest) |
+
+### Option 2: Build Desktop from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/farshidrezaei/vidonex.git
+cd vidonex
+
+# Build and run desktop app (Linux / macOS / Windows)
+go build -tags webkit2_41 -o build/bin/vidonex .
+./build/bin/vidonex
+```
+
+---
+
+## 💻 Vidonex CLI Automation
+
+The **`vidonex`** CLI provides an automation pipeline for server environments, continuous integration, batch rendering, and containerized video workloads.
+
+### CLI Installation
+
+```bash
+go install github.com/farshidrezaei/vidonex/cmd/vidonex@latest
+```
+
+### Core CLI Commands
+
+```bash
+# 1. Start the headless Web Studio & REST/WebSocket server
+vidonex serve --port 8080
+
+# 2. Render a declarative YAML or JSON project to MP4
+vidonex render project.yaml -o output.mp4 --gpu nvenc
+
+# 3. Dry-run compile and inspect FFmpeg filtergraph args
+vidonex render project.yaml --dry-run
+
+# 4. Validate project syntax and media paths
+vidonex validate project.yaml
+
+# 5. Export interactive Mermaid or Graphviz DAG diagrams
+vidonex graph project.yaml --format mermaid -o filtergraph.mmd
+
+# 6. Probe media streams, codecs, and durations
+vidonex probe assets/video.mp4 --json
+```
+
+### Declarative Project Specification (`project.yaml`)
+
+```yaml
+version: "1.0"
+canvas:
+  width: 1920
+  height: 1080
+fps: 60
+tracks:
+  - id: "background_video"
+    kind: "video"
+    clips:
+      - id: "intro_clip"
+        source: "assets/intro.mp4"
+        offset: 0s
+        duration: 10s
+
+  - id: "pip_overlay"
+    kind: "overlay"
+    z_index: 1
+    clips:
+      - id: "webcam"
+        source: "assets/webcam.mp4"
+        offset: 2s
+        duration: 8s
+        scale: 0.3
+        position: { x: 1300, y: 50 }
+
+  - id: "background_audio"
+    kind: "audio"
+    clips:
+      - id: "soundtrack"
+        source: "assets/music.mp3"
+        volume: 0.25
+```
+
+---
+
+## 🛠️ Vidonex Go Engine SDK
+
+For Go backend developers and video infrastructure engineers, Vidonex is a pure-Go, type-safe compiler that abstracts complex FFmpeg filter strings into a declarative AST and Directed Acyclic Graph (DAG).
+
+### Installation
+
+```bash
+go get github.com/farshidrezaei/vidonex
+```
+
+### Code Example: Composing Video & Picture-in-Picture
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
+)
+
+func main() {
+	// 1. Initialize Timeline Canvas
+	tl := timeline.New(
+		timeline.WithCanvas(types.Res1080p),
+		timeline.WithFPS(types.FPS60),
+	)
+
+	// 2. Base Video Layer (Layer 0)
+	baseTrack := timeline.NewTrack("main_video", timeline.TrackKindVideo).SetZIndex(0)
+	baseTrack.AddClip(
+		timeline.NewClip("gameplay", "assets/gameplay.mp4", 0, 15*time.Second),
+	)
+
+	// 3. Picture-in-Picture Facecam Layer (Layer 1)
+	pipTrack := timeline.NewTrack("pip_overlay", timeline.TrackKindOverlay).SetZIndex(1)
+	pipClip := timeline.NewClip("facecam", "assets/webcam.mp4", 2*time.Second, 10*time.Second).
+		WithScale(0.25).
+		WithPosition(types.Point{X: 1400, Y: 40}).
+		WithOpacity(0.95)
+	pipTrack.AddClip(pipClip)
+
+	// 4. Background Audio Track
+	bgmTrack := timeline.NewTrack("bgm", timeline.TrackKindAudio)
+	bgmTrack.AddClip(
+		timeline.NewClip("music", "assets/bgm.mp3", 0, 15*time.Second).WithVolume(0.3),
+	)
+
+	tl.AddTrack(baseTrack, pipTrack, bgmTrack)
+
+	// 5. Compile and Render
+	c := composer.New()
+
+	// Dry-run inspection & Mermaid flowchart
+	compilation, err := c.Compile(tl, "output.mp4")
+	if err != nil {
+		log.Fatalf("Compilation failed: %v", err)
+	}
+
+	diagram, _ := compilation.Mermaid()
+	fmt.Println("Filtergraph Diagram:\n", diagram)
+
+	// Live progress execution
+	ctx := context.Background()
+	_, err = c.Render(ctx, tl, "output.mp4", func(event executor.ProgressEvent) {
+		fmt.Printf("Progress: %.1f%% (Speed: %.2fx, FPS: %.1f)\n", event.Percentage, event.Speed, event.FPS)
+	})
+	if err != nil {
+		log.Fatalf("Render failed: %v", err)
+	}
+}
+```
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 graph LR
@@ -78,88 +262,15 @@ graph LR
     TL --> Norm --> Plan --> Duck --> DAG --> Passes --> CLI & Mermaid --> Exec --> Probe
 ```
 
----
-
-## 📦 Installation
-
-```bash
-go get github.com/farshidrezaei/vidonex
-```
+### Compiler Optimization Passes
+- **`AutoSplitPass`**: Automatically injects `split` or `asplit` filters whenever a video/audio pad feeds multiple downstream filters, preventing FFmpeg pad reuse errors.
+- **`DeadCodeEliminationPass`**: Prunes dangling nodes, unlinked inputs, and unreachable branches before generating CLI arguments.
+- **Alpha Normalization**: Preserves transparency channels (`yuva420p`) across overlays, PNGs, and ChromaKey layers, finishing with optimal `yuv420p` export.
+- **Zero-Drift Rational Timing**: Prevents frame desynchronization over long compositions by utilizing exact fractions (`types.Rational`) instead of floating-point numbers.
 
 ---
 
-## 🚀 Quickstart: Picture-in-Picture Composition
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"log"
-	"time"
-
-	"github.com/farshidrezaei/vidonex/composer"
-	"github.com/farshidrezaei/vidonex/executor"
-	"github.com/farshidrezaei/vidonex/timeline"
-	"github.com/farshidrezaei/vidonex/types"
-)
-
-func main() {
-	// 1. Define Canvas & Frame Rate
-	tl := timeline.New(
-		timeline.WithCanvas(types.Res1080p),
-		timeline.WithFPS(types.FPS60),
-	)
-
-	// 2. Base Video Track (Layer 0)
-	baseTrack := timeline.NewTrack("base_video", timeline.TrackKindVideo).SetZIndex(0)
-	baseTrack.AddClip(
-		timeline.NewClip("gameplay", "assets/gameplay.mp4", 0, 15*time.Second),
-	)
-
-	// 3. Picture-in-Picture Facecam Overlay (Layer 1)
-	pipTrack := timeline.NewTrack("pip_overlay", timeline.TrackKindOverlay).SetZIndex(1)
-	pipClip := timeline.NewClip("facecam", "assets/webcam.mp4", 2*time.Second, 10*time.Second).
-		WithScale(0.25).
-		WithPosition(types.Point{X: 1400, Y: 40}).
-		WithOpacity(0.95)
-	pipTrack.AddClip(pipClip)
-
-	// 4. Background Music
-	bgmTrack := timeline.NewTrack("bgm", timeline.TrackKindAudio)
-	bgmTrack.AddClip(
-		timeline.NewClip("music", "assets/bgm.mp3", 0, 15*time.Second).WithVolume(0.3),
-	)
-
-	tl.AddTrack(baseTrack, pipTrack, bgmTrack)
-
-	// 5. Compose and Render
-	c := composer.New()
-
-	// Dry-run inspection & Mermaid flowchart
-	compilation, err := c.Compile(tl, "output.mp4")
-	if err != nil {
-		log.Fatalf("Compilation failed: %v", err)
-	}
-
-	mermaid, _ := compilation.Mermaid()
-	fmt.Println("Filtergraph Diagram:\n", mermaid)
-
-	// Execute Render with Live Progress
-	ctx := context.Background()
-	_, err = c.Render(ctx, tl, "output.mp4", func(event executor.ProgressEvent) {
-		fmt.Printf("Rendering: %.1f%% (Speed: %.2fx, FPS: %.1f)\n", event.Percentage, event.Speed, event.FPS)
-	})
-	if err != nil {
-		log.Fatalf("Render failed: %v", err)
-	}
-}
-```
-
----
-
-## 📚 Package Layout
+## 📦 Package Layout
 
 | Package | Purpose | Key Symbols |
 | :--- | :--- | :--- |
@@ -177,60 +288,23 @@ func main() {
 | [`probe`](./probe/) | Automated media inspection & stream caching | `MediaProber`, `FFprobeProber`, `CachedProber`, `MockProber` |
 | [`executor`](./executor/) | Subprocess execution & live telemetry | `CommandExecutor`, `OSExecutor`, `MockExecutor`, `ParseProgressStream()` |
 | [`visualizer`](./visualizer/) | Flowchart generation | `ToMermaid()`, `ToDOT()` |
-| [`spec`](./spec/) | Declarative YAML/JSON project parsing & relative path resolution | `ParseFile()`, `ParseYAML()`, `ParseJSON()`, `ToTimeline()` |
-| [`server`](./server/) | Pure-Go SQLite persistence, REST API, & WebSocket telemetry server | `Server`, `New()`, `Start()`, `Stop()` |
-| [`ui`](./ui/) | Modern Nuxt 4 + Nuxt UI Web Studio Workstation (SPA) | Vue 3, Pinia, i18n (FA/EN), Transform Gizmo, Timeline |
+| [`spec`](./spec/) | Declarative YAML/JSON project parsing | `ParseFile()`, `ParseYAML()`, `ParseJSON()`, `ToTimeline()` |
+| [`server`](./server/) | Pure-Go SQLite persistence & WebSocket server | `Server`, `New()`, `Start()`, `Stop()` |
+| [`desktop`](./desktop/) | Wails v2 native desktop application bridge | `App`, `NewApp()`, `Startup()`, `SelectFile()` |
+| [`ui`](./ui/) | Modern Nuxt 4 + Nuxt UI Web Studio Workstation | Vue 3, Pinia, i18n, Transform Gizmo, Timeline |
 | [`composer`](./composer/) | Unified high-level facade | `Composer`, `New()`, `Compile()`, `Render()` |
 
 ---
 
-## 🎨 Vidonex Web Studio (GUI)
+## 🍳 Runnable Recipes
 
-Vidonex includes a modern, high-performance web workstation built with **Nuxt 4, Vue 3, Nuxt UI v4, Nuxt i18n, TypeScript, and WebSocket**:
-
-- 🎬 **Pro Multi-Track Timeline**: Layer video, audio, overlay, subtitle, and waveform tracks with drag-and-drop, trim handles, adjacent clip transitions (XFade ribbons), sticky time ruler, scrubbing playhead needle, split clip (`S`), duplicate (`Ctrl+D`), and magnetic snapping.
-- 📐 **Interactive Viewport with Hand Tool & Zoom**: Direct on-canvas 8-point resize, translation, rotation, smart alignment guides, zoom controls (wheel zoom, fit/reset, preset zoom menu), Spacebar hand pan tool, and full-screen preview.
-- 🔀 **Flexible Splitter Layout**: Customizable workspace layout powered by Nuxt UI `USplitter` with collapsible/resizable panels for Media Library, Viewport, Timeline, and Inspector.
-- ⏱ **Exact Content Duration & Atomic History**: Timeline and playback durations snap precisely to the last clip boundary without artificial padding, backed by an atomic snapshot-based Undo/Redo engine (`Ctrl+Z` / `Ctrl+Y`).
-- 🎛 **Full Feature Inspectors**: Chroma Key, Sidechain Ducking, Podcast Waveform, Caption Subtitle Editor, Ken Burns Keyframes, and interactive Mermaid.js filtergraph DAG visualizer modal with SVG export.
-- 💾 **Pure-Go SQLite Persistence**: Auto-saving project workspace with zero CGO dependencies and instant aspect-ratio canvas presets (16:9, 9:16 Reels/TikTok, 1:1 Square, 21:9 Cinema).
-
-### Launching the Web Studio:
-
-```bash
-# Start backend server and open Web Studio on http://localhost:8080
-vidonex serve --port 8080
-
-# Or run frontend dev mode
-cd ui && pnpm dev
-```
-
-### 🖥️ Native Desktop Application (Wails v2 + Nuxt 4):
-
-Vidonex includes a native cross-platform desktop workstation powered by Wails v2:
-- **Zero Electron Bloat**: Sub-25MB standalone executable utilizing native OS WebViews (Edge WebView2 on Windows, WebKit on macOS, WebKitGTK on Linux).
-- **Direct Filesystem Access & Zero-Copy Import**: Instant native file pickers and multi-gigabyte video asset registration directly with local FFprobe metadata.
-- **Hardware Acceleration Auto-Detection**: Automatically identifies NVIDIA NVENC, Apple VideoToolbox, Intel QSV, or Linux VAAPI hardware encoders.
-
-```bash
-# Build desktop binary (Linux)
-go build -tags webkit2_41 -o bin/vidonex-desktop ./cmd/vidonex-desktop
-
-# Launch desktop workstation
-./bin/vidonex-desktop
-```
-
----
-
-## 🍳 Example Recipes
-
-Complete, runnable recipes located in [`examples/`](./examples/):
+Explore production recipes in [`examples/`](./examples/):
 
 1. **[`01_simple_cut`](./examples/01_simple_cut/)**: Single video trimming and canvas normalization.
-2. **[`02_picture_in_picture`](./examples/02_picture_in_picture/)**: Facecam overlay on top of gameplay video with opacity.
+2. **[`02_picture_in_picture`](./examples/02_picture_in_picture/)**: Facecam overlay on top of gameplay video.
 3. **[`03_transitions`](./examples/03_transitions/)**: Seamless video crossfades (`xfade`) and audio transitions (`acrossfade`).
 4. **[`04_animated_motion`](./examples/04_animated_motion/)**: Ken Burns pan/zoom and dynamic 2D position/scale keyframe tracks.
-5. **[`05_animated_subtitles`](./examples/05_animated_subtitles/)**: SRT subtitle parsing with styled yellow captions and bounding boxes.
+5. **[`05_animated_subtitles`](./examples/05_animated_subtitles/)**: SRT subtitle parsing with styled yellow captions.
 6. **[`06_audio_ducking`](./examples/06_audio_ducking/)**: Background soundtrack automatically ducking during voiceover commentary.
 7. **[`07_platform_presets`](./examples/07_platform_presets/)**: Vertical 9:16 TikTok 60fps render with NVIDIA NVENC GPU acceleration.
 8. **[`08_podcast_audio_waveform`](./examples/08_podcast_audio_waveform/)**: Square 1:1 podcast audiogram with neon animated waveform overlay.
@@ -241,7 +315,7 @@ Complete, runnable recipes located in [`examples/`](./examples/):
 
 ## 🧪 Testing & Quality Assurance
 
-Vidonex follows strict engineering contracts enshrined in [CONTRACTS.md](CONTRACTS.md).
+Vidonex adheres to zero-compromise engineering contracts documented in [CONTRACTS.md](CONTRACTS.md).
 
 ```bash
 # Run all unit and real-FFmpeg end-to-end tests with race detection
