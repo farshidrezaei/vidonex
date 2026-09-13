@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col bg-gray-950 border-l border-gray-800 select-none overflow-hidden">
+  <div class="h-full flex flex-col bg-gray-950 select-none overflow-hidden">
     <!-- Header -->
     <div class="h-10 border-b border-gray-800 px-4 flex items-center justify-between flex-shrink-0">
       <span class="text-xs font-semibold text-gray-200 tracking-wide uppercase">

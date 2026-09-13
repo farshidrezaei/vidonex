@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col bg-gray-900/60 border-r border-gray-800 select-none relative">
+  <div class="h-full flex flex-col bg-gray-900/60 select-none relative">
     <!-- Hidden Custom Sleek Drag Ghost Badge -->
     <div
       ref="dragGhostRef"

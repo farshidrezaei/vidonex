@@ -1,7 +1,7 @@
 <template>
   <div class="h-full flex flex-col bg-gray-950/90 relative overflow-hidden select-none">
     <!-- Viewport Canvas Stage -->
-    <div ref="stageRef" class="flex-1 flex items-center justify-center p-10 relative overflow-hidden">
+    <div ref="stageRef" class="flex-1 flex items-center justify-center p-3 relative overflow-hidden">
       <!-- Scaled Aspect Ratio Canvas Screen -->
       <div
         class="canvas-stage relative shadow-2xl transition-all rounded-sm flex items-center justify-center"
@@ -149,23 +149,41 @@ function handleClipMouseDown(clip: ClipSpec, event: MouseEvent) {
 const stageRef = ref<HTMLDivElement | null>(null)
 const stageDimensions = useElementSize(stageRef)
 
+// Padding offset corresponding to p-3 padding (12px each side = 24px total)
+const VIEWPORT_PADDING_OFFSET = 24
+
 const displayDimensions = computed(() => {
-  const availableW = Math.max(100, stageDimensions.width.value - 80)
-  const availableH = Math.max(100, stageDimensions.height.value - 80)
+  const stageW = stageDimensions.width.value
+  const stageH = stageDimensions.height.value
 
-  const canvasW = projectStore.canvasWidth
-  const canvasH = projectStore.canvasHeight
+  const availableW = Math.max(50, stageW - VIEWPORT_PADDING_OFFSET)
+  const availableH = Math.max(50, stageH - VIEWPORT_PADDING_OFFSET)
+
+  const canvasW = projectStore.canvasWidth || 1920
+  const canvasH = projectStore.canvasHeight || 1080
   const targetRatio = canvasW / canvasH
+  const availableRatio = availableW / availableH
 
-  let width = availableW
-  let height = width / targetRatio
+  let width: number
+  let height: number
 
-  if (height > availableH) {
+  // Dynamic Fit:
+  // If the available area is proportionally narrower than the aspect ratio (availableRatio < targetRatio),
+  // the video is constrained by available width -> Fit on the X axis.
+  // If the available area is proportionally wider than the aspect ratio (availableRatio >= targetRatio),
+  // the video is constrained by available height -> Fit on the Y axis.
+  if (availableRatio < targetRatio) {
+    width = availableW
+    height = width / targetRatio
+  } else {
     height = availableH
     width = height * targetRatio
   }
 
-  return { width, height }
+  return {
+    width: Math.round(width),
+    height: Math.round(height),
+  }
 })
 
 const screenStyle = computed(() => ({
