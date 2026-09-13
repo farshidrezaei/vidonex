@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -132,6 +133,11 @@ func (a *App) Shutdown(ctx context.Context) {
 	if a.listener != nil {
 		_ = a.listener.Close()
 	}
+}
+
+// Handler returns the HTTP Handler for proxying REST API and WebSocket requests within Wails AssetServer.
+func (a *App) Handler() http.Handler {
+	return a.server.Handler()
 }
 
 // GetServerInfo returns the internal local server address and port.

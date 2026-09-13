@@ -47,7 +47,8 @@ func main() {
 		HideWindowOnClose: false,
 		BackgroundColour:  &options.RGBA{R: 11, G: 15, B: 25, A: 255},
 		AssetServer: &assetserver.Options{
-			Assets: subFS,
+			Assets:  subFS,
+			Handler: app.Handler(),
 		},
 		LogLevel:   logger.INFO,
 		OnStartup:  app.Startup,
