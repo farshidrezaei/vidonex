@@ -18,18 +18,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: 'ui/package.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'ui/pnpm-lock.yaml'
 
       - name: Build Web Studio Frontend
         working-directory: ui
         run: |
-          npm ci
-          npm run generate
+          pnpm install --frozen-lockfile
+          pnpm run generate
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -67,16 +72,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: 'ui/pnpm-lock.yaml'
 
       - name: Build Web Studio Frontend
         working-directory: ui
         run: |
-          npm ci
-          npm run generate
+          pnpm install --frozen-lockfile
+          pnpm run generate
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -106,16 +118,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: 'ui/pnpm-lock.yaml'
 
       - name: Build Web Studio Frontend
         working-directory: ui
         run: |
-          npm ci
-          npm run generate
+          pnpm install --frozen-lockfile
+          pnpm run generate
 
       - name: Setup Go
         uses: actions/setup-go@v5
