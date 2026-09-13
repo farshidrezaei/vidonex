@@ -3,10 +3,10 @@ package presets_test
 import (
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestPlatformPresetsTable(t *testing.T) {

@@ -1,4 +1,4 @@
-// Package db provides lightweight, pure-Go SQLite persistence for Vidonyx projects, media assets, and render jobs.
+// Package db provides lightweight, pure-Go SQLite persistence for Vidonex projects, media assets, and render jobs.
 package db
 
 import (

@@ -4,7 +4,7 @@ package effects
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonex/filtergraph"
 )
 
 // VolumeFilter adjusts audio gain.

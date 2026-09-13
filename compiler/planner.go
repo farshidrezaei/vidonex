@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/effects"
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/effects"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // ProcessClipVideo processes a single clip's video pipeline:

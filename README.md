@@ -1,10 +1,12 @@
-# Vidonyx
+# Vidonex
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/farshidrezaei/vidonyx.svg)](https://pkg.go.dev/github.com/farshidrezaei/vidonyx)
-[![Go Report Card](https://goreportcard.com/badge/github.com/farshidrezaei/vidonyx)](https://goreportcard.com/report/github.com/farshidrezaei/vidonyx)
+[![CI](https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml/badge.svg)](https://github.com/farshidrezaei/vidonex/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/farshidrezaei/vidonex?color=indigo&logo=github)](https://github.com/farshidrezaei/vidonex/releases)
+[![Go Reference](https://pkg.go.dev/badge/github.com/farshidrezaei/vidonex.svg)](https://pkg.go.dev/github.com/farshidrezaei/vidonex)
+[![Go Report Card](https://goreportcard.com/badge/github.com/farshidrezaei/vidonex)](https://goreportcard.com/report/github.com/farshidrezaei/vidonex)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Vidonyx** is an open-source, production-grade Go library and engine for declarative, non-linear video editing (conceptually similar to Remotion, Editframe, or the CapCut backend, but written natively in idiomatic, high-performance Go).
+**Vidonex** is an open-source, production-grade Go engine & desktop workstation for declarative, non-linear video editing (conceptually similar to Remotion, Editframe, or the CapCut backend, but written natively in idiomatic, high-performance Go).
 
 ---
 
@@ -72,7 +74,7 @@ graph LR
 ## 📦 Installation
 
 ```bash
-go get github.com/farshidrezaei/vidonyx
+go get github.com/farshidrezaei/vidonex
 ```
 
 ---
@@ -88,10 +90,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func main() {
@@ -173,9 +175,9 @@ func main() {
 
 ---
 
-## 🎨 Vidonyx Web Studio (GUI)
+## 🎨 Vidonex Web Studio (GUI)
 
-Vidonyx includes a modern, high-performance web workstation built with **Nuxt 4, Vue 3, Nuxt UI v4, Nuxt i18n, TypeScript, and WebSocket**:
+Vidonex includes a modern, high-performance web workstation built with **Nuxt 4, Vue 3, Nuxt UI v4, Nuxt i18n, TypeScript, and WebSocket**:
 
 - 🎬 **Pro Multi-Track Timeline**: Layer video, audio, overlay, subtitle, and waveform tracks with drag-and-drop, trim handles, adjacent clip transitions (XFade ribbons), sticky time ruler, scrubbing playhead needle, split clip (`S`), duplicate (`Ctrl+D`), and magnetic snapping.
 - 📐 **Interactive Viewport with Hand Tool & Zoom**: Direct on-canvas 8-point resize, translation, rotation, smart alignment guides, zoom controls (wheel zoom, fit/reset, preset zoom menu), Spacebar hand pan tool, and full-screen preview.
@@ -188,7 +190,7 @@ Vidonyx includes a modern, high-performance web workstation built with **Nuxt 4,
 
 ```bash
 # Start backend server and open Web Studio on http://localhost:8080
-vidonyx serve --port 8080
+vidonex serve --port 8080
 
 # Or run frontend dev mode
 cd ui && pnpm dev
@@ -196,17 +198,17 @@ cd ui && pnpm dev
 
 ### 🖥️ Native Desktop Application (Wails v2 + Nuxt 4):
 
-Vidonyx includes a native cross-platform desktop workstation powered by Wails v2:
+Vidonex includes a native cross-platform desktop workstation powered by Wails v2:
 - **Zero Electron Bloat**: Sub-25MB standalone executable utilizing native OS WebViews (Edge WebView2 on Windows, WebKit on macOS, WebKitGTK on Linux).
 - **Direct Filesystem Access & Zero-Copy Import**: Instant native file pickers and multi-gigabyte video asset registration directly with local FFprobe metadata.
 - **Hardware Acceleration Auto-Detection**: Automatically identifies NVIDIA NVENC, Apple VideoToolbox, Intel QSV, or Linux VAAPI hardware encoders.
 
 ```bash
 # Build desktop binary (Linux)
-go build -tags webkit2_41 -o bin/vidonyx-desktop ./cmd/vidonyx-desktop
+go build -tags webkit2_41 -o bin/vidonex-desktop ./cmd/vidonex-desktop
 
 # Launch desktop workstation
-./bin/vidonyx-desktop
+./bin/vidonex-desktop
 ```
 
 ---
@@ -230,7 +232,7 @@ Complete, runnable recipes located in [`examples/`](./examples/):
 
 ## 🧪 Testing & Quality Assurance
 
-Vidonyx follows strict engineering contracts enshrined in [CONTRACTS.md](CONTRACTS.md).
+Vidonex follows strict engineering contracts enshrined in [CONTRACTS.md](CONTRACTS.md).
 
 ```bash
 # Run all unit and real-FFmpeg end-to-end tests with race detection

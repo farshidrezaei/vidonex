@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestApplyChromaKeyTable(t *testing.T) {

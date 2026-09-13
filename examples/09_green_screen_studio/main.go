@@ -1,4 +1,4 @@
-// Package main demonstrates studio green screen chroma key removal with despill suppression using Vidonyx.
+// Package main demonstrates studio green screen chroma key removal with despill suppression using Vidonex.
 package main
 
 import (
@@ -7,11 +7,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func main() {

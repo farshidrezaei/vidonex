@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/spec"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/spec"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestSpec_ParserAndConverterTable(t *testing.T) {
@@ -71,7 +71,7 @@ tracks:
       srt_content: |
         1
         00:00:01,000 --> 00:00:03,500
-        Welcome to Vidonyx Declarative Engine!
+        Welcome to Vidonex Declarative Engine!
       style:
         font_size: 42
         color: "yellow"

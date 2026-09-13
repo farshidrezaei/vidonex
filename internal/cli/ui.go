@@ -1,4 +1,4 @@
-// Package cli provides private terminal UI, live progress telemetry, and structured logging helpers for the Vidonyx CLI tool.
+// Package cli provides private terminal UI, live progress telemetry, and structured logging helpers for the Vidonex CLI tool.
 package cli
 
 import (
@@ -56,7 +56,7 @@ func (ui *UI) colorize(colorCode, text string) string {
 	return colorCode + text + ColorReset
 }
 
-// PrintBanner outputs the stylized Vidonyx engine banner.
+// PrintBanner outputs the stylized Vidonex engine banner.
 func (ui *UI) PrintBanner() {
 	banner := `
   __   ___     __                  

@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/ducking"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/ducking"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 // ToTimeline compiles the VideoSpec into a timeline.Timeline AST and compiler.EncodingOptions.

@@ -7,7 +7,7 @@
       <!-- Studio Workspace with Nested Resizable USplitter Panels -->
       <USplitter
         id="studio-vertical-splitter"
-        auto-save-id="vidonyx-studio-vertical"
+        auto-save-id="vidonex-studio-vertical"
         orientation="vertical"
         :items="verticalPanels"
         class="flex-1 overflow-hidden"
@@ -23,7 +23,7 @@
         <template #workspace>
           <USplitter
             id="studio-horizontal-splitter"
-            auto-save-id="vidonyx-studio-horizontal"
+            auto-save-id="vidonex-studio-horizontal"
             orientation="horizontal"
             :items="horizontalPanels"
             class="h-full w-full overflow-hidden"

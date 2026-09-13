@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/farshidrezaei/vidonyx/ducking"
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/visualizer"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/ducking"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/visualizer"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 // isImageSource reports whether a media source file path is an image.

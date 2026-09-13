@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestChainTrackTransitions_Table(t *testing.T) {

@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 func TestApplyWaveformVisualizerTable(t *testing.T) {

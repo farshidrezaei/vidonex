@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/executor"
+	"github.com/farshidrezaei/vidonex/executor"
 )
 
 func TestParseProgressStreamTable(t *testing.T) {

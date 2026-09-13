@@ -1,7 +1,7 @@
 // Recipe 10: Declarative YAML/JSON Video Composition Project.
 //
 // This example demonstrates how to load, resolve relative media paths, compile,
-// and render a complete multi-track video composition from a declarative vidonyx.yaml file.
+// and render a complete multi-track video composition from a declarative vidonex.yaml file.
 package main
 
 import (
@@ -11,13 +11,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/spec"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/spec"
 )
 
 func main() {
-	specPath := "examples/10_declarative_yaml_project/vidonyx.yaml"
+	specPath := "examples/10_declarative_yaml_project/vidonex.yaml"
 	fmt.Printf("=== Recipe 10: Declarative YAML Video Composition ===\n")
 	fmt.Printf("Loading project specification: %s\n\n", specPath)
 

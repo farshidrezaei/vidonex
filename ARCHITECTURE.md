@@ -1,12 +1,12 @@
-# Vidonyx Architecture & Deep Design Guide
+# Vidonex Architecture & Deep Design Guide
 
-This document provides a comprehensive technical overview of the internal architecture, design principles, intermediate representation (IR), and execution pipeline of the **Vidonyx** video composition engine.
+This document provides a comprehensive technical overview of the internal architecture, design principles, intermediate representation (IR), and execution pipeline of the **Vidonex** video composition engine.
 
 ---
 
 ## 1. System Overview & Architectural Pipeline
 
-Vidonyx uses a **Multi-Stage Compiler Pipeline** to translate high-level declarative video compositions into valid, highly-optimized FFmpeg filtergraphs:
+Vidonex uses a **Multi-Stage Compiler Pipeline** to translate high-level declarative video compositions into valid, highly-optimized FFmpeg filtergraphs:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@ Vidonyx uses a **Multi-Stage Compiler Pipeline** to translate high-level declara
 ### 2.1. Fundamental Types (`types/`)
 
 - **`types.Rational` (`Num/Den int64`)**:
-  - Floating-point calculations drift when rendering thousands of frames across hours of video. Vidonyx strictly relies on fractional arithmetic for timecode, frame rate, and aspect ratio calculations.
+  - Floating-point calculations drift when rendering thousands of frames across hours of video. Vidonex strictly relies on fractional arithmetic for timecode, frame rate, and aspect ratio calculations.
   - Standard frame rate definitions (`FPS24`, `FPS30`, `FPS60`, `FPS23_976`, `FPS29_97`, `FPS59_94`) are exact integer fractions.
 - **`types.Size` & `types.Rect`**:
   - Enforces even-dimension rounding (`makeEven`) on all scale operations, guaranteeing compatibility with `yuv420p` chroma subsampling and H.264/HEVC encoders.

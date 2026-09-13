@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/farshidrezaei/vidonyx/desktop"
-	"github.com/farshidrezaei/vidonyx/ui"
+	"github.com/farshidrezaei/vidonex/desktop"
+	"github.com/farshidrezaei/vidonex/ui"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -25,7 +25,7 @@ func main() {
 
 	app, err := desktop.NewApp("", appLogger)
 	if err != nil {
-		appLogger.Error("failed initializing vidonyx desktop application", "error", err)
+		appLogger.Error("failed initializing vidonex desktop application", "error", err)
 		os.Exit(1)
 	}
 
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	appOptions := &options.App{
-		Title:             "Vidonyx Studio - Video Composition Workstation",
+		Title:             "Vidonex Studio - Video Composition Workstation",
 		Width:             1440,
 		Height:            900,
 		MinWidth:          1024,

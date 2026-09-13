@@ -4,7 +4,7 @@ import (
 	"iter"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // Timeline is the top-level declarative description of a composition.

@@ -6,7 +6,7 @@
 *.dylib
 *.test
 *.out
-/vidonyx
+/vidonex
 
 # ── Go build & module cache ──
 vendor/

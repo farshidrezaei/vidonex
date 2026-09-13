@@ -328,7 +328,7 @@ function handleDragStart(event: DragEvent) {
 
   if (event.dataTransfer) {
     event.dataTransfer.setData(
-      'application/vidonyx-clip',
+      'application/vidonex-clip',
       JSON.stringify({
         clipId: props.clip.id,
         sourceTrackId: props.trackId,

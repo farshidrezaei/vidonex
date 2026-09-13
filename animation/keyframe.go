@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // Keyframe represents a discrete animated value at a specific timeline timestamp.

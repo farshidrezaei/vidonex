@@ -3,10 +3,10 @@ package effects_test
 import (
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/effects"
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/effects"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestEffects_VideoFilters(t *testing.T) {
@@ -22,7 +22,7 @@ func TestEffects_VideoFilters(t *testing.T) {
 
 	// Test DrawText
 	textFilter := effects.DrawTextFilter{
-		Text:      "Vidonyx Engine",
+		Text:      "Vidonex Engine",
 		FontSize:  32,
 		FontColor: types.ColorWhite,
 		Box:       true,

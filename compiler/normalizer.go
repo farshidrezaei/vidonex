@@ -3,8 +3,8 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // InjectVideoNormalizer creates a normalization chain ensuring uniform resolution, FPS, SAR and pixel format:

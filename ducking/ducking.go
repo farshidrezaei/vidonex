@@ -4,7 +4,7 @@ package ducking
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonex/filtergraph"
 )
 
 // Options configures sidechain compression parameters.

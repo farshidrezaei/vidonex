@@ -1,12 +1,12 @@
-# Contributing to Vidonyx
+# Contributing to Vidonex
 
-Thank you for contributing to **Vidonyx**! We welcome contributions from developers, researchers, and video engineers worldwide.
+Thank you for contributing to **Vidonex**! We welcome contributions from developers, researchers, and video engineers worldwide.
 
 ---
 
 ## 1. Code Standards & Engineering Principles
 
-Vidonyx follows strict production-grade Go conventions:
+Vidonex follows strict production-grade Go conventions:
 
 1. **Pure Standard Library Core**: Do not add heavy external dependencies to core packages (`types`, `timeline`, `filtergraph`, `compiler`).
 2. **Modern Go Idioms**:

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonex/filtergraph"
 )
 
 func TestGraph_TopologicalSortTable(t *testing.T) {

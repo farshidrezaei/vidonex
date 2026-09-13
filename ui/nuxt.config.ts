@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Vidonyx Studio - Video Composition Workstation',
+      title: 'Vidonex Studio - Video Composition Workstation',
       meta: [
         { name: 'description', content: 'Professional Declarative Video Composition & FFmpeg Filtergraph Editor' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' },

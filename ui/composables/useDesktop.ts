@@ -59,7 +59,7 @@ export function useDesktop() {
     }
   }
 
-  async function saveProjectFileDialog(defaultName = 'project.vidonyx.json'): Promise<string> {
+  async function saveProjectFileDialog(defaultName = 'project.vidonex.json'): Promise<string> {
     if (!isDesktop.value) return ''
     try {
       return await (window as any).go.desktop.App.SaveProjectFileDialog(defaultName)

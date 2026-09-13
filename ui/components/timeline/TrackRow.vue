@@ -283,7 +283,7 @@ function handleDrop(event: DragEvent) {
   // Case 1: Moving an existing timeline clip (Cross-track or same-track)
   let clipInfo = activeTimelineClip.value
   if (!clipInfo) {
-    const rawClipData = event.dataTransfer?.getData('application/vidonyx-clip')
+    const rawClipData = event.dataTransfer?.getData('application/vidonex-clip')
     if (rawClipData) {
       try {
         const parsed = JSON.parse(rawClipData)
@@ -328,7 +328,7 @@ function handleDrop(event: DragEvent) {
   // Case 2: Adding an asset from Media Library
   let asset = activeAsset.value
   if (!asset) {
-    const assetId = event.dataTransfer?.getData('vidonyx-asset-id') || event.dataTransfer?.getData('text/plain')
+    const assetId = event.dataTransfer?.getData('vidonex-asset-id') || event.dataTransfer?.getData('text/plain')
     if (assetId) {
       asset = mediaStore.assets.find((a) => a.id === assetId || a.file_path === assetId || a.file_name === assetId) || null
     }

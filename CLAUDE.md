@@ -1,6 +1,6 @@
 # CLAUDE.md: Coding & Development Guide
 
-This repository contains **Vidonyx**, a declarative video composition engine and FFmpeg filtergraph compiler in Go.
+This repository contains **Vidonex**, a declarative video composition engine and FFmpeg filtergraph compiler in Go.
 
 ---
 
@@ -43,7 +43,7 @@ cd ui && pnpm dev     # Run Nuxt 4 development workstation
 cd ui && pnpm build   # Production static build & validation
 
 # Run CLI Tool
-./vidonyx --help
+./vidonex --help
 ```
 
 ---

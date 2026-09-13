@@ -1,4 +1,4 @@
-// Package main demonstrates subtitle track burn-in and styled social media captions with Vidonyx.
+// Package main demonstrates subtitle track burn-in and styled social media captions with Vidonex.
 package main
 
 import (
@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	// 3. Parse SRT Subtitles and Configure Style
 	srtContent := `1
 00:00:01,000 --> 00:00:04,500
-Hey everyone! Welcome to Vidonyx.
+Hey everyone! Welcome to Vidonex.
 
 2
 00:00:05,000 --> 00:00:08,000

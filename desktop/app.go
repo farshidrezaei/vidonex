@@ -1,4 +1,4 @@
-// Package desktop implements the Wails v2 native desktop application shell for Vidonyx.
+// Package desktop implements the Wails v2 native desktop application shell for Vidonex.
 package desktop
 
 import (
@@ -16,10 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/probe"
-	"github.com/farshidrezaei/vidonyx/server"
-	"github.com/farshidrezaei/vidonyx/server/db"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/probe"
+	"github.com/farshidrezaei/vidonex/server"
+	"github.com/farshidrezaei/vidonex/server/db"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -70,7 +70,7 @@ func NewApp(dataDirectory string, logger *slog.Logger) (*App, error) {
 		if err != nil {
 			homeDir = "."
 		}
-		dataDirectory = filepath.Join(homeDir, ".vidonyx")
+		dataDirectory = filepath.Join(homeDir, ".vidonex")
 	}
 
 	if err := os.MkdirAll(dataDirectory, 0755); err != nil {
@@ -113,7 +113,7 @@ func NewApp(dataDirectory string, logger *slog.Logger) (*App, error) {
 // Startup is called by Wails when the application begins.
 func (a *App) Startup(ctx context.Context) {
 	a.context = ctx
-	a.logger.Info("vidonyx desktop starting up", "server_port", a.serverPort)
+	a.logger.Info("vidonex desktop starting up", "server_port", a.serverPort)
 
 	// Launch embedded HTTP server in background
 	go func() {
@@ -125,7 +125,7 @@ func (a *App) Startup(ctx context.Context) {
 
 // Shutdown is called by Wails when the application terminates.
 func (a *App) Shutdown(ctx context.Context) {
-	a.logger.Info("vidonyx desktop shutting down")
+	a.logger.Info("vidonex desktop shutting down")
 	shutdownContext, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -223,18 +223,18 @@ func (a *App) SelectMediaFiles() ([]string, error) {
 	return selectedFiles, nil
 }
 
-// SaveProjectFileDialog opens a native OS file save dialog for Vidonyx project files.
+// SaveProjectFileDialog opens a native OS file save dialog for Vidonex project files.
 func (a *App) SaveProjectFileDialog(defaultName string) (string, error) {
 	if defaultName == "" {
-		defaultName = "project.vidonyx.json"
+		defaultName = "project.vidonex.json"
 	}
 	savePath, err := wailsRuntime.SaveFileDialog(a.context, wailsRuntime.SaveDialogOptions{
-		Title:           "Save Vidonyx Project",
+		Title:           "Save Vidonex Project",
 		DefaultFilename: defaultName,
 		Filters: []wailsRuntime.FileFilter{
 			{
-				DisplayName: "Vidonyx Project File (*.vidonyx.json, *.vdx)",
-				Pattern:     "*.vidonyx.json;*.vdx;*.json;*.yaml;*.yml",
+				DisplayName: "Vidonex Project File (*.vidonex.json, *.vdx)",
+				Pattern:     "*.vidonex.json;*.vdx;*.json;*.yaml;*.yml",
 			},
 			{
 				DisplayName: "All Files (*.*)",
@@ -251,11 +251,11 @@ func (a *App) SaveProjectFileDialog(defaultName string) (string, error) {
 // OpenProjectFileDialog opens a native OS file open dialog for project files.
 func (a *App) OpenProjectFileDialog() (string, error) {
 	filePath, err := wailsRuntime.OpenFileDialog(a.context, wailsRuntime.OpenDialogOptions{
-		Title: "Open Vidonyx Project File",
+		Title: "Open Vidonex Project File",
 		Filters: []wailsRuntime.FileFilter{
 			{
-				DisplayName: "Vidonyx Project Files (*.vidonyx.json, *.vdx, *.yaml, *.yml)",
-				Pattern:     "*.vidonyx.json;*.vdx;*.json;*.yaml;*.yml",
+				DisplayName: "Vidonex Project Files (*.vidonex.json, *.vdx, *.yaml, *.yml)",
+				Pattern:     "*.vidonex.json;*.vdx;*.json;*.yaml;*.yml",
 			},
 			{
 				DisplayName: "All Files (*.*)",

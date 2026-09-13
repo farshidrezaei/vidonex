@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestColor_HexParsingTable(t *testing.T) {

@@ -1,11 +1,11 @@
 # AGENTS.md: Developer & AI Agent Context Guide
 
-This guide is optimized for autonomous AI coding agents (and human engineers) working in the **Vidonyx** repository.
+This guide is optimized for autonomous AI coding agents (and human engineers) working in the **Vidonex** repository.
 
 ---
 
 ## 1. Project Mission & Identity
-- **Repository**: `github.com/farshidrezaei/vidonyx`
+- **Repository**: `github.com/farshidrezaei/vidonex`
 - **Purpose**: Declarative Video Composition & FFmpeg Filtergraph Compiler Engine in Go (conceptually similar to Remotion / Editframe / CapCut backend, but written natively in Go).
 - **Core Strategy**: Abstract video composition into a high-level AST (`timeline/`), compile to an Intermediate Representation DAG (`filtergraph/`), run graph optimization passes (split-injection, dead-code elimination, normalization), and emit valid FFmpeg CLI arguments (`-filter_complex`).
 
@@ -62,7 +62,7 @@ This guide is optimized for autonomous AI coding agents (and human engineers) wo
 | `spec` | Declarative YAML/JSON Parser & Path Resolver | `ParseFile()`, `ParseYAML()`, `ParseJSON()`, `ToTimeline()` |
 | `server` | Embedded SQLite Persistence, REST & WebSocket Server | `Server`, `New()`, `Start()`, `Stop()` |
 | `ui` | Nuxt 4 + Nuxt UI v4 Web Studio Workstation | Vue 3, Pinia, i18n, Viewport Zoom/Pan, USplitter, Transform Gizmo, Multi-Track Timeline |
-| `cmd/vidonyx` | Standalone CLI Tool | `serve`, `render`, `validate`, `graph`, `probe`, `version` |
+| `cmd/vidonex` | Standalone CLI Tool | `serve`, `render`, `validate`, `graph`, `probe`, `version` |
 | `composer` | High-Level Facade | `Composer`, `New()`, `Render()`, `Compile()` |
 | `tests/e2e` | Real-FFmpeg E2E Test Suite | `TestEndToEnd_FullCompositionSuiteTable`, `TestCLI_EndToEndSuiteTable` |
 | `examples` | Concrete Recipes | `01` through `10` |

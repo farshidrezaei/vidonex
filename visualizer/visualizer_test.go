@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/visualizer"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/visualizer"
 )
 
 func TestVisualizer_MermaidAndDOT(t *testing.T) {

@@ -1,5 +1,5 @@
 # ==============================================================================
-# 🎬 Vidonyx - Declarative Video Composition & FFmpeg Filtergraph Engine
+# 🎬 Vidonex - Declarative Video Composition & FFmpeg Filtergraph Engine
 # Modern, High-Performance Build System & Developer Automation
 # ==============================================================================
 
@@ -8,9 +8,9 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 # ─── Variables & Configuration ────────────────────────────────────────────────
-APP_NAME            := vidonyx
-CLI_BINARY          := bin/vidonyx
-DESKTOP_BINARY      := bin/vidonyx-desktop
+APP_NAME            := vidonex
+CLI_BINARY          := bin/vidonex
+DESKTOP_BINARY      := bin/vidonex-desktop
 VERSION             ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "1.0.0")
 COMMIT              ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME          ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -28,7 +28,7 @@ RESET  := \033[0m
 # ─── Help Target ──────────────────────────────────────────────────────────────
 .PHONY: help
 help: ## Display this colorful and organized command reference
-	@printf "\n$(BOLD)$(CYAN)🎬 Vidonyx Build & Development Commands $(RESET) (v$(VERSION))\n\n"
+	@printf "\n$(BOLD)$(CYAN)🎬 Vidonex Build & Development Commands $(RESET) (v$(VERSION))\n\n"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / { \
 		category = "General"; \
 		if ($$1 ~ /^(desktop|dev-desktop)/) category = "Desktop Workstation"; \
@@ -56,7 +56,7 @@ desktop: ui-build ## Compile the native single-binary desktop workstation
 
 .PHONY: run-desktop
 run-desktop: desktop ## Build and immediately run the native desktop application
-	@printf "$(CYAN)🚀 Launching Vidonyx Desktop Workstation...$(RESET)\n"
+	@printf "$(CYAN)🚀 Launching Vidonex Desktop Workstation...$(RESET)\n"
 	@./$(DESKTOP_BINARY)
 
 .PHONY: dev-desktop
@@ -97,16 +97,16 @@ ui-build: ## Build and generate static UI distribution for embedding
 build: cli desktop ## Build both the standalone CLI and Desktop application
 
 .PHONY: cli
-cli: ## Compile the Vidonyx standalone CLI binary (bin/vidonyx)
+cli: ## Compile the Vidonex standalone CLI binary (bin/vidonex)
 	@printf "$(CYAN)🔨 Compiling standalone CLI binary ($(CLI_BINARY))...$(RESET)\n"
 	@mkdir -p bin
-	@go build -trimpath -ldflags="$(GO_LDFLAGS)" -o $(CLI_BINARY) ./cmd/vidonyx
+	@go build -trimpath -ldflags="$(GO_LDFLAGS)" -o $(CLI_BINARY) ./cmd/vidonex
 	@printf "$(GREEN)✅ CLI binary compiled: $(BOLD)%s$(RESET)\n" "$(CLI_BINARY)"
 
 # ─── Runtime & Execution ──────────────────────────────────────────────────────
 .PHONY: serve
 serve: cli ## Start the embedded HTTP/WebSocket server and serve Web Studio
-	@printf "$(CYAN)📡 Starting Vidonyx Web Studio Server...$(RESET)\n"
+	@printf "$(CYAN)📡 Starting Vidonex Web Studio Server...$(RESET)\n"
 	@./$(CLI_BINARY) serve --port 8080
 
 .PHONY: probe

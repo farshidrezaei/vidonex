@@ -3,9 +3,9 @@ package timeline
 import (
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // Clip represents a media element placed at a specific time range in a track.

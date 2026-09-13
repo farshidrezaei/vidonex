@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/ducking"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/ducking"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 func TestCompiler_CompositionsTable(t *testing.T) {
@@ -154,7 +154,7 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 						Index:     1,
 						StartTime: 1 * time.Second,
 						EndTime:   4 * time.Second,
-						Text:      "Vidonyx Subtitles In Action",
+						Text:      "Vidonex Subtitles In Action",
 					})
 
 				subTimelineTrack := timeline.NewSubtitleTrack("sub_track", subTrack)
@@ -167,7 +167,7 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 			expectedInputCount: 1,
 			expectedArgSnippets: []string{
 				"drawtext=",
-				"Vidonyx Subtitles In Action",
+				"Vidonex Subtitles In Action",
 				"between(t,1.0000,4.0000)",
 				"out_sub.mp4",
 			},

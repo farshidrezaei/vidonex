@@ -50,13 +50,13 @@ jobs:
 
       - name: Build Linux Binary
         run: |
-          go build -trimpath -tags webkit2_41 -ldflags="-s -w" -o build/bin/vidonyx-linux-amd64 .
+          go build -trimpath -tags webkit2_41 -ldflags="-s -w" -o build/bin/vidonex-linux-amd64 .
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vidonyx-linux-amd64
-          path: build/bin/vidonyx-linux-amd64
+          name: vidonex-linux-amd64
+          path: build/bin/vidonex-linux-amd64
           retention-days: 7
 
   # ─── Build Windows Desktop (NSIS & exe) ───────────────────────────────────
@@ -89,13 +89,13 @@ jobs:
 
       - name: Build Windows Binary
         run: |
-          go build -trimpath -ldflags="-s -w -H windowsgui" -o build/bin/vidonyx-windows-amd64.exe .
+          go build -trimpath -ldflags="-s -w -H windowsgui" -o build/bin/vidonex-windows-amd64.exe .
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vidonyx-windows-amd64.exe
-          path: build/bin/vidonyx-windows-amd64.exe
+          name: vidonex-windows-amd64.exe
+          path: build/bin/vidonex-windows-amd64.exe
           retention-days: 7
 
   # ─── Build macOS Desktop (Universal Binary & .app) ────────────────────────
@@ -128,20 +128,51 @@ jobs:
 
       - name: Build macOS ARM64
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonyx-darwin-arm64 .
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-darwin-arm64 .
 
       - name: Build macOS AMD64
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonyx-darwin-amd64 .
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-darwin-amd64 .
 
       - name: Create macOS Universal Binary
         run: |
-          lipo -create -output build/bin/vidonyx-darwin-universal build/bin/vidonyx-darwin-arm64 build/bin/vidonyx-darwin-amd64
-          chmod +x build/bin/vidonyx-darwin-universal
+          lipo -create -output build/bin/vidonex-darwin-universal build/bin/vidonex-darwin-arm64 build/bin/vidonex-darwin-amd64
+          chmod +x build/bin/vidonex-darwin-universal
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vidonyx-darwin-universal
-          path: build/bin/vidonyx-darwin-universal
+          name: vidonex-darwin-universal
+          path: build/bin/vidonex-darwin-universal
           retention-days: 7
+
+  # ─── Publish GitHub Release ───────────────────────────────────────────────
+  publish-release:
+    name: Publish Release Assets & Checksums
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download All Platform Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Compute SHA256 Checksums
+        working-directory: release-assets
+        run: |
+          sha256sum * > checksums.txt
+          cat checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false

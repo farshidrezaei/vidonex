@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestParseSRTTable(t *testing.T) {
 	sampleSRT := `1
 00:00:01,000 --> 00:00:04,500
-Welcome to Vidonyx!
+Welcome to Vidonex!
 Declarative Video Composition in Go.
 
 2
@@ -36,7 +36,7 @@ High Performance & Fast Rendering.
 				if cue1.StartTime != 1*time.Second || cue1.EndTime != 4500*time.Millisecond {
 					t.Errorf("Cue 1 timing = %v to %v, want 1s to 4.5s", cue1.StartTime, cue1.EndTime)
 				}
-				if !strings.Contains(cue1.Text, "Welcome to Vidonyx!") {
+				if !strings.Contains(cue1.Text, "Welcome to Vidonex!") {
 					t.Errorf("Cue 1 text does not contain expected string: %s", cue1.Text)
 				}
 

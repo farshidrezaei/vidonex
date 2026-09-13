@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/internal/cli"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/internal/cli"
 )
 
 func TestCLI_UITable(t *testing.T) {

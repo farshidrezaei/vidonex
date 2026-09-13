@@ -3,8 +3,8 @@ package effects
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // ScaleFilter configures an FFmpeg scale node.

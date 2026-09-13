@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/ducking"
-	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonex/ducking"
+	"github.com/farshidrezaei/vidonex/filtergraph"
 )
 
 func TestApplySidechainDuckingTable(t *testing.T) {

@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/server/db"
+	"github.com/farshidrezaei/vidonex/server/db"
 )
 
 func TestDatabase_Table(t *testing.T) {
 	tempDirectory := t.TempDir()
-	databasePath := filepath.Join(tempDirectory, "test_vidonyx.db")
+	databasePath := filepath.Join(tempDirectory, "test_vidonex.db")
 
 	databaseInstance, err := db.Open(databasePath)
 	if err != nil {

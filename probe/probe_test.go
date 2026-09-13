@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/probe"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/probe"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestParseFFprobeJSONTable(t *testing.T) {

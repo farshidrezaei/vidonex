@@ -1,4 +1,4 @@
-// Package main demonstrates dynamic keyframing, easing animations, Ken Burns effects, and fade transitions with Vidonyx.
+// Package main demonstrates dynamic keyframing, easing animations, Ken Burns effects, and fade transitions with Vidonex.
 package main
 
 import (
@@ -7,11 +7,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func main() {

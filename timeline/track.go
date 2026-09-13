@@ -4,9 +4,9 @@ import (
 	"iter"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/ducking"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/ducking"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 // TrackKind specifies the primary media layer type of a track.

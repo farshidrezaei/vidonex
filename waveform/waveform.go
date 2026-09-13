@@ -4,8 +4,8 @@ package waveform
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // Mode defines the visual rendering style of the audio waveform.

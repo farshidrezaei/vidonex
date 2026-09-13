@@ -1,4 +1,4 @@
-// Package server provides the HTTP & WebSocket server for the Vidonyx Web Studio.
+// Package server provides the HTTP & WebSocket server for the Vidonex Web Studio.
 package server
 
 import (
@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/server/api"
-	"github.com/farshidrezaei/vidonyx/server/db"
-	"github.com/farshidrezaei/vidonyx/server/ws"
+	"github.com/farshidrezaei/vidonex/server/api"
+	"github.com/farshidrezaei/vidonex/server/db"
+	"github.com/farshidrezaei/vidonex/server/ws"
 )
 
 // Config configures the server runtime.
@@ -43,13 +43,13 @@ func New(config Config) (*Server, error) {
 	}
 	if config.DataDirectory == "" {
 		homeDir, _ := os.UserHomeDir()
-		config.DataDirectory = filepath.Join(homeDir, ".vidonyx")
+		config.DataDirectory = filepath.Join(homeDir, ".vidonex")
 	}
 	if config.Logger == nil {
 		config.Logger = slog.Default()
 	}
 
-	databasePath := filepath.Join(config.DataDirectory, "vidonyx.db")
+	databasePath := filepath.Join(config.DataDirectory, "vidonex.db")
 	mediaDirectory := filepath.Join(config.DataDirectory, "media")
 	exportDirectory := filepath.Join(config.DataDirectory, "exports")
 
@@ -221,7 +221,7 @@ func (s *Server) Start() error {
 		ReadHeaderTimeout: 15 * time.Second,
 	}
 
-	s.logger.Info("vidonyx web studio server listening", "address", fmt.Sprintf("http://localhost:%d", s.config.Port))
+	s.logger.Info("vidonex web studio server listening", "address", fmt.Sprintf("http://localhost:%d", s.config.Port))
 	return s.httpServer.ListenAndServe()
 }
 

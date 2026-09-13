@@ -1,6 +1,6 @@
-# Vidonyx API Reference
+# Vidonex API Reference
 
-Complete API documentation for the **Vidonyx** video composition engine and compiler.
+Complete API documentation for the **Vidonex** video composition engine and compiler.
 
 ---
 
@@ -37,7 +37,7 @@ Complete API documentation for the **Vidonyx** video composition engine and comp
 ## Package `types`
 
 ```go
-import "github.com/farshidrezaei/vidonyx/types"
+import "github.com/farshidrezaei/vidonex/types"
 ```
 
 ### `Rational`
@@ -90,7 +90,7 @@ fmtStr := custom.FFmpegColor() // "0xFFAA00"
 ## Package `timeline`
 
 ```go
-import "github.com/farshidrezaei/vidonyx/timeline"
+import "github.com/farshidrezaei/vidonex/timeline"
 ```
 
 ### `Timeline`
@@ -154,7 +154,7 @@ Supported transition types:
 ## Package `filtergraph`
 
 ```go
-import "github.com/farshidrezaei/vidonyx/filtergraph"
+import "github.com/farshidrezaei/vidonex/filtergraph"
 ```
 
 ### `Graph`
@@ -185,7 +185,7 @@ str, err := g.FormattedFilterComplex()
 ## Package `compiler`
 
 ```go
-import "github.com/farshidrezaei/vidonyx/compiler"
+import "github.com/farshidrezaei/vidonex/compiler"
 ```
 
 ```go
@@ -210,7 +210,7 @@ result, err := c.Compile(tl, "output.mp4")
 ## Package `composer`
 
 ```go
-import "github.com/farshidrezaei/vidonyx/composer"
+import "github.com/farshidrezaei/vidonex/composer"
 ```
 
 ```go
@@ -233,17 +233,17 @@ result, err := c.Render(ctx, tl, "output.mp4", func(ev executor.ProgressEvent) {
 
 ## Package `server` & RESTful API
 
-Vidonyx includes an embedded pure-Go server with SQLite persistence, REST endpoints, and WebSocket telemetry.
+Vidonex includes an embedded pure-Go server with SQLite persistence, REST endpoints, and WebSocket telemetry.
 
 ### Starting the Server programmatically:
 
 ```go
-import "github.com/farshidrezaei/vidonyx/server"
+import "github.com/farshidrezaei/vidonex/server"
 
 srv, err := server.New(server.Config{
     Port:            8080,
     Host:            "0.0.0.0",
-    DataDirectory:   "/path/to/.vidonyx",
+    DataDirectory:   "/path/to/.vidonex",
     StaticDirectory: "/path/to/ui/dist",
     Logger:          slog.Default(),
 })

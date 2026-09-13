@@ -1,6 +1,6 @@
-# Vidonyx Development & Engineering Contracts
+# Vidonex Development & Engineering Contracts
 
-This document specifies the **Mandatory Development Contracts and Invariants** that every human contributor and AI agent MUST adhere to when authoring or modifying code in the **Vidonyx** repository.
+This document specifies the **Mandatory Development Contracts and Invariants** that every human contributor and AI agent MUST adhere to when authoring or modifying code in the **Vidonex** repository.
 
 ---
 

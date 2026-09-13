@@ -13,7 +13,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// Database encapsulates the SQLite database connection and operations for Vidonyx.
+// Database encapsulates the SQLite database connection and operations for Vidonex.
 type Database struct {
 	connection *sql.DB
 }

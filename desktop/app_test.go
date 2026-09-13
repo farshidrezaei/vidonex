@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/desktop"
+	"github.com/farshidrezaei/vidonex/desktop"
 )
 
 func TestDesktopAppInitializationTable(t *testing.T) {
-	temporaryDirectory, err := os.MkdirTemp("", "vidonyx_desktop_test_*")
+	temporaryDirectory, err := os.MkdirTemp("", "vidonex_desktop_test_*")
 	if err != nil {
 		t.Fatalf("failed creating temp directory: %v", err)
 	}

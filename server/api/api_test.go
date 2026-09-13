@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/farshidrezaei/vidonyx/server/api"
-	"github.com/farshidrezaei/vidonyx/server/db"
-	"github.com/farshidrezaei/vidonyx/server/ws"
-	"github.com/farshidrezaei/vidonyx/spec"
+	"github.com/farshidrezaei/vidonex/server/api"
+	"github.com/farshidrezaei/vidonex/server/db"
+	"github.com/farshidrezaei/vidonex/server/ws"
+	"github.com/farshidrezaei/vidonex/spec"
 )
 
 func TestAPIEndpoints_Table(t *testing.T) {

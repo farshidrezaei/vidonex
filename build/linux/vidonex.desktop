@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=Vidonyx Studio
+Name=Vidonex Studio
 Comment=Professional Declarative Video Composition & FFmpeg Filtergraph Editor
-Exec=vidonyx-desktop
-Icon=vidonyx
+Exec=vidonex-desktop
+Icon=vidonex
 Terminal=false
 Type=Application
 Categories=AudioVideo;Video;AudioVideoEditing;
-MimeType=application/x-vidonyx;
+MimeType=application/x-vidonex;

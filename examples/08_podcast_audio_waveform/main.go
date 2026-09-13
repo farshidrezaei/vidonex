@@ -1,4 +1,4 @@
-// Package main demonstrates creating a modern podcast audiogram with animated waveform visualization using Vidonyx.
+// Package main demonstrates creating a modern podcast audiogram with animated waveform visualization using Vidonex.
 package main
 
 import (
@@ -7,11 +7,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 func main() {

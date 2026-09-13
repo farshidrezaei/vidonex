@@ -1,4 +1,4 @@
-// Package main demonstrates platform-specific presets (TikTok, YouTube 4K) and GPU hardware acceleration with Vidonyx.
+// Package main demonstrates platform-specific presets (TikTok, YouTube 4K) and GPU hardware acceleration with Vidonex.
 package main
 
 import (
@@ -7,10 +7,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/timeline"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/timeline"
 )
 
 func main() {

@@ -203,7 +203,7 @@ function downloadSvg() {
   const url = URL.createObjectURL(blob)
   const downloadLink = document.createElement('a')
   downloadLink.href = url
-  downloadLink.download = `vidonyx-filtergraph-${Date.now()}.svg`
+  downloadLink.download = `vidonex-filtergraph-${Date.now()}.svg`
   document.body.appendChild(downloadLink)
   downloadLink.click()
   document.body.removeChild(downloadLink)

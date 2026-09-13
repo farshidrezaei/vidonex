@@ -18,7 +18,7 @@ export function useWebSocket() {
 
       socket.onopen = () => {
         isConnected.value = true
-        console.log('[Vidonyx WS] Connected to server hub')
+        console.log('[Vidonex WS] Connected to server hub')
       }
 
       socket.onmessage = (event) => {
@@ -39,23 +39,23 @@ export function useWebSocket() {
               break
           }
         } catch (err) {
-          console.error('[Vidonyx WS] Error parsing message', err)
+          console.error('[Vidonex WS] Error parsing message', err)
         }
       }
 
       socket.onclose = () => {
         isConnected.value = false
-        console.log('[Vidonyx WS] Disconnected, scheduling reconnect...')
+        console.log('[Vidonex WS] Disconnected, scheduling reconnect...')
         if (reconnectTimeout) clearTimeout(reconnectTimeout)
         reconnectTimeout = setTimeout(connect, 3000)
       }
 
       socket.onerror = (err) => {
-        console.warn('[Vidonyx WS] Socket error', err)
+        console.warn('[Vidonex WS] Socket error', err)
         socket?.close()
       }
     } catch (err) {
-      console.error('[Vidonyx WS] Connection error', err)
+      console.error('[Vidonex WS] Connection error', err)
     }
   }
 

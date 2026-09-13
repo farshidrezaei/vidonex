@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 func TestCalculateProgressTable(t *testing.T) {

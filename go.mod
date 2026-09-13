@@ -1,4 +1,4 @@
-module github.com/farshidrezaei/vidonyx
+module github.com/farshidrezaei/vidonex
 
 go 1.26.5
 

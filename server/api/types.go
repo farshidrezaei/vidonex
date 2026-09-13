@@ -1,9 +1,9 @@
-// Package api provides HTTP REST API route handlers and request/response payloads for the Vidonyx Web Studio.
+// Package api provides HTTP REST API route handlers and request/response payloads for the Vidonex Web Studio.
 package api
 
 import (
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/spec"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/spec"
 )
 
 // CreateProjectRequest defines payload for initializing a new project.

@@ -197,7 +197,7 @@ function handleAssetDragStart(event: DragEvent, asset: MediaAsset) {
   mediaStore.setDraggedAsset(asset)
 
   if (event.dataTransfer) {
-    event.dataTransfer.setData('vidonyx-asset-id', asset.id)
+    event.dataTransfer.setData('vidonex-asset-id', asset.id)
     event.dataTransfer.setData('application/json', JSON.stringify(asset))
     event.dataTransfer.setData('text/plain', asset.id)
     event.dataTransfer.effectAllowed = 'all'

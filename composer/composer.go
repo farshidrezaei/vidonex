@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/timeline"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/timeline"
 )
 
 // RenderResult contains the metadata and artifacts of a rendered composition.

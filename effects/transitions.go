@@ -3,8 +3,8 @@ package effects
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/timeline"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/timeline"
 )
 
 // XFadeFilter applies an FFmpeg xfade transition between two video streams.

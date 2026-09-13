@@ -1,9 +1,9 @@
 package presets
 
 import (
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // PlatformPreset defines turnkey canvas dimensions, frame rate, and encoding configurations for major platforms.

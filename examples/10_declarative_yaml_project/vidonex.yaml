@@ -44,7 +44,7 @@ tracks:
       srt_content: |
         1
         00:00:01,000 --> 00:00:04,500
-        Welcome to Vidonyx Declarative Video Engine!
+        Welcome to Vidonex Declarative Video Engine!
       style:
         font_size: 44
         color: "yellow"

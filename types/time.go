@@ -1,4 +1,4 @@
-// Package types defines exact mathematical, geometric, and temporal primitives for Vidonyx.
+// Package types defines exact mathematical, geometric, and temporal primitives for Vidonex.
 package types
 
 import (

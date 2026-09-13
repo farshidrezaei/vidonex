@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/probe"
+	"github.com/farshidrezaei/vidonex/probe"
 )
 
 func TestCLI_EndToEndSuiteTable(t *testing.T) {
@@ -18,10 +18,10 @@ func TestCLI_EndToEndSuiteTable(t *testing.T) {
 	mediaProber := probe.NewFFprobeProber("ffprobe")
 
 	// Compile CLI binary into temporary directory
-	cliBinaryPath := filepath.Join(temporaryDirectory, "vidonyx_cli")
-	compileCmd := exec.Command("go", "build", "-o", cliBinaryPath, "../../cmd/vidonyx")
+	cliBinaryPath := filepath.Join(temporaryDirectory, "vidonex_cli")
+	compileCmd := exec.Command("go", "build", "-o", cliBinaryPath, "../../cmd/vidonex")
 	if compileOut, err := compileCmd.CombinedOutput(); err != nil {
-		t.Fatalf("failed compiling vidonyx CLI: %v\nOutput: %s", err, string(compileOut))
+		t.Fatalf("failed compiling vidonex CLI: %v\nOutput: %s", err, string(compileOut))
 	}
 
 	// 1. Create a sample YAML project file in a dedicated subdirectory to test relative path resolution
@@ -45,7 +45,7 @@ func TestCLI_EndToEndSuiteTable(t *testing.T) {
 	copyFile(t, assets.audioVoice, filepath.Join(audioDir, "speech.mp3"))
 	copyFile(t, assets.audioSoundtrack, filepath.Join(audioDir, "bgm.mp3"))
 
-	yamlSpecPath := filepath.Join(projectDir, "vidonyx.yaml")
+	yamlSpecPath := filepath.Join(projectDir, "vidonex.yaml")
 	yamlContent := `
 version: "1.0"
 canvas:
@@ -87,7 +87,7 @@ tracks:
       srt_content: |
         1
         00:00:00,500 --> 00:00:02,500
-        Vidonyx CLI YAML Automation!
+        Vidonex CLI YAML Automation!
       style:
         font_size: 32
         color: "yellow"
@@ -113,7 +113,7 @@ tracks:
 	}
 
 	// 2. Create a sample JSON project file
-	jsonSpecPath := filepath.Join(projectDir, "vidonyx.json")
+	jsonSpecPath := filepath.Join(projectDir, "vidonex.json")
 	jsonContent := `{
   "version": "1.0",
   "preset": "tiktok_1080p60",
@@ -148,7 +148,7 @@ tracks:
 		{
 			name:                 "cli_version",
 			arguments:            []string{"version"},
-			expectedOutputStdout: "vidonyx engine version 1.0.0",
+			expectedOutputStdout: "vidonex engine version 1.0.0",
 		},
 		{
 			name:                 "cli_validate_yaml",

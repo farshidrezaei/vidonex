@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/types"
 	"gopkg.in/yaml.v3"
 )
 

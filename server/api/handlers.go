@@ -16,15 +16,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/compiler"
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/probe"
-	"github.com/farshidrezaei/vidonyx/server/db"
-	"github.com/farshidrezaei/vidonyx/server/ws"
-	"github.com/farshidrezaei/vidonyx/spec"
-	"github.com/farshidrezaei/vidonyx/timeline"
+	"github.com/farshidrezaei/vidonex/compiler"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/probe"
+	"github.com/farshidrezaei/vidonex/server/db"
+	"github.com/farshidrezaei/vidonex/server/ws"
+	"github.com/farshidrezaei/vidonex/spec"
+	"github.com/farshidrezaei/vidonex/timeline"
 )
 
 // Handlers bundles all route dependencies.

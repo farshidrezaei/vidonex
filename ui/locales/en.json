@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Vidonyx Studio",
+    "title": "Vidonex Studio",
     "tagline": "Declarative Video Composition Workstation",
     "save": "Save",
     "saved": "All changes saved",
@@ -288,7 +288,7 @@
     "speed": "Multiplier: {speed}x",
     "eta": "Estimated Time Remaining: {eta}s",
     "completed": "Render Completed Successfully!",
-    "completed_desc": "Your video was encoded and verified with Vidonyx engine.",
+    "completed_desc": "Your video was encoded and verified with Vidonex engine.",
     "preview_title": "Render Output Preview",
     "download_file": "Download Rendered Video",
     "new_render": "New Export",

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // AttachSubtitles converts all subtitle cues on a track into chained drawtext filter nodes.

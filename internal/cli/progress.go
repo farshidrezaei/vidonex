@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/executor"
+	"github.com/farshidrezaei/vidonex/executor"
 )
 
 // ProgressBar manages interactive live terminal progress visualization.

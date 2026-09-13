@@ -4,8 +4,8 @@ package chromakey
 import (
 	"fmt"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
-	"github.com/farshidrezaei/vidonyx/types"
+	"github.com/farshidrezaei/vidonex/filtergraph"
+	"github.com/farshidrezaei/vidonex/types"
 )
 
 // DespillMode specifies which color channel to suppress during despill processing.

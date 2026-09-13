@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/farshidrezaei/vidonyx/compiler"
+	"github.com/farshidrezaei/vidonex/compiler"
 )
 
 // HardwareAccelerator enumerates supported GPU and dedicated hardware encoders.

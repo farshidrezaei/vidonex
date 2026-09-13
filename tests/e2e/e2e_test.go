@@ -9,16 +9,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/animation"
-	"github.com/farshidrezaei/vidonyx/chromakey"
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/ducking"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/probe"
-	"github.com/farshidrezaei/vidonyx/subtitles"
-	"github.com/farshidrezaei/vidonyx/timeline"
-	"github.com/farshidrezaei/vidonyx/types"
-	"github.com/farshidrezaei/vidonyx/waveform"
+	"github.com/farshidrezaei/vidonex/animation"
+	"github.com/farshidrezaei/vidonex/chromakey"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/ducking"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/probe"
+	"github.com/farshidrezaei/vidonex/subtitles"
+	"github.com/farshidrezaei/vidonex/timeline"
+	"github.com/farshidrezaei/vidonex/types"
+	"github.com/farshidrezaei/vidonex/waveform"
 )
 
 type syntheticMediaAssets struct {
@@ -200,7 +200,7 @@ func TestEndToEnd_FullCompositionSuiteTable(t *testing.T) {
 
 				rawSRT := `1
 00:00:00,500 --> 00:00:02,500
-Vidonyx Real End-To-End Subtitles
+Vidonex Real End-To-End Subtitles
 `
 				subTrack, err := subtitles.ParseSRT(strings.NewReader(rawSRT))
 				if err != nil {

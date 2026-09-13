@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonex/filtergraph"
 )
 
 // ToDOT generates a Graphviz DOT representation of the filtergraph.

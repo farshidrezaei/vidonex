@@ -1,4 +1,4 @@
-// Package main implements the Vidonyx standalone command-line video composition interface.
+// Package main implements the Vidonex standalone command-line video composition interface.
 package main
 
 import (
@@ -15,13 +15,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/farshidrezaei/vidonyx/composer"
-	"github.com/farshidrezaei/vidonyx/executor"
-	"github.com/farshidrezaei/vidonyx/internal/cli"
-	"github.com/farshidrezaei/vidonyx/presets"
-	"github.com/farshidrezaei/vidonyx/probe"
-	"github.com/farshidrezaei/vidonyx/server"
-	"github.com/farshidrezaei/vidonyx/spec"
+	"github.com/farshidrezaei/vidonex/composer"
+	"github.com/farshidrezaei/vidonex/executor"
+	"github.com/farshidrezaei/vidonex/internal/cli"
+	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/probe"
+	"github.com/farshidrezaei/vidonex/server"
+	"github.com/farshidrezaei/vidonex/spec"
 )
 
 const (
@@ -48,7 +48,7 @@ func main() {
 	case "probe":
 		executeProbeCommand(os.Args[2:])
 	case "version", "--version", "-v":
-		fmt.Printf("vidonyx engine version %s\n", EngineVersion)
+		fmt.Printf("vidonex engine version %s\n", EngineVersion)
 	case "help", "--help", "-h":
 		printUsage()
 	default:
@@ -74,7 +74,7 @@ func executeRenderCommand(arguments []string) {
 
 	positionalArgs := fs.Args()
 	if len(positionalArgs) < 1 {
-		fmt.Fprintln(os.Stderr, "Error: missing specification file path. Usage: vidonyx render <project.yaml> [flags]")
+		fmt.Fprintln(os.Stderr, "Error: missing specification file path. Usage: vidonex render <project.yaml> [flags]")
 		os.Exit(1)
 	}
 
@@ -206,7 +206,7 @@ func executeValidateCommand(arguments []string) {
 	}
 
 	if len(fs.Args()) < 1 {
-		fmt.Fprintln(os.Stderr, "Error: missing spec file. Usage: vidonyx validate <project.yaml>")
+		fmt.Fprintln(os.Stderr, "Error: missing spec file. Usage: vidonex validate <project.yaml>")
 		os.Exit(1)
 	}
 
@@ -247,7 +247,7 @@ func executeGraphCommand(arguments []string) {
 	}
 
 	if len(fs.Args()) < 1 {
-		fmt.Fprintln(os.Stderr, "Error: missing spec file. Usage: vidonyx graph <project.yaml> [--format mermaid|dot]")
+		fmt.Fprintln(os.Stderr, "Error: missing spec file. Usage: vidonex graph <project.yaml> [--format mermaid|dot]")
 		os.Exit(1)
 	}
 
@@ -305,7 +305,7 @@ func executeProbeCommand(arguments []string) {
 	}
 
 	if len(fs.Args()) < 1 {
-		fmt.Fprintln(os.Stderr, "Error: missing media file. Usage: vidonyx probe <media.mp4> [--json]")
+		fmt.Fprintln(os.Stderr, "Error: missing media file. Usage: vidonex probe <media.mp4> [--json]")
 		os.Exit(1)
 	}
 
@@ -446,7 +446,7 @@ func executeServeCommand(arguments []string) {
 		_ = serverInstance.Stop(shutdownCtx)
 	}()
 
-	fmt.Printf("\n✨ Vidonyx Web Studio running on http://localhost:%d\n\n", *portFlag)
+	fmt.Printf("\n✨ Vidonex Web Studio running on http://localhost:%d\n\n", *portFlag)
 	if err := serverInstance.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		ui.PrintError(fmt.Errorf("server error: %w", err))
 		os.Exit(1)
@@ -455,23 +455,23 @@ func executeServeCommand(arguments []string) {
 
 func printUsage() {
 	usage := `
-Vidonyx - Declarative Video Composition & FFmpeg Filtergraph Engine
+Vidonex - Declarative Video Composition & FFmpeg Filtergraph Engine
 
 USAGE:
-  vidonyx <command> [arguments] [flags]
+  vidonex <command> [arguments] [flags]
 
 COMMANDS:
-  serve    [flags]              Launch the Vidonyx Web Studio GUI server
+  serve    [flags]              Launch the Vidonex Web Studio GUI server
   render   <project.yaml|json>  Compile and render video composition
   validate <project.yaml|json>  Validate specification syntax and constraints
   graph    <project.yaml|json>  Export Mermaid.js or Graphviz DOT filtergraph diagram
   probe    <media.mp4>          Inspect media container and stream properties
-  version                       Show Vidonyx engine version
+  version                       Show Vidonex engine version
 
 SERVE FLAGS:
   --port <number>               HTTP port (default: 8080)
   --host <string>               Listening host (default: 0.0.0.0)
-  --data-dir <path>             Custom data directory (default: ~/.vidonyx)
+  --data-dir <path>             Custom data directory (default: ~/.vidonex)
   --static-dir <path>           Static assets directory (default: ui/dist)
   --log-level <level>           Log verbosity (debug, info, warn, error)
 
@@ -483,12 +483,12 @@ RENDER FLAGS:
   --dry-run                     Compile filtergraph without executing FFmpeg
 
 EXAMPLES:
-  vidonyx serve --port 8080
-  vidonyx render project.yaml -o final.mp4
-  vidonyx render project.yaml --gpu nvenc --log-level debug
-  vidonyx validate project.yaml
-  vidonyx graph project.yaml --format mermaid
-  vidonyx probe gameplay.mp4 --json
+  vidonex serve --port 8080
+  vidonex render project.yaml -o final.mp4
+  vidonex render project.yaml --gpu nvenc --log-level debug
+  vidonex validate project.yaml
+  vidonex graph project.yaml --format mermaid
+  vidonex probe gameplay.mp4 --json
 `
 	fmt.Println(strings.TrimSpace(usage))
 }

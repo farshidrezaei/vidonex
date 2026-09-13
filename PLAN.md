@@ -1,6 +1,6 @@
-# Architectural & Implementation Plan: Vidonyx Video Composition Engine
+# Architectural & Implementation Plan: Vidonex Video Composition Engine
 
-Vidonyx is an open-source, production-grade, declarative video composition engine and FFmpeg filtergraph compiler written in idiomatic, modern Go. It empowers developers to define complex multi-track timelines (video, audio, text, transitions, filters, and overlays) using an expressive, type-safe API and compiles them into valid, optimized FFmpeg `-filter_complex` directed acyclic graphs (DAGs).
+Vidonex is an open-source, production-grade, declarative video composition engine and FFmpeg filtergraph compiler written in idiomatic, modern Go. It empowers developers to define complex multi-track timelines (video, audio, text, transitions, filters, and overlays) using an expressive, type-safe API and compiles them into valid, optimized FFmpeg `-filter_complex` directed acyclic graphs (DAGs).
 
 ---
 
@@ -62,7 +62,7 @@ Vidonyx is an open-source, production-grade, declarative video composition engin
 ## 2. Package Organization & Module Layout
 
 ```text
-vidonyx/
+vidonex/
 ├── go.mod
 ├── types/                 # Fundamental mathematical, geometric & temporal types
 │   ├── time.go            # Rational time, frame rate conversions, timecode
@@ -193,7 +193,7 @@ vidonyx/
 
 ## 4. Visual Debugging (Mermaid & DOT)
 
-Vidonyx will include built-in visualizers that emit clean diagrams of any generated filtergraph:
+Vidonex will include built-in visualizers that emit clean diagrams of any generated filtergraph:
 
 ```mermaid
 graph LR
@@ -227,7 +227,7 @@ graph LR
 ## 5. Phased Implementation Roadmap
 
 ### Phase 1: Foundation, Types & Core Graph IR
-- Initialize Go module `github.com/vidonyx/vidonyx`.
+- Initialize Go module `github.com/vidonex/vidonex`.
 - Implement `types/` (Rational time arithmetic, geometries, color representations).
 - Implement `filtergraph/` (Node, Pad, Graph, Edge management, Kahn's topological sort).
 - Implement Graph passes (`AutoSplitPass`, `DeadCodeEliminationPass`, `ValidatePass`).

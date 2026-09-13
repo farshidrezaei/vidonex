@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/farshidrezaei/vidonyx/filtergraph"
+	"github.com/farshidrezaei/vidonex/filtergraph"
 )
 
 // ToMermaid generates a Mermaid.js diagram (flowchart LR) visualizing the filtergraph DAG.

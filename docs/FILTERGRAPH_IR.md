@@ -1,6 +1,6 @@
 # Filtergraph Intermediate Representation (IR) & Passes
 
-This document explains the design, data structures, and graph rewrite algorithms of the **Vidonyx Filtergraph IR**.
+This document explains the design, data structures, and graph rewrite algorithms of the **Vidonex Filtergraph IR**.
 
 ---
 
