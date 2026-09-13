@@ -63,9 +63,9 @@ run-desktop: desktop ## Build and immediately run the native desktop application
 dev-desktop: ## Start desktop workstation in live development mode with Hot-Reload (requires wails)
 	@printf "$(CYAN)⚡ Starting Wails live development mode (Hot-Reload)...$(RESET)\n"
 	@if command -v wails >/dev/null 2>&1; then \
-		wails dev; \
+		wails dev -s; \
 	elif [ -f $(HOME)/go/bin/wails ]; then \
-		$(HOME)/go/bin/wails dev; \
+		$(HOME)/go/bin/wails dev -s; \
 	else \
 		printf "$(RED)Wails CLI not found. Run 'make install-wails' first.$(RESET)\n"; exit 1; \
 	fi
