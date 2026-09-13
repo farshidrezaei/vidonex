@@ -50,7 +50,7 @@ jobs:
 
       - name: Build Linux Binary
         run: |
-          go build -trimpath -tags webkit2_41 -ldflags="-s -w" -o build/bin/vidonyx-linux-amd64 ./cmd/vidonyx-desktop
+          go build -trimpath -tags webkit2_41 -ldflags="-s -w" -o build/bin/vidonyx-linux-amd64 .
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
@@ -89,7 +89,7 @@ jobs:
 
       - name: Build Windows Binary
         run: |
-          go build -trimpath -ldflags="-s -w -H windowsgui" -o build/bin/vidonyx-windows-amd64.exe ./cmd/vidonyx-desktop
+          go build -trimpath -ldflags="-s -w -H windowsgui" -o build/bin/vidonyx-windows-amd64.exe .
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
@@ -128,11 +128,11 @@ jobs:
 
       - name: Build macOS ARM64
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonyx-darwin-arm64 ./cmd/vidonyx-desktop
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonyx-darwin-arm64 .
 
       - name: Build macOS AMD64
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonyx-darwin-amd64 ./cmd/vidonyx-desktop
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonyx-darwin-amd64 .
 
       - name: Create macOS Universal Binary
         run: |

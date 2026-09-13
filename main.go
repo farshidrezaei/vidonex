@@ -1,7 +1,8 @@
-// Package main provides the desktop application entrypoint for Vidonyx Workstation.
+// Package main provides the root entrypoint and Wails v2 desktop integration.
 package main
 
 import (
+	"fmt"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -28,11 +29,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Sub-FS to mount .output/public as root
 	subFS, err := fs.Sub(ui.Assets, ".output/public")
 	if err != nil {
-		appLogger.Error("failed accessing embedded ui assets", "error", err)
-		os.Exit(1)
+		fmt.Fprintf(os.Stderr, "Warning: running without embedded assets: %v\n", err)
 	}
 
 	appOptions := &options.App{

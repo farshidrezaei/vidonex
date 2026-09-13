@@ -50,7 +50,7 @@ help: ## Display this colorful and organized command reference
 desktop: ui-build ## Compile the native single-binary desktop workstation
 	@printf "$(CYAN)🔨 Building native desktop binary ($(DESKTOP_BINARY))...$(RESET)\n"
 	@mkdir -p bin
-	@go build -trimpath -tags webkit2_41 -ldflags="$(GO_LDFLAGS)" -o $(DESKTOP_BINARY) ./cmd/vidonyx-desktop
+	@go build -trimpath -tags webkit2_41 -ldflags="$(GO_LDFLAGS)" -o $(DESKTOP_BINARY) .
 	@printf "$(GREEN)✅ Desktop binary compiled successfully: $(BOLD)%s$(RESET) (%s)\n" \
 		"$(DESKTOP_BINARY)" "$$(du -h $(DESKTOP_BINARY) | cut -f1)"
 
