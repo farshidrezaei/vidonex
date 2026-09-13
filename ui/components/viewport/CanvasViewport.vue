@@ -1,10 +1,35 @@
 <template>
-  <div class="h-full flex flex-col bg-gray-950/90 relative overflow-hidden select-none">
+  <div
+    ref="viewportContainerRef"
+    class="h-full flex flex-col bg-gray-950/90 relative overflow-hidden select-none"
+  >
     <!-- Viewport Canvas Stage -->
-    <div ref="stageRef" class="flex-1 flex items-center justify-center p-3 relative overflow-hidden">
+    <div
+      ref="stageRef"
+      class="flex-1 flex items-center justify-center p-3 relative overflow-hidden"
+      :class="isSpacePressed && isPanning ? 'cursor-grabbing' : (isSpacePressed ? 'cursor-grab' : 'cursor-default')"
+      @wheel.prevent="handleWheel"
+      @mousedown="handleStageMouseDown"
+      @dblclick="resetZoom"
+    >
+      <!-- Floating Pan/Zoom Reset Overlay Pill (visible when panned or zoomed) -->
+      <div
+        v-if="!isFit"
+        class="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-900/80 backdrop-blur border border-gray-700/60 shadow-lg text-xs font-mono text-gray-300 pointer-events-auto transition-all"
+      >
+        <span>{{ zoomDisplay }}</span>
+        <button
+          class="px-1.5 py-0.5 rounded bg-indigo-600/70 hover:bg-indigo-500 text-white text-[10px] font-sans font-medium transition-colors"
+          title="Reset View to Fit"
+          @click.stop="resetZoom"
+        >
+          Fit
+        </button>
+      </div>
+
       <!-- Scaled Aspect Ratio Canvas Screen -->
       <div
-        class="canvas-stage relative shadow-2xl transition-all rounded-sm flex items-center justify-center"
+        class="canvas-stage relative shadow-2xl rounded-sm flex items-center justify-center transition-transform duration-75"
         :style="screenStyle"
       >
         <!-- Canvas Screen Frame (Clipped Media & Background) -->
@@ -103,7 +128,7 @@
     </div>
 
     <!-- Playback Transport Controls Toolbar -->
-    <ViewportPlaybackToolbar />
+    <ViewportPlaybackToolbar @toggle-fullscreen="onToggleFullscreen" />
   </div>
 </template>
 
@@ -112,6 +137,7 @@ import { useProjectStore } from '~/stores/project'
 import { usePlaybackStore } from '~/stores/playback'
 import { useTimelineStore } from '~/stores/timeline'
 import { useMediaStore } from '~/stores/media'
+import { useViewportZoom } from '~/composables/useViewportZoom'
 import {
   showGuideCenterX,
   showGuideCenterY,
@@ -134,15 +160,54 @@ const playbackStore = usePlaybackStore()
 const timelineStore = useTimelineStore()
 const mediaStore = useMediaStore()
 const { startDrag } = useTransformGizmo()
+const {
+  zoom,
+  panX,
+  panY,
+  isSpacePressed,
+  isPanning,
+  isFit,
+  zoomDisplay,
+  resetZoom,
+  handleWheel,
+  startPan,
+  toggleFullscreen,
+} = useViewportZoom()
+
+const viewportContainerRef = ref<HTMLDivElement | null>(null)
+
+function onToggleFullscreen() {
+  toggleFullscreen(viewportContainerRef.value)
+}
+
+function handleStageMouseDown(event: MouseEvent) {
+  // If space is held down or middle click (button === 1), start panning
+  if (isSpacePressed.value || event.button === 1) {
+    startPan(event)
+    return
+  }
+
+  // If clicked directly on the empty background (outside canvas screen), deselect active clip
+  if (event.target === stageRef.value) {
+    timelineStore.selectedClipId = null
+  }
+}
 
 // Initialize multi-track synchronized audio playback engine for live preview
 useTimelineAudio()
 
 function handleClipMouseDown(clip: ClipSpec, event: MouseEvent) {
+  // If space is pressed or middle click, pan tool takes precedence over element dragging
+  if (isSpacePressed.value || event.button === 1) {
+    startPan(event)
+    return
+  }
+
   event.stopPropagation()
   event.preventDefault()
   timelineStore.selectedClipId = clip.id
-  const displayScale = projectStore.canvasWidth > 0 ? displayDimensions.value.width / projectStore.canvasWidth : 1
+  const baseScale = projectStore.canvasWidth > 0 ? displayDimensions.value.width / projectStore.canvasWidth : 1
+  const displayScale = baseScale * zoom.value
   startDrag(event, displayScale)
 }
 
@@ -189,7 +254,35 @@ const displayDimensions = computed(() => {
 const screenStyle = computed(() => ({
   width: `${displayDimensions.value.width}px`,
   height: `${displayDimensions.value.height}px`,
+  transform: `translate3d(${panX.value}px, ${panY.value}px, 0) scale(${zoom.value})`,
+  transformOrigin: 'center center',
 }))
+
+function handleKeyDown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  if (target && (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable)) {
+    return
+  }
+  if (event.code === 'Space' || event.key === ' ') {
+    isSpacePressed.value = true
+  }
+}
+
+function handleKeyUp(event: KeyboardEvent) {
+  if (event.code === 'Space' || event.key === ' ') {
+    isSpacePressed.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keyup', handleKeyUp)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('keyup', handleKeyUp)
+})
 
 function findTrackForClip(clipId: string): TrackSpec | undefined {
   return timelineStore.tracks.find((t) => t.clips?.some((c) => c.id === clipId))

@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { useTimelineStore } from '~/stores/timeline'
 import { useMediaStore } from '~/stores/media'
+import { useViewportZoom } from '~/composables/useViewportZoom'
 import { useTransformGizmo, calculateClipBounds, type HandleType, type ClipBounds } from '~/composables/useTransformGizmo'
 
 const props = defineProps<{
@@ -112,7 +113,9 @@ const gizmoStyle = computed(() => {
   }
 })
 
-const displayScale = computed(() => (props.canvasWidth > 0 ? props.displayWidth / props.canvasWidth : 1))
+const { zoom } = useViewportZoom()
+
+const displayScale = computed(() => (props.canvasWidth > 0 ? (props.displayWidth / props.canvasWidth) * zoom.value : 1))
 
 function handleDrag(event: MouseEvent) {
   event.stopPropagation()

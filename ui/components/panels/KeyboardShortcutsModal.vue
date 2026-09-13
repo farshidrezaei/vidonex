@@ -89,9 +89,12 @@ const categories = [
     ],
   },
   {
-    name: 'Canvas & Element Transform',
+    name: 'Canvas & Viewport Navigation',
     icon: 'i-heroicons-cursor-arrow-rays',
     shortcuts: [
+      { description: 'Hand / Pan Tool', hint: 'Pan viewport canvas freely', keys: ['Space', '+', 'Drag'] },
+      { description: 'Viewport Zoom', hint: 'Smoothly zoom in / out', keys: ['Mouse Wheel'] },
+      { description: 'Reset Zoom & Pan', hint: 'Return to fit view', keys: ['Double Click'] },
       { description: 'Nudge Element (1px)', hint: 'Precise movement in canvas', keys: ['↑', '↓', '←', '→'] },
       { description: 'Nudge Element (10px)', hint: 'Fast movement in canvas', keys: ['Shift', '+', '↑ / ↓ / ← / →'] },
     ],
@@ -100,7 +103,6 @@ const categories = [
     name: 'Playback & Navigation',
     icon: 'i-heroicons-play-circle',
     shortcuts: [
-      { description: 'Play / Pause Toggle', hint: 'Starts or pauses video', keys: ['Space'] },
       { description: 'Step 1 Frame Backward', hint: 'Precision frame jump left (no clip selected)', keys: ['←', 'or', 'J'] },
       { description: 'Step 1 Frame Forward', hint: 'Precision frame jump right (no clip selected)', keys: ['→', 'or', 'L'] },
       { description: 'Jump to Beginning (0s)', hint: 'Seeks to start of timeline', keys: ['Home'] },

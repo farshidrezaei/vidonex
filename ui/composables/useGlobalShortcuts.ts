@@ -54,13 +54,7 @@ export function useGlobalShortcuts() {
       return
     }
 
-    // 4. Play / Pause toggle: Space
-    if (code === 'Space' || key === ' ' || key === 'spacebar') {
-      event.preventDefault()
-      event.stopPropagation()
-      playbackStore.togglePlay()
-      return
-    }
+    // Note: Space key is reserved exclusively for Viewport Pan / Hand Tool
 
     // 5. Split Clip: S or C
     if (!isCtrlOrCmd && !event.altKey && (code === 'KeyS' || code === 'KeyC' || key === 's' || key === 'c' || key === 'س' || key === 'ژ')) {

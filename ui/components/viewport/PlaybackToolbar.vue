@@ -64,8 +64,8 @@
       />
     </div>
 
-    <!-- Right: Loop & Volume Controls -->
-    <div class="flex items-center gap-3">
+    <!-- Right: Loop, Volume, Zoom & Fullscreen Controls -->
+    <div class="flex items-center gap-2.5">
       <!-- Loop Toggle -->
       <button
         class="p-1 rounded transition"
@@ -91,9 +91,56 @@
           min="0"
           max="1"
           step="0.05"
-          class="w-16 h-1 bg-gray-800 rounded appearance-none accent-indigo-500 cursor-pointer"
+          class="w-14 h-1 bg-gray-800 rounded appearance-none accent-indigo-500 cursor-pointer"
         />
       </div>
+
+      <!-- Divider -->
+      <div class="h-4 w-px bg-gray-800"></div>
+
+      <!-- Zoom Controls -->
+      <div class="flex items-center gap-0.5">
+        <!-- Zoom Out -->
+        <button
+          class="p-1 rounded text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition"
+          title="Zoom Out"
+          @click="zoomOut"
+        >
+          <UIcon name="i-heroicons-minus" class="w-3.5 h-3.5" />
+        </button>
+
+        <!-- Zoom Dropdown Menu -->
+        <UDropdownMenu :items="zoomMenuItems">
+          <button
+            class="px-1.5 py-0.5 text-[11px] font-mono font-medium rounded border border-gray-800 bg-gray-900/80 text-gray-300 hover:text-white hover:border-gray-700 transition flex items-center gap-1"
+            title="Preview Zoom"
+          >
+            <span>{{ zoomDisplay }}</span>
+            <UIcon name="i-heroicons-chevron-down" class="w-3 h-3 text-gray-500" />
+          </button>
+        </UDropdownMenu>
+
+        <!-- Zoom In -->
+        <button
+          class="p-1 rounded text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition"
+          title="Zoom In"
+          @click="zoomIn"
+        >
+          <UIcon name="i-heroicons-plus" class="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="h-4 w-px bg-gray-800"></div>
+
+      <!-- Fullscreen Toggle -->
+      <button
+        class="p-1 rounded text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition"
+        :title="isFullscreen ? 'Exit Full Screen' : 'Full Screen'"
+        @click="emit('toggleFullscreen')"
+      >
+        <UIcon :name="isFullscreen ? 'i-heroicons-arrows-pointing-in' : 'i-heroicons-arrows-pointing-out'" class="w-4 h-4" />
+      </button>
     </div>
   </div>
 </template>
@@ -101,12 +148,41 @@
 <script setup lang="ts">
 import { usePlaybackStore } from '~/stores/playback'
 import { useProjectStore } from '~/stores/project'
+import { useViewportZoom } from '~/composables/useViewportZoom'
+
+const emit = defineEmits<{
+  (e: 'toggleFullscreen'): void
+}>()
 
 const playbackStore = usePlaybackStore()
 const projectStore = useProjectStore()
+const {
+  zoom,
+  zoomDisplay,
+  ZOOM_PRESETS,
+  setZoom,
+  zoomIn,
+  zoomOut,
+  resetZoom,
+  isFullscreen,
+} = useViewportZoom()
 
 const formattedTime = computed(() => playbackStore.formatTimecode(playbackStore.currentTime, projectStore.frameRate))
 const formattedDuration = computed(() => playbackStore.formatTimecode(playbackStore.duration, projectStore.frameRate))
+
+const zoomMenuItems = computed(() => [
+  ZOOM_PRESETS.map((p) => ({
+    label: p.label,
+    icon: p.isFit ? (zoom.value === 1.0 ? 'i-heroicons-check' : '') : (Math.round(zoom.value * 100) === Math.round(p.value * 100) ? 'i-heroicons-check' : ''),
+    onSelect: () => {
+      if (p.isFit) {
+        resetZoom()
+      } else {
+        setZoom(p.value, true)
+      }
+    },
+  })),
+])
 
 function toggleMute() {
   playbackStore.isMuted = !playbackStore.isMuted
