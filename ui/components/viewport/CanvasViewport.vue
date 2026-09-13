@@ -29,7 +29,8 @@
 
       <!-- Scaled Aspect Ratio Canvas Screen -->
       <div
-        class="canvas-stage relative shadow-2xl rounded-sm flex items-center justify-center transition-transform duration-75"
+        class="canvas-stage relative shadow-2xl rounded-sm flex items-center justify-center"
+        :class="isPanning || isDragging || isResizing || isRotating ? '!transition-none' : 'transition-transform duration-75'"
         :style="screenStyle"
       >
         <!-- Canvas Screen Frame (Clipped Media & Background) -->
@@ -146,6 +147,9 @@ import {
   showGuideTop,
   showGuideBottom,
   calculateClipBounds,
+  isDragging,
+  isResizing,
+  isRotating,
   useTransformGizmo,
 } from '~/composables/useTransformGizmo'
 import {

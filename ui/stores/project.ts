@@ -101,6 +101,27 @@ export const useProjectStore = defineStore('project', () => {
     if (!currentProject.value) return
     currentProject.value.width = preset.width
     currentProject.value.height = preset.height
+    if (currentProject.value.specification) {
+      if (!currentProject.value.specification.canvas) {
+        currentProject.value.specification.canvas = {
+          width: preset.width,
+          height: preset.height,
+          frame_rate: currentProject.value.frame_rate || 30.0,
+          background_color: currentProject.value.background_color || '#000000',
+        }
+      } else {
+        currentProject.value.specification.canvas.width = preset.width
+        currentProject.value.specification.canvas.height = preset.height
+      }
+      saveCurrentProject(currentProject.value.specification)
+    }
+  }
+
+  function setAspectRatio(ratio: string) {
+    const found = ASPECT_RATIO_PRESETS.find((p) => p.ratio === ratio || p.id === ratio)
+    if (found) {
+      setPreset(found)
+    }
   }
 
   return {
@@ -121,5 +142,6 @@ export const useProjectStore = defineStore('project', () => {
     loadProject,
     saveCurrentProject,
     setPreset,
+    setAspectRatio,
   }
 })

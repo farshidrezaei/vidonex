@@ -159,8 +159,11 @@ function saveProject() {
 const presetMenuItems = computed(() => [
   ASPECT_RATIO_PRESETS.map((preset) => ({
     label: `${preset.name} (${preset.width}x${preset.height})`,
-    icon: preset.aspectRatio === '9:16' ? 'i-heroicons-device-phone-mobile' : 'i-heroicons-computer-desktop',
-    onSelect: () => projectStore.setAspectRatio(preset.aspectRatio),
+    icon: preset.ratio === '9:16' ? 'i-heroicons-device-phone-mobile' : 'i-heroicons-computer-desktop',
+    onSelect: () => {
+      projectStore.setPreset(preset)
+      timelineStore.saveCurrentTimeline()
+    },
   })),
 ])
 </script>

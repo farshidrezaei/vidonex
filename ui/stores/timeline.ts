@@ -103,11 +103,6 @@ export const useTimelineStore = defineStore('timeline', () => {
   // Dragged clip for cross-track movement
   const draggedTimelineClip = ref<DraggedClipInfo | null>(null)
 
-  // Undo / Redo history stacks
-  const undoStack = ref<{ tracks: string; description: string }[]>([])
-  const redoStack = ref<{ tracks: string; description: string }[]>([])
-  const maxHistoryLength = 50
-
   const selectedClip = computed(() => {
     if (!selectedClipId.value) return null
     for (const track of tracks.value) {
@@ -122,9 +117,9 @@ export const useTimelineStore = defineStore('timeline', () => {
     return tracks.value.find((track) => track.id === selectedTrackId.value) || null
   })
 
-  // Total duration of all tracks
-  const calculatedDuration = computed(() => {
-    let maxTime = 10 // Minimum 10 seconds empty timeline
+  // Content duration of all tracks (no artificial floor or padding)
+  const contentDuration = computed(() => {
+    let maxTime = 0
     for (const track of tracks.value) {
       for (const clip of track.clips || []) {
         const start = Number(clip.start) || 0
@@ -137,8 +132,13 @@ export const useTimelineStore = defineStore('timeline', () => {
     return maxTime
   })
 
-  watch(calculatedDuration, (newDuration) => {
-    playbackStore.duration = Math.max(10, Math.ceil(newDuration) + 2)
+  // Synchronize playback duration to exact content duration (or default 5s if empty)
+  watch(contentDuration, (newDuration) => {
+    if (newDuration > 0) {
+      playbackStore.duration = Number(newDuration.toFixed(2))
+    } else {
+      playbackStore.duration = 5.0
+    }
   }, { immediate: true })
 
   let isInternalLoading = false
@@ -157,6 +157,68 @@ export const useTimelineStore = defineStore('timeline', () => {
     }, 300)
   }
 
+  // Unified Snapshot-Based History Engine
+  const history = ref<string[]>([JSON.stringify(tracks.value)])
+  const historyIndex = ref<number>(0)
+  const maxHistoryLength = 50
+
+  const undoStack = computed(() => {
+    return history.value.slice(0, historyIndex.value).map((s) => ({ tracks: s, description: 'Past State' }))
+  })
+
+  const redoStack = computed(() => {
+    return history.value.slice(historyIndex.value + 1).map((s) => ({ tracks: s, description: 'Future State' }))
+  })
+
+  function pushHistoryState(description = 'Edit Timeline') {
+    if (isInternalLoading) return
+    const currentSerialized = JSON.stringify(tracks.value)
+    if (history.value[historyIndex.value] === currentSerialized) {
+      return
+    }
+
+    // Drop any redo history beyond current index
+    history.value = history.value.slice(0, historyIndex.value + 1)
+    history.value.push(currentSerialized)
+
+    if (history.value.length > maxHistoryLength) {
+      history.value.shift()
+    } else {
+      historyIndex.value++
+    }
+
+    // Trigger immediate auto-save
+    saveCurrentTimeline()
+  }
+
+  function undo() {
+    if (historyIndex.value <= 0) return
+    historyIndex.value--
+    const state = history.value[historyIndex.value]
+    if (state) {
+      isInternalLoading = true
+      tracks.value = JSON.parse(state)
+      saveCurrentTimeline()
+      setTimeout(() => {
+        isInternalLoading = false
+      }, 50)
+    }
+  }
+
+  function redo() {
+    if (historyIndex.value >= history.value.length - 1) return
+    historyIndex.value++
+    const state = history.value[historyIndex.value]
+    if (state) {
+      isInternalLoading = true
+      tracks.value = JSON.parse(state)
+      saveCurrentTimeline()
+      setTimeout(() => {
+        isInternalLoading = false
+      }, 50)
+    }
+  }
+
   watch(
     tracks,
     () => {
@@ -164,44 +226,6 @@ export const useTimelineStore = defineStore('timeline', () => {
     },
     { deep: true }
   )
-
-  function pushHistoryState(description = 'Edit Timeline') {
-    undoStack.value.push({
-      tracks: JSON.stringify(tracks.value),
-      description,
-    })
-    if (undoStack.value.length > maxHistoryLength) {
-      undoStack.value.shift()
-    }
-    redoStack.value = [] // Clear redo stack on new mutation
-
-    // Trigger immediate auto-save
-    saveCurrentTimeline()
-  }
-
-  function undo() {
-    if (undoStack.value.length === 0) return
-    const currentState = { tracks: JSON.stringify(tracks.value), description: 'Current' }
-    redoStack.value.push(currentState)
-
-    const previousState = undoStack.value.pop()
-    if (previousState) {
-      tracks.value = JSON.parse(previousState.tracks)
-      projectStore.saveCurrentProject(toVideoSpec())
-    }
-  }
-
-  function redo() {
-    if (redoStack.value.length === 0) return
-    const currentState = { tracks: JSON.stringify(tracks.value), description: 'Current' }
-    undoStack.value.push(currentState)
-
-    const nextState = redoStack.value.pop()
-    if (nextState) {
-      tracks.value = JSON.parse(nextState.tracks)
-      projectStore.saveCurrentProject(toVideoSpec())
-    }
-  }
 
   function addTrack(kind: TrackKind) {
     pushHistoryState(`Add ${kind} track`)
@@ -269,12 +293,6 @@ export const useTimelineStore = defineStore('timeline', () => {
     }
     track.clips.push(newClip)
     selectedClipId.value = newClip.id
-
-    // Expand total timeline duration if needed
-    const clipEnd = start + duration
-    if (clipEnd + 10 > playbackStore.duration) {
-      playbackStore.duration = Math.ceil(clipEnd + 10)
-    }
   }
 
   function moveClipToTrack(sourceTrackId: string, targetTrackId: string, clipId: string, targetStart: number): boolean {
@@ -312,12 +330,6 @@ export const useTimelineStore = defineStore('timeline', () => {
     targetTrack.clips.push(clip)
     selectedClipId.value = clip.id
     selectedTrackId.value = targetTrack.id
-
-    // Expand total timeline duration if needed
-    const clipEnd = validStart + duration
-    if (clipEnd + 10 > playbackStore.duration) {
-      playbackStore.duration = Math.ceil(clipEnd + 10)
-    }
 
     return true
   }
@@ -453,8 +465,8 @@ export const useTimelineStore = defineStore('timeline', () => {
       tracks.value = parsedTracks
       selectedClipId.value = null
       selectedTrackId.value = tracks.value[0]?.id || null
-      undoStack.value = []
-      redoStack.value = []
+      history.value = [JSON.stringify(parsedTracks)]
+      historyIndex.value = 0
       setTimeout(() => {
         isInternalLoading = false
       }, 100)

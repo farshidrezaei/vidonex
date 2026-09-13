@@ -40,24 +40,18 @@
         <span class="font-semibold text-xs tracking-wider uppercase text-gray-300">{{ $t('media.title') }}</span>
       </div>
 
-      <label class="cursor-pointer">
+      <div>
         <UButton
           size="xs"
           color="primary"
           variant="soft"
           icon="i-heroicons-plus"
           :loading="mediaStore.isUploading"
+          @click="triggerFileSelect"
         >
           {{ $t('media.upload') }}
         </UButton>
-        <input
-          type="file"
-          multiple
-          accept="video/*,audio/*,image/*"
-          class="hidden"
-          @change="handleFileInput"
-        />
-      </label>
+      </div>
     </div>
 
     <!-- Dropzone Area -->
