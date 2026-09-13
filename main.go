@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
 	"log/slog"
 	"os"
 
@@ -29,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	subFS, err := fs.Sub(ui.Assets, ".output/public")
+	subFS, err := ui.GetFS()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: running without embedded assets: %v\n", err)
 	}

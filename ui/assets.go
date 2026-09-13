@@ -1,9 +1,23 @@
 // Package ui provides embedded assets and utilities for the Web Studio user interface.
 package ui
 
-import "embed"
+import (
+	"embed"
+	"io/fs"
+)
 
-// Assets embeds the statically generated Nuxt 4 distribution for production desktop and web embedding.
+// EmbeddedFS embeds the static web assets from the public directory.
 //
-//go:embed all:.output/public
-var Assets embed.FS
+//go:embed all:public
+var EmbeddedFS embed.FS
+
+// GetFS returns an fs.FS pointing to the static web application root.
+func GetFS() (fs.FS, error) {
+	// If generated dist exists under public, serve it; otherwise serve public root
+	if sub, err := fs.Sub(EmbeddedFS, "public/dist"); err == nil {
+		if _, statErr := fs.Stat(sub, "index.html"); statErr == nil {
+			return sub, nil
+		}
+	}
+	return fs.Sub(EmbeddedFS, "public")
+}

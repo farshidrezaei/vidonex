@@ -13,6 +13,9 @@ export default defineNuxtConfig({
   ssr: false, // SPA Mode for smooth client-side real-time timeline editing and canvas gizmo
   nitro: {
     preset: 'static',
+    output: {
+      publicDir: 'public/dist',
+    },
   },
   app: {
     head: {
