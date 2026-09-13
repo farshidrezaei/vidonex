@@ -181,7 +181,30 @@ func (s *Server) Handler() http.Handler {
 	mediaDirectory := filepath.Join(s.config.DataDirectory, "media")
 	exportDirectory := filepath.Join(s.config.DataDirectory, "exports")
 
-	mux.Handle("/api/media/files/", http.StripPrefix("/api/media/files/", http.FileServer(http.Dir(mediaDirectory))))
+	// Static Media Serving (supports internal media directory and native host files)
+	mux.HandleFunc("/api/media/files/", func(responseWriter http.ResponseWriter, request *http.Request) {
+		relativePath := strings.TrimPrefix(request.URL.Path, "/api/media/files/")
+		if relativePath == "" {
+			http.NotFound(responseWriter, request)
+			return
+		}
+
+		// 1. Check relative path inside project mediaDirectory
+		mediaFilePath := filepath.Join(mediaDirectory, filepath.Clean("/"+relativePath))
+		if fileInfo, err := os.Stat(mediaFilePath); err == nil && !fileInfo.IsDir() {
+			http.ServeFile(responseWriter, request, mediaFilePath)
+			return
+		}
+
+		// 2. Check if relativePath is an absolute path on host filesystem
+		absoluteCandidate := "/" + strings.TrimPrefix(relativePath, "/")
+		if fileInfo, err := os.Stat(absoluteCandidate); err == nil && !fileInfo.IsDir() {
+			http.ServeFile(responseWriter, request, absoluteCandidate)
+			return
+		}
+
+		http.NotFound(responseWriter, request)
+	})
 	mux.Handle("/api/exports/", http.StripPrefix("/api/exports/", http.FileServer(http.Dir(exportDirectory))))
 
 	// Static Web UI Hosting (SPA Fallback)

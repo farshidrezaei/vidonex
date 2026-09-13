@@ -338,7 +338,14 @@ func (a *App) ImportLocalMedia(projectID string, filePaths []string) []ImportedA
 				thumbnailPath = thumbFileName
 			}
 		case "image":
-			thumbnailPath = originalPath
+			thumbFileName := fmt.Sprintf("thumb_%s.jpg", assetID)
+			thumbFullPath := filepath.Join(mediaDirectory, thumbFileName)
+			thumbCmd := exec.Command("ffmpeg", "-y", "-i", originalPath, "-vframes", "1", "-vf", "scale=320:-1", thumbFullPath)
+			if thumbCmd.Run() == nil {
+				thumbnailPath = thumbFileName
+			} else {
+				thumbnailPath = originalPath
+			}
 		}
 
 		assetRecord := db.MediaAssetRecord{

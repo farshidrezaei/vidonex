@@ -65,6 +65,7 @@ type ClipSpec struct {
 	Position    *PositionSpec   `json:"position,omitempty" yaml:"position,omitempty"`
 	ChromaKey   *ChromaKeySpec  `json:"chroma_key,omitempty" yaml:"chroma_key,omitempty"`
 	Keyframes   *KeyframesSpec  `json:"keyframes,omitempty" yaml:"keyframes,omitempty"`
+	HasAudio    *bool           `json:"has_audio,omitempty" yaml:"has_audio,omitempty"`
 }
 
 // PositionSpec sets the visual placement on the canvas.

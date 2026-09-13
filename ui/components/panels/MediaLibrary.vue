@@ -8,7 +8,7 @@
       <div class="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-indigo-950 border border-indigo-400/50 flex-shrink-0">
         <img
           v-if="ghostAsset?.thumbnail_path"
-          :src="`/api/media/files/${ghostAsset.thumbnail_path}`"
+          :src="getThumbnailUrl(ghostAsset.thumbnail_path)"
           class="w-full h-full object-cover"
           alt=""
         />
@@ -92,7 +92,7 @@
         <div class="w-12 h-12 rounded bg-gray-900 flex-shrink-0 flex items-center justify-center overflow-hidden relative border border-gray-800">
           <img
             v-if="asset.thumbnail_path"
-            :src="`/api/media/files/${asset.thumbnail_path}`"
+            :src="getThumbnailUrl(asset.thumbnail_path)"
             class="w-full h-full object-cover pointer-events-none"
             alt=""
           />
@@ -179,6 +179,12 @@ const isDraggingOver = ref(false)
 const dragGhostRef = ref<HTMLDivElement | null>(null)
 const ghostAsset = ref<MediaAsset | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
+
+function getThumbnailUrl(path?: string): string {
+  if (!path) return ''
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  return `/api/media/files/${path.replace(/^\/+/, '')}`
+}
 
 async function triggerFileSelect() {
   if (isDesktop.value && projectStore.currentProject) {

@@ -54,17 +54,19 @@
             <!-- Video / Image Asset Element -->
             <img
               v-if="isImage(clip.source)"
-              :src="`/api/media/files/${clip.source}`"
+              :src="getMediaSourceUrl(clip.source)"
               class="w-full h-full object-cover pointer-events-none select-none rounded-sm"
               alt=""
             />
             <video
               v-else-if="clip.source"
-              :src="`/api/media/files/${clip.source}`"
+              :ref="(el) => setVideoRef(clip.id, el as HTMLVideoElement | null)"
+              :src="getMediaSourceUrl(clip.source)"
               class="w-full h-full object-cover pointer-events-none select-none rounded-sm"
-              :currentTime="getClipCurrentTime(clip)"
               muted
               playsinline
+              preload="auto"
+              @loadedmetadata="handleVideoLoaded(clip, $event)"
             ></video>
             <div
               v-else
@@ -401,4 +403,112 @@ function getClipCurrentTime(clip: ClipSpec): number {
   const elapsed = (playbackStore.currentTime - start) * speed
   return Math.max(0, trim + elapsed)
 }
+
+function getMediaSourceUrl(source?: string): string {
+  if (!source) return ''
+  if (source.startsWith('http://') || source.startsWith('https://')) {
+    return source
+  }
+  return `/api/media/files/${source}`
+}
+
+const videoElements = new Map<string, HTMLVideoElement>()
+
+function setVideoRef(clipId: string, el: HTMLVideoElement | null) {
+  if (el) {
+    videoElements.set(clipId, el)
+    syncSingleVideo(clipId, el)
+  } else {
+    videoElements.delete(clipId)
+  }
+}
+
+function handleVideoLoaded(clip: ClipSpec, event: Event) {
+  const video = event.target as HTMLVideoElement
+  if (!video) return
+  syncSingleVideo(clip.id, video)
+}
+
+function syncSingleVideo(clipId: string, video: HTMLVideoElement) {
+  const clip = activeVisualClips.value.find((c) => c.id === clipId)
+  if (!clip) return
+
+  const targetTime = getClipCurrentTime(clip)
+  const isPlaying = playbackStore.isPlaying
+  const speed = Math.max(0.1, Number(clip.speed) || 1.0)
+  video.playbackRate = Math.max(0.25, Math.min(4.0, speed * playbackStore.playbackRate))
+
+  if (isPlaying) {
+    const drift = Math.abs(video.currentTime - targetTime)
+    if (drift > 0.2 || video.paused) {
+      video.currentTime = targetTime
+    }
+    if (video.paused) {
+      video.play().catch(() => {
+        // Suppress autoplay policy errors on background tab
+      })
+    }
+  } else {
+    if (!video.paused) {
+      video.pause()
+    }
+    if (Math.abs(video.currentTime - targetTime) > 0.04) {
+      video.currentTime = targetTime
+    }
+  }
+}
+
+function syncAllVideos() {
+  for (const [clipId, video] of videoElements.entries()) {
+    syncSingleVideo(clipId, video)
+  }
+}
+
+watch(() => playbackStore.isPlaying, (playing) => {
+  if (!playing) {
+    for (const video of videoElements.values()) {
+      if (!video.paused) {
+        try {
+          video.pause()
+        } catch {
+          // Ignore
+        }
+      }
+    }
+  }
+  syncAllVideos()
+})
+
+watch(() => playbackStore.currentTime, () => {
+  syncAllVideos()
+})
+
+watch(activeVisualClips, (clips) => {
+  const activeIds = new Set(clips.map((c) => c.id))
+  for (const [id, video] of videoElements.entries()) {
+    if (!activeIds.has(id)) {
+      if (!video.paused) {
+        try {
+          video.pause()
+        } catch {
+          // Ignore
+        }
+      }
+      videoElements.delete(id)
+    }
+  }
+  nextTick(() => syncAllVideos())
+}, { deep: true })
+
+onUnmounted(() => {
+  for (const video of videoElements.values()) {
+    try {
+      video.pause()
+      video.src = ''
+    } catch {
+      // Ignore
+    }
+  }
+  videoElements.clear()
+})
 </script>

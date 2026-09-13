@@ -72,9 +72,11 @@ Pre-built, standalone binaries are available on the [**GitHub Releases**](https:
 git clone https://github.com/farshidrezaei/vidonex.git
 cd vidonex
 
-# Build and run desktop app (Linux / macOS / Windows)
-go build -tags webkit2_41 -o build/bin/vidonex .
-./build/bin/vidonex
+# Build and run native desktop workstation
+make run-desktop
+
+# Or compile the desktop binary directly:
+make desktop
 ```
 
 ---

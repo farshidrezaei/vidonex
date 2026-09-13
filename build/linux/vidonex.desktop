@@ -5,5 +5,7 @@ Exec=vidonex-desktop
 Icon=vidonex
 Terminal=false
 Type=Application
+StartupWMClass=vidonex
+StartupNotify=true
 Categories=AudioVideo;Video;AudioVideoEditing;
 MimeType=application/x-vidonex;

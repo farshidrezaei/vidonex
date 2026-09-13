@@ -508,7 +508,10 @@ func (h *Handlers) HandleStartRender(responseWriter http.ResponseWriter, httpReq
 			cancel()
 		}()
 
-		var composerOptions []composer.Option
+		composerOptions := []composer.Option{
+			composer.WithProber(h.prober),
+			composer.WithLogger(h.logger),
+		}
 		if request.HardwareAcceleration != "" {
 			composerOptions = append(composerOptions, composer.WithHardwareAcceleration(request.HardwareAcceleration, false))
 		}

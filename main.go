@@ -2,6 +2,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"log/slog"
 	"os"
@@ -16,6 +17,9 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
+
+//go:embed build/appicon.png
+var appIcon []byte
 
 func main() {
 	appLogger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
@@ -68,6 +72,8 @@ func main() {
 			WindowIsTranslucent:  false,
 		},
 		Linux: &linux.Options{
+			Icon:                appIcon,
+			ProgramName:         "vidonex",
 			WindowIsTranslucent: false,
 		},
 	}

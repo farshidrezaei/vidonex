@@ -383,6 +383,28 @@ func TestCompiler_CompositionsTable(t *testing.T) {
 				"out_blend.mp4",
 			},
 		},
+		{
+			name: "single video clip without audio stream generates silent audio and avoids 0:a pad",
+			buildTimeline: func() *timeline.Timeline {
+				tl := timeline.New(timeline.WithCanvas(types.Res1080p), timeline.WithFPS(types.FPS30))
+				tr := timeline.NewTrack("v0", timeline.TrackKindVideo)
+				clip := timeline.NewClip("c1", "silent_video.mp4", 0, 5*time.Second)
+				clip.HasAudioStream = false
+				tr.AddClip(clip)
+				tl.AddTrack(tr)
+				return tl
+			},
+			encodingOpts:       compiler.DefaultEncodingOptions(),
+			outputPath:         "out_silent.mp4",
+			expectedInputCount: 1,
+			expectedArgSnippets: []string{
+				"-i silent_video.mp4",
+				"-filter_complex",
+				"anullsrc",
+				"-map [out_v]",
+				"-map [out_a]",
+			},
+		},
 	}
 
 	for _, tt := range tests {

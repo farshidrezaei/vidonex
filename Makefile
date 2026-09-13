@@ -47,7 +47,7 @@ help: ## Display this colorful and organized command reference
 
 # ─── Desktop Workstation (Wails v2 + Nuxt 4) ──────────────────────────────────
 .PHONY: desktop
-desktop: ui-build ## Compile the native single-binary desktop workstation
+desktop: ui-build install-desktop-icon ## Compile the native single-binary desktop workstation
 	@printf "$(CYAN)🔨 Building native desktop binary ($(DESKTOP_BINARY))...$(RESET)\n"
 	@mkdir -p bin
 	@go build -trimpath -tags "webkit2_41,desktop,production" -ldflags="$(GO_LDFLAGS)" -o $(DESKTOP_BINARY) .
@@ -58,6 +58,18 @@ desktop: ui-build ## Compile the native single-binary desktop workstation
 run-desktop: desktop ## Build and immediately run the native desktop application
 	@printf "$(CYAN)🚀 Launching Vidonex Desktop Workstation...$(RESET)\n"
 	@./$(DESKTOP_BINARY)
+
+.PHONY: install-desktop-icon
+install-desktop-icon: ## Register desktop icon and launcher for Linux desktop integration
+	@if [ "$$(uname -s)" = "Linux" ]; then \
+		mkdir -p $(HOME)/.local/share/icons/hicolor/512x512/apps $(HOME)/.local/share/pixmaps $(HOME)/.local/share/applications $(HOME)/.local/bin; \
+		cp -f build/appicon.png $(HOME)/.local/share/icons/hicolor/512x512/apps/vidonex.png 2>/dev/null || true; \
+		cp -f build/appicon.png $(HOME)/.local/share/pixmaps/vidonex.png 2>/dev/null || true; \
+		cp -f build/linux/vidonex.desktop $(HOME)/.local/share/applications/vidonex.desktop 2>/dev/null || true; \
+		ln -sf $(CURDIR)/bin/vidonex-desktop $(HOME)/.local/bin/vidonex-desktop 2>/dev/null || true; \
+		which gtk-update-icon-cache >/dev/null 2>&1 && gtk-update-icon-cache -f -t $(HOME)/.local/share/icons/hicolor 2>/dev/null || true; \
+		which update-desktop-database >/dev/null 2>&1 && update-desktop-database $(HOME)/.local/share/applications 2>/dev/null || true; \
+	fi
 
 .PHONY: dev-desktop
 dev-desktop: ## Start desktop workstation in live development mode with Hot-Reload (requires wails)
@@ -89,7 +101,8 @@ ui-dev: ## Start Nuxt 4 frontend standalone dev server (http://localhost:3000)
 
 .PHONY: ui-build
 ui-build: ## Build and generate static UI distribution for embedding
-	@printf "$(CYAN)📦 Generating static UI distribution (.output/public)...$(RESET)\n"
+	@printf "$(CYAN)📦 Generating static UI distribution (public/dist)...$(RESET)\n"
+	@rm -rf ui/public/dist
 	@npm --prefix ui run generate
 
 # ─── Building & Binaries ──────────────────────────────────────────────────────

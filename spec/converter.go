@@ -388,6 +388,9 @@ func buildClip(clipSpec ClipSpec) (*timeline.Clip, error) {
 	if clipSpec.Volume != nil {
 		clip.WithVolume(*clipSpec.Volume)
 	}
+	if clipSpec.HasAudio != nil {
+		clip.HasAudioStream = *clipSpec.HasAudio
+	}
 	if clipSpec.Opacity != nil {
 		clip.WithOpacity(*clipSpec.Opacity)
 	}

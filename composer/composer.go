@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"log/slog"
 
+	"os"
+
 	"github.com/farshidrezaei/vidonex/compiler"
 	"github.com/farshidrezaei/vidonex/executor"
 	"github.com/farshidrezaei/vidonex/presets"
+	"github.com/farshidrezaei/vidonex/probe"
 	"github.com/farshidrezaei/vidonex/timeline"
 )
 
@@ -23,6 +26,13 @@ type ProgressHandler func(executor.ProgressEvent)
 
 // Option configures the Composer runtime.
 type Option func(*Composer)
+
+// WithProber configures a custom MediaProber for stream property detection.
+func WithProber(customProber probe.MediaProber) Option {
+	return func(composerInstance *Composer) {
+		composerInstance.prober = customProber
+	}
+}
 
 // WithExecutor configures a custom CommandExecutor (e.g. MockExecutor for testing).
 func WithExecutor(customExecutor executor.CommandExecutor) Option {
@@ -72,6 +82,7 @@ type Composer struct {
 	logger     *slog.Logger
 	encoding   compiler.EncodingOptions
 	binaryPath string
+	prober     probe.MediaProber
 }
 
 // New creates an initialized Composer with standard defaults.
@@ -81,6 +92,7 @@ func New(options ...Option) *Composer {
 		logger:     slog.Default(),
 		encoding:   compiler.DefaultEncodingOptions(),
 		binaryPath: "ffmpeg",
+		prober:     probe.NewCachedProber(probe.NewFFprobeProber("ffprobe")),
 	}
 	for _, option := range options {
 		option(composerInstance)
@@ -90,6 +102,21 @@ func New(options ...Option) *Composer {
 
 // Compile translates a timeline into a compilation result without rendering.
 func (composerInstance *Composer) Compile(compositionTimeline *timeline.Timeline, outputPath string) (*compiler.CompilationResult, error) {
+	if composerInstance.prober != nil {
+		for _, track := range compositionTimeline.Tracks {
+			for _, clip := range track.Clips {
+				// If source file exists on disk, inspect presence of an audio stream
+				if clip.Source != "" {
+					if fileInfo, statErr := os.Stat(clip.Source); statErr == nil && !fileInfo.IsDir() {
+						if metadata, probeErr := composerInstance.prober.Probe(context.Background(), clip.Source); probeErr == nil && metadata != nil {
+							clip.HasAudioStream = (metadata.AudioStream != nil)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	comp := compiler.New(composerInstance.logger).SetEncodingOptions(composerInstance.encoding)
 	return comp.Compile(compositionTimeline, outputPath)
 }

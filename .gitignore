@@ -26,6 +26,8 @@ ui/.nitro/
 ui/.cache/
 ui/dist
 ui/dist/
+ui/public/dist/*
+!ui/public/dist/.gitkeep
 dist/
 dist
 

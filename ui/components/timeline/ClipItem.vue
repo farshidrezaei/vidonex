@@ -171,13 +171,10 @@ const nativeDuration = computed(() => {
 })
 
 const thumbnailUrl = computed(() => {
-  if (matchedAsset.value?.thumbnail_path) {
-    return `/api/media/files/${matchedAsset.value.thumbnail_path}`
-  }
-  if (props.clip.source) {
-    return `/api/media/files/${props.clip.source}`
-  }
-  return null
+  const rawPath = matchedAsset.value?.thumbnail_path || props.clip.source
+  if (!rawPath) return null
+  if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) return rawPath
+  return `/api/media/files/${rawPath.replace(/^\/+/, '')}`
 })
 
 const clipStyle = computed(() => {
