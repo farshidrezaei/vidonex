@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "description": "Declarative Video Composition & FFmpeg Filtergraph Compiler Engine in Go",
+  "homepage": "https://farshidrezaei.github.io/vidonex/",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/farshidrezaei/vidonex/releases/download/v1.0.0/vidonex-cli-windows-amd64.exe#/vidonex.exe",
+      "hash": "REPLACE_WITH_WINDOWS_SHA256"
+    }
+  },
+  "bin": "vidonex.exe",
+  "checkver": "github",
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/farshidrezaei/vidonex/releases/download/v$version/vidonex-cli-windows-amd64.exe#/vidonex.exe"
+      }
+    }
+  }
+}

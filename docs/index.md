@@ -13,6 +13,9 @@ hero:
       text: Get Started
       link: /guide/quick-start
     - theme: alt
+      text: 📥 Download v1.0.0
+      link: /guide/installation
+    - theme: alt
       text: Go SDK Reference
       link: /api/
     - theme: alt

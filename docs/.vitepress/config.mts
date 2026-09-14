@@ -23,6 +23,7 @@ export default defineConfig({
     },
     nav: [
       { text: 'Guide', link: '/guide/introduction' },
+      { text: 'Download', link: '/guide/installation' },
       { text: 'API Reference', link: '/api/' },
       { text: 'Recipes', link: '/recipes/' },
       { text: 'Studio', link: '/guide/desktop-studio' },
@@ -44,6 +45,7 @@ export default defineConfig({
           text: 'Getting Started',
           items: [
             { text: 'Introduction', link: '/guide/introduction' },
+            { text: 'Installation & Downloads', link: '/guide/installation' },
             { text: 'Quick Start', link: '/guide/quick-start' },
             { text: 'Architecture & DAG IR', link: '/guide/architecture' },
             { text: 'CLI Automation', link: '/guide/cli' },
