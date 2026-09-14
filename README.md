@@ -38,7 +38,8 @@
 
 ### ✨ Studio Highlights
 
-- 🎞️ **Multi-Track Timeline**: Layer video, audio, picture-in-picture overlays, subtitles, and animated waveforms with precise drag-and-drop, trim handles, adjacent clip transitions (XFade ribbons), playhead scrubbing, split clips (`S`), and magnetic snapping.
+- 🎞️ **Multi-Track Timeline**: Layer video, audio, picture-in-picture overlays, subtitles, and animated waveforms with precise drag-and-drop, full-runway interactive scrub area, trim handles, adjacent clip transitions (XFade ribbons), playhead scrubbing, split clips (`S`), and magnetic snapping.
+- 📂 **Categorized TreeView Media Library**: High-density hierarchical media asset browser with collapsible groupings for Videos, Audio, Images, and Subtitles, real-time search filtering, and pure drag-and-drop onto timeline tracks.
 - 📐 **Interactive Viewport with Transform Gizmo**: Direct on-canvas 8-point resize handles, rotational pivots, magnetic alignment guides, mouse-wheel zoom, and keyboard arrow nudging (`1px` fine / `10px` coarse).
 - 🔀 **Customizable Splitter Workspace**: Smooth panel resizing with collapsible drawers for Media Library, Viewport, Timeline, and Inspectors.
 - 🎛️ **Full-Suite Inspectors**:
@@ -48,8 +49,8 @@
   - **Captions & Subtitles**: Parse and edit SRT/VTT captions with custom fonts, margins, and highlight bounding boxes.
   - **Keyframe Animation**: Animate position, scale, and opacity using smooth mathematical easing curves (Linear, Quad, Cubic, Sine).
   - **DAG Graph Visualizer**: Interactive Mermaid.js visual representation of the underlying FFmpeg filter DAG with SVG export.
-- 🚀 **Zero-Copy Native Media Import**: Direct filesystem access with instant FFprobe metadata parsing for multi-gigabyte video libraries.
-- ⚡ **Auto Hardware Acceleration**: Automatically detects NVIDIA NVENC, Apple VideoToolbox, Intel QSV, and VAAPI encoders.
+- 🚀 **Zero-Copy Native Media Import & Export**: Direct filesystem access, native OS "Save As" destination selection, and instant FFprobe metadata parsing for multi-gigabyte video libraries.
+- ⚡ **Auto Hardware Acceleration**: Automatically detects NVIDIA NVENC, Apple VideoToolbox, Intel QSV, and VAAPI encoders with real-time WebSocket progress telemetry.
 
 ---
 
