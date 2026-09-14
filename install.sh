@@ -6,7 +6,7 @@ set -e
 
 OWNER="farshidrezaei"
 REPO="vidonex"
-INSTALL_DIR="/usr/local/bin"
+INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
 # Visual formatting
 BOLD="$(tput bold 2>/dev/null || echo '')"
