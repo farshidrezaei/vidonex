@@ -47,6 +47,8 @@ func main() {
 		executeGraphCommand(os.Args[2:])
 	case "probe":
 		executeProbeCommand(os.Args[2:])
+	case "completion":
+		executeCompletionCommand(os.Args[2:])
 	case "version", "--version", "-v":
 		fmt.Printf("vidonex engine version %s\n", EngineVersion)
 	case "help", "--help", "-h":
@@ -466,6 +468,7 @@ COMMANDS:
   validate <project.yaml|json>  Validate specification syntax and constraints
   graph    <project.yaml|json>  Export Mermaid.js or Graphviz DOT filtergraph diagram
   probe    <media.mp4>          Inspect media container and stream properties
+  completion <shell>            Generate shell autocompletions (bash, zsh, fish)
   version                       Show Vidonex engine version
 
 SERVE FLAGS:
@@ -489,6 +492,155 @@ EXAMPLES:
   vidonex validate project.yaml
   vidonex graph project.yaml --format mermaid
   vidonex probe gameplay.mp4 --json
+  vidonex completion zsh > ~/.zsh/completion/_vidonex
 `
 	fmt.Println(strings.TrimSpace(usage))
 }
+
+func executeCompletionCommand(arguments []string) {
+	if len(arguments) < 1 {
+		fmt.Fprintln(os.Stderr, "Usage: vidonex completion [bash|zsh|fish]")
+		os.Exit(1)
+	}
+
+	shell := strings.ToLower(arguments[0])
+	switch shell {
+	case "bash":
+		fmt.Print(bashCompletionScript)
+	case "zsh":
+		fmt.Print(zshCompletionScript)
+	case "fish":
+		fmt.Print(fishCompletionScript)
+	default:
+		fmt.Fprintf(os.Stderr, "Unsupported shell %q. Supported shells: bash, zsh, fish\n", shell)
+		os.Exit(1)
+	}
+}
+
+const bashCompletionScript = `# bash completion for vidonex
+_vidonex_completion() {
+    local cur prev words cword
+    if declare -F _init_completion >/dev/null 2>&1; then
+        _init_completion || return
+    else
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        words=("${COMP_WORDS[@]}")
+        cword=$COMP_CWORD
+    fi
+
+    local commands="serve render validate graph probe completion version help"
+
+    if [[ ${cword} -eq 1 ]]; then
+        COMPREPLY=( $(compgen -W "${commands}" -- "${cur}") )
+        return
+    fi
+
+    case "${words[1]}" in
+        serve|studio|ui)
+            COMPREPLY=( $(compgen -W "--port --host --data-dir --static-dir --log-level" -- "${cur}") )
+            ;;
+        render)
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "-o --output --gpu --log-level --log-format --dry-run" -- "${cur}") )
+            fi
+            ;;
+        graph)
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "--format --output" -- "${cur}") )
+            fi
+            ;;
+        probe)
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "--json" -- "${cur}") )
+            fi
+            ;;
+        completion)
+            COMPREPLY=( $(compgen -W "bash zsh fish" -- "${cur}") )
+            ;;
+    esac
+}
+complete -F _vidonex_completion vidonex
+`
+
+const zshCompletionScript = `#compdef vidonex
+
+_vidonex() {
+    local -a commands
+    commands=(
+        'serve:Launch Vidonex Web Studio GUI server'
+        'render:Compile and render video composition'
+        'validate:Validate specification syntax and constraints'
+        'graph:Export Mermaid.js or Graphviz DOT filtergraph diagram'
+        'probe:Inspect media container and stream properties'
+        'completion:Generate shell autocompletions'
+        'version:Show Vidonex engine version'
+        'help:Show help documentation'
+    )
+
+    _arguments -C \
+        '1: :->command' \
+        '*:: :->args'
+
+    case $state in
+        command)
+            _describe 'command' commands
+            ;;
+        args)
+            case $words[1] in
+                serve|studio|ui)
+                    _arguments \
+                        '--port[HTTP port]:number:' \
+                        '--host[Listening host]:host:' \
+                        '--data-dir[Data directory]:directory:_files -/' \
+                        '--static-dir[Static directory]:directory:_files -/' \
+                        '--log-level[Log level]:(debug info warn error)'
+                    ;;
+                render)
+                    _arguments \
+                        '-o[Output file]:output file:_files' \
+                        '--output[Output file]:output file:_files' \
+                        '--gpu[Hardware accelerator]:(nvenc videotoolbox qsv vaapi)' \
+                        '--log-level[Log level]:(debug info warn error)' \
+                        '--log-format[Log format]:(text json)' \
+                        '--dry-run[Compile without invoking FFmpeg]' \
+                        '1:project file:_files -g "*.yaml *.yml *.json"'
+                    ;;
+                validate)
+                    _arguments '1:project file:_files -g "*.yaml *.yml *.json"'
+                    ;;
+                graph)
+                    _arguments \
+                        '--format[Diagram format]:(mermaid dot)' \
+                        '--output[Output diagram path]:file:_files' \
+                        '1:project file:_files -g "*.yaml *.yml *.json"'
+                    ;;
+                probe)
+                    _arguments \
+                        '--json[Output JSON format]' \
+                        '1:media file:_files'
+                    ;;
+                completion)
+                    _arguments '1:shell:(bash zsh fish)'
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_vidonex "$@"
+`
+
+const fishCompletionScript = `# fish completion for vidonex
+complete -c vidonex -f
+complete -c vidonex -n "__fish_use_subcommand" -a serve -d "Launch Vidonex Web Studio GUI server"
+complete -c vidonex -n "__fish_use_subcommand" -a render -d "Compile and render video composition"
+complete -c vidonex -n "__fish_use_subcommand" -a validate -d "Validate specification syntax"
+complete -c vidonex -n "__fish_use_subcommand" -a graph -d "Export filtergraph diagram"
+complete -c vidonex -n "__fish_use_subcommand" -a probe -d "Inspect media container"
+complete -c vidonex -n "__fish_use_subcommand" -a completion -d "Generate shell autocompletions"
+complete -c vidonex -n "__fish_use_subcommand" -a version -d "Show engine version"
+complete -c vidonex -n "__fish_use_subcommand" -a help -d "Show help documentation"
+
+complete -c vidonex -n "__fish_seen_subcommand_from completion" -a "bash zsh fish"
+`

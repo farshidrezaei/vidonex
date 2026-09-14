@@ -71,13 +71,22 @@ Whether you need a **visual desktop editing suite**, a **cloud video rendering m
 
 ## 🚀 Quick Start
 
-### 1. Download Native Desktop Studio
-Download pre-built standalone binaries for Linux, macOS (Apple Silicon & Intel), and Windows from [**GitHub Releases**](https://github.com/farshidrezaei/vidonex/releases/latest).
+### 1. Install Automation CLI (1-Liner)
 
-### 2. Install Automation CLI
+**macOS & Linux:**
 ```bash
-go install github.com/farshidrezaei/vidonex/cmd/vidonex@latest
+curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
 ```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1 | iex
+```
+
+*(Or via Go toolchain: `go install github.com/farshidrezaei/vidonex/cmd/vidonex@latest`)*
+
+### 2. Download Native Desktop Studio
+Standalone production installers for Linux, macOS (Universal), and Windows are available from [**GitHub Releases**](https://github.com/farshidrezaei/vidonex/releases/latest).
 
 ### 3. Add to Go Project
 ```bash

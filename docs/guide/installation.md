@@ -4,15 +4,38 @@ Install **Vidonex** on macOS, Linux, or Windows via your favorite package manage
 
 ---
 
-## ⚡ Universal 1-Line Installer (macOS & Linux)
+## ⚡ Universal 1-Line Installer
 
-The quickest way to install the latest `vidonex` CLI on Linux and macOS:
+The quickest way to install the latest `vidonex` binary on any system:
 
+### macOS & Linux (Bash / Zsh)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
 ```
 
-This script automatically detects your operating system and CPU architecture, downloads the latest binary from GitHub Releases, and puts it in `/usr/local/bin/vidonex`.
+### Windows (PowerShell)
+```powershell
+irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1 | iex
+```
+
+### ✨ What the Installer Does Automatically:
+1. **Detects OS & Architecture Matrix**: Supports Linux (`x86_64`), macOS Universal (`Apple Silicon` + `Intel`), and Windows.
+2. **Cryptographic SHA-256 Verification**: Verifies SHA-256 signatures before binary execution.
+3. **Zero-Sudo Smart Pathing**: Prioritizes standard user space (`~/.local/bin`) or `/usr/local/bin` without prompting for sudo unless needed.
+4. **Environment `$PATH` Configuration**: Automatically updates your shell configuration (`.bashrc`, `.zshrc`, `.config/fish/config.fish`, or Windows User PATH).
+5. **System Readiness Check**: Probes for `ffmpeg` and detects available GPU hardware acceleration (NVENC, VideoToolbox, VA-API, QSV).
+
+### 🛠️ Advanced Installer Options:
+```bash
+# Install a specific release version
+VERSION=v1.0.0 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
+
+# Install the Desktop Studio GUI Workstation instead of headless CLI
+APP_TYPE=desktop curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
+
+# Install into a custom directory without touching shell profiles
+INSTALL_DIR=~/.bin NO_MODIFY_PATH=1 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
+```
 
 ---
 
@@ -97,10 +120,40 @@ go install github.com/farshidrezaei/vidonex/cmd/vidonex@latest
 ---
 
 ## 🔍 Verification
-
+ 
 Once installed, verify that Vidonex is available in your `$PATH`:
 
 ```bash
 vidonex version
 vidonex --help
+```
+
+---
+
+## ⚡ Shell Autocompletions
+
+Vidonex includes native autocompletion for Bash, Zsh, and Fish:
+
+### Zsh
+```bash
+# Generate completion into your Zsh completions directory:
+mkdir -p ~/.zsh/completion
+vidonex completion zsh > ~/.zsh/completion/_vidonex
+
+# Add to ~/.zshrc if not already present:
+# fpath=(~/.zsh/completion $fpath)
+# autoload -Uz compinit && compinit
+```
+
+### Bash
+```bash
+vidonex completion bash | sudo tee /etc/bash_completion.d/vidonex > /dev/null
+# Or user-local:
+# vidonex completion bash >> ~/.bash_completion
+```
+
+### Fish
+```fish
+mkdir -p ~/.config/fish/completions
+vidonex completion fish > ~/.config/fish/completions/vidonex.fish
 ```
