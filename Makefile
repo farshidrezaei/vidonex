@@ -182,3 +182,20 @@ clean: ## Clean build artifacts, temp files, and caches
 	@rm -rf ui/.output ui/.nuxt ui/dist
 	@go clean -cache -testcache
 	@printf "$(GREEN)✨ Clean complete!$(RESET)\n"
+
+# ─── Documentation (VitePress) ────────────────────────────────────────────────
+.PHONY: docs-install
+docs-install: ## Install documentation site dependencies
+	@printf "$(CYAN)📦 Installing documentation dependencies...$(RESET)\n"
+	@cd docs && pnpm install --dangerously-allow-all-builds
+
+.PHONY: docs-dev
+docs-dev: ## Start live-reloading documentation dev server
+	@printf "$(CYAN)📖 Starting documentation dev server on http://localhost:5173/vidonex/...$(RESET)\n"
+	@cd docs && pnpm run dev
+
+.PHONY: docs-build
+docs-build: ## Build production static documentation site for GitHub Pages
+	@printf "$(CYAN)🏗️ Building static documentation site...$(RESET)\n"
+	@cd docs && pnpm run build
+	@printf "$(GREEN)✅ Documentation built in docs/.vitepress/dist!$(RESET)\n"

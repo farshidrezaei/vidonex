@@ -1,4 +1,4 @@
-name: Release Desktop Workstation
+name: Release Vidonex (Desktop & CLI)
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  # ─── Build Linux Desktop (AppImage & deb) ──────────────────────────────────
+  # ─── Build Linux (Desktop + CLI) ──────────────────────────────────────────
   build-linux:
     name: Build Linux (x86_64)
     runs-on: ubuntu-latest
@@ -53,18 +53,24 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
 
-      - name: Build Linux Binary
+      - name: Build Desktop Binary
         run: |
           go build -trimpath -tags webkit2_41 -ldflags="-s -w" -o build/bin/vidonex-linux-amd64 .
 
-      - name: Upload Linux Artifact
+      - name: Build Headless CLI Binary
+        run: |
+          CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-cli-linux-amd64 ./cmd/vidonex
+
+      - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: vidonex-linux-amd64
-          path: build/bin/vidonex-linux-amd64
+          name: vidonex-linux-artifacts
+          path: |
+            build/bin/vidonex-linux-amd64
+            build/bin/vidonex-cli-linux-amd64
           retention-days: 7
 
-  # ─── Build Windows Desktop (NSIS & exe) ───────────────────────────────────
+  # ─── Build Windows (Desktop + CLI) ────────────────────────────────────────
   build-windows:
     name: Build Windows (x86_64)
     runs-on: windows-latest
@@ -99,18 +105,24 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
 
-      - name: Build Windows Binary
+      - name: Build Desktop Binary
         run: |
           go build -trimpath -ldflags="-s -w -H windowsgui" -o build/bin/vidonex-windows-amd64.exe .
 
-      - name: Upload Windows Artifact
+      - name: Build Headless CLI Binary
+        run: |
+          go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-cli-windows-amd64.exe ./cmd/vidonex
+
+      - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: vidonex-windows-amd64.exe
-          path: build/bin/vidonex-windows-amd64.exe
+          name: vidonex-windows-artifacts
+          path: |
+            build/bin/vidonex-windows-amd64.exe
+            build/bin/vidonex-cli-windows-amd64.exe
           retention-days: 7
 
-  # ─── Build macOS Desktop (Universal Binary & .app) ────────────────────────
+  # ─── Build macOS (Desktop + CLI Universal) ────────────────────────────────
   build-macos:
     name: Build macOS (Universal)
     runs-on: macos-latest
@@ -145,24 +157,27 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
 
-      - name: Build macOS ARM64
+      - name: Build Desktop macOS ARM64 & AMD64
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-darwin-arm64 .
-
-      - name: Build macOS AMD64
-        run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-darwin-amd64 .
-
-      - name: Create macOS Universal Binary
-        run: |
           lipo -create -output build/bin/vidonex-darwin-universal build/bin/vidonex-darwin-arm64 build/bin/vidonex-darwin-amd64
           chmod +x build/bin/vidonex-darwin-universal
 
-      - name: Upload macOS Artifact
+      - name: Build Headless CLI macOS ARM64 & AMD64
+        run: |
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-cli-darwin-arm64 ./cmd/vidonex
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-cli-darwin-amd64 ./cmd/vidonex
+          lipo -create -output build/bin/vidonex-cli-darwin-universal build/bin/vidonex-cli-darwin-arm64 build/bin/vidonex-cli-darwin-amd64
+          chmod +x build/bin/vidonex-cli-darwin-universal
+
+      - name: Upload macOS Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: vidonex-darwin-universal
-          path: build/bin/vidonex-darwin-universal
+          name: vidonex-macos-artifacts
+          path: |
+            build/bin/vidonex-darwin-universal
+            build/bin/vidonex-cli-darwin-universal
           retention-days: 7
 
   # ─── Publish GitHub Release ───────────────────────────────────────────────

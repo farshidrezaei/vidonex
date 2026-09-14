@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Official Documentation
+    url: https://farshidrezaei.github.io/vidonex/
+    about: Please read our documentation, architecture guides, and runnable recipes.
+  - name: 💬 GitHub Discussions
+    url: https://github.com/farshidrezaei/vidonex/discussions
+    about: Ask questions, share your video creation projects, or discuss architecture.
+  - name: 🔒 Report a Security Vulnerability
+    url: https://github.com/farshidrezaei/vidonex/security/advisories/new
+    about: Privately disclose sensitive security vulnerabilities.

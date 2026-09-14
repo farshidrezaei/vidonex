@@ -1,48 +1,96 @@
 # Contributing to Vidonex
 
-Thank you for contributing to **Vidonex**! We welcome contributions from developers, researchers, and video engineers worldwide.
+First off, thank you for taking the time to contribute! 🎉
+
+Vidonex is an open-source, high-performance video composition engine and modern desktop/web workstation written in Go, Vue 3, and Nuxt UI. We welcome contributions of all kinds: bug reports, documentation improvements, feature requests, new video/audio filters, and architectural enhancements.
 
 ---
 
-## 1. Code Standards & Engineering Principles
+## Code of Conduct
 
-Vidonex follows strict production-grade Go conventions:
-
-1. **Pure Standard Library Core**: Do not add heavy external dependencies to core packages (`types`, `timeline`, `filtergraph`, `compiler`).
-2. **Modern Go Idioms**:
-   - Use Go iterators (`iter.Seq`, `iter.Seq2`) for graph and slice traversals.
-   - Use `log/slog` for structured logging.
-   - Use `errors.Join` for multi-error collection.
-   - Use `types.Rational` instead of raw `float64` for video timestamps and frame rates.
-3. **Table-Driven Tests**: All new features, filters, and passes must include table-driven unit tests covering happy paths, edge cases, and error conditions.
-4. **Race Detection**: All tests must pass with the `-race` detector enabled.
-5. **Documentation**: Every exported struct, interface, function, and constant must have a clear, descriptive docstring.
+All contributors and maintainers are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Please report any violations or abusive behavior to [security@vidonex.io](mailto:security@vidonex.io).
 
 ---
 
-## 2. Development Workflow
+## How Can I Contribute?
+
+- **Reporting Bugs**: Check existing issues first. If not reported, submit a detailed report using the [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.yml).
+- **Proposing Features**: Open a discussion or use the [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.yml) explaining the use case, API design, and expected FFmpeg filtergraph output.
+- **Improving Documentation**: Fix typos, add recipes in `examples/`, or improve guides in `docs/`.
+- **Submitting Code**: Pick up an issue marked `good first issue` or `help wanted`, or propose an optimization.
+
+---
+
+## Development Setup
 
 ### Prerequisites
-- Go 1.22+ (or Go 1.23+)
-- Optional: `ffmpeg` binary (for manual end-to-end rendering tests)
+- **Go**: 1.22+ (Go 1.25/1.26 recommended)
+- **Node.js**: 20+ & `pnpm` (if working on the Web Studio in `ui/`)
+- **FFmpeg & FFprobe**: Version 5.x, 6.x, or 7.x installed in system `$PATH` (for E2E tests and rendering)
+- **golangci-lint**: `v1.59+`
 
-### Running Tests
-Run the entire test suite with race detection:
+### Repository Setup
 ```bash
-go test -race -v ./...
-```
+# Clone the repository
+git clone https://github.com/farshidrezaei/vidonex.git
+cd vidonex
 
-### Running Examples
-```bash
-go run ./examples/01_simple_cut/main.go
-go run ./examples/02_picture_in_picture/main.go
+# Download Go modules
+go mod download
+
+# Build CLI binary
+make build
 ```
 
 ---
 
-## 3. Submitting Pull Requests
+## Engineering Contracts & Guidelines
 
-1. **Fork and Branch**: Create a feature branch with a descriptive name (e.g. `feat/chroma-key-enhancement` or `fix/audio-desync-pad`).
-2. **Implement & Test**: Ensure all existing and new unit tests pass cleanly.
-3. **Commit Messages**: Follow [Conventional Commits](https://www.conventionalcommits.org/) format (e.g. `feat: add drawbox effect`, `fix: handle negative source trims`).
-4. **Open PR**: Submit your pull request with a clear summary of changes and diagram outputs if modifying the compiler or filtergraph IR.
+Vidonex enforces strict architectural contracts documented in [CONTRACTS.md](CONTRACTS.md):
+
+1. **Pure Standard Library Core**:
+   - Packages `types`, `timeline`, `filtergraph`, and `compiler` MUST NOT import external third-party dependencies.
+2. **No String Concatenation for Filtergraphs**:
+   - NEVER construct raw FFmpeg filter strings manually with `fmt.Sprintf` or string concatenation. Build a `filtergraph.Graph`, add `filtergraph.Node`s with typed pads, and connect them.
+3. **No Floating-Point for Core Timing**:
+   - Always use `types.Rational` or `time.Duration` for timestamps, frame rates, and durations to prevent float precision drift over time.
+4. **Stream Type Safety**:
+   - Video pads (`StreamTypeVideo`) can only connect to video pads. Audio pads (`StreamTypeAudio`) can only connect to audio pads.
+5. **Table-Driven Tests**:
+   - Every unit test must be table-driven (`Test...Table`), covering happy paths, edge cases, zero-values, and error branches.
+
+---
+
+## Quality Checks & Verification
+
+Before submitting your pull request, ensure all linters and tests pass cleanly:
+
+```bash
+# 1. Run static analysis & linter
+golangci-lint run ./...
+
+# 2. Run unit tests with race detection
+go test -race -v ./...
+
+# 3. Run real-FFmpeg end-to-end tests (requires ffmpeg installed)
+go test -race -v ./tests/e2e/...
+```
+
+---
+
+## Pull Request Guidelines
+
+1. **Branch Naming**:
+   - `feat/feature-name`
+   - `fix/bug-description`
+   - `docs/topic-update`
+   - `refactor/subsystem-name`
+2. **Conventional Commits**:
+   - Format: `<type>(<scope>): <short summary>`
+   - Examples:
+     - `feat(ducking): add dynamic attack and release curves`
+     - `fix(filtergraph): prevent dangling output pad in auto-split pass`
+     - `docs(readme): add comparison matrix with Remotion`
+3. **Keep PRs Focused**: A pull request should address a single concern. If you have multiple independent improvements, split them into separate PRs.
+
+Thank you for helping make Vidonex the premier programmatic video engine! 🚀

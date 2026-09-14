@@ -91,3 +91,9 @@ __debug_bin*
 *.log
 .codegraph/
 /icons/
+
+# ── Docs VitePress artifacts ──
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+!/docs/public/**/*.png
