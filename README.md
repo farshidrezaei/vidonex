@@ -26,7 +26,8 @@
 </p>
 
 <p align="center">
-  <a href="https://farshidrezaei.github.io/vidonex/"><strong>📖 Official Documentation</strong></a> &bull;
+  <a href="https://farshidrezaei.github.io/vidonex/"><strong>📖 Documentation</strong></a> &bull;
+  <a href="CHANGELOG.md"><strong>Changelog</strong></a> &bull;
   <a href="#-why-vidonex"><strong>Why Vidonex?</strong></a> &bull;
   <a href="#-quick-start"><strong>Quick Start</strong></a> &bull;
   <a href="#-vidonex-studio"><strong>Studio Workstation</strong></a> &bull;

@@ -26,12 +26,15 @@ export default defineConfig({
       { text: 'API Reference', link: '/api/' },
       { text: 'Recipes', link: '/recipes/' },
       { text: 'Studio', link: '/guide/desktop-studio' },
+      { text: 'Changelog', link: '/changelog' },
       {
         text: 'v1.0.0',
         items: [
-          { text: 'Release Notes', link: 'https://github.com/farshidrezaei/vidonex/releases' },
-          { text: 'Contributing', link: 'https://github.com/farshidrezaei/vidonex/blob/main/CONTRIBUTING.md' },
-          { text: 'Roadmap & Architecture', link: '/guide/architecture' }
+          { text: 'v1.0.0 (Latest Stable)', link: '/' },
+          { text: 'v1.1.0 (Next Roadmap)', link: '/changelog#unreleased' },
+          { text: 'All Releases', link: 'https://github.com/farshidrezaei/vidonex/releases' },
+          { text: 'Versioning Policy', link: '/guide/versioning-policy' },
+          { text: 'Contributing', link: 'https://github.com/farshidrezaei/vidonex/blob/main/CONTRIBUTING.md' }
         ]
       }
     ],
@@ -46,6 +49,13 @@ export default defineConfig({
             { text: 'CLI Automation', link: '/guide/cli' },
             { text: 'Declarative YAML Spec', link: '/guide/yaml-spec' },
             { text: 'Desktop Studio Workstation', link: '/guide/desktop-studio' }
+          ]
+        },
+        {
+          text: 'Releases & Versions',
+          items: [
+            { text: 'Changelog', link: '/changelog' },
+            { text: 'Versioning Policy', link: '/guide/versioning-policy' }
           ]
         }
       ],
