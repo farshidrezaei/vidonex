@@ -280,6 +280,59 @@ func (a *App) SelectExportDirectory() (string, error) {
 	return directoryPath, nil
 }
 
+// SaveVideoFileDialog opens a native OS save dialog allowing the user to select destination folder and filename in one step.
+func (a *App) SaveVideoFileDialog(defaultName string, format string) (string, error) {
+	normalizedFormat := strings.ToLower(strings.TrimPrefix(format, "."))
+	if normalizedFormat == "" {
+		normalizedFormat = "mp4"
+	}
+	if defaultName == "" {
+		defaultName = fmt.Sprintf("rendered_composition.%s", normalizedFormat)
+	} else if !strings.HasSuffix(strings.ToLower(defaultName), "."+normalizedFormat) {
+		defaultName = fmt.Sprintf("%s.%s", strings.TrimSuffix(defaultName, filepath.Ext(defaultName)), normalizedFormat)
+	}
+	filters := []wailsRuntime.FileFilter{
+		{
+			DisplayName: "Video / Media Files (*.mp4, *.mkv, *.mov, *.webm, *.gif)",
+			Pattern:     "*.mp4;*.mkv;*.mov;*.webm;*.gif",
+		},
+		{
+			DisplayName: "MP4 Video (*.mp4)",
+			Pattern:     "*.mp4",
+		},
+		{
+			DisplayName: "MKV Video (*.mkv)",
+			Pattern:     "*.mkv",
+		},
+		{
+			DisplayName: "QuickTime Movie (*.mov)",
+			Pattern:     "*.mov",
+		},
+		{
+			DisplayName: "WebM Video (*.webm)",
+			Pattern:     "*.webm",
+		},
+		{
+			DisplayName: "Animated GIF (*.gif)",
+			Pattern:     "*.gif",
+		},
+		{
+			DisplayName: "All Files (*.*)",
+			Pattern:     "*.*",
+		},
+	}
+
+	savePath, err := wailsRuntime.SaveFileDialog(a.context, wailsRuntime.SaveDialogOptions{
+		Title:           "Choose Export Output Location",
+		DefaultFilename: defaultName,
+		Filters:         filters,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed opening export save dialog: %w", err)
+	}
+	return savePath, nil
+}
+
 // ImportLocalMedia probes and imports local media files into a project without network copying.
 func (a *App) ImportLocalMedia(projectID string, filePaths []string) []ImportedAssetResult {
 	results := make([]ImportedAssetResult, 0, len(filePaths))

@@ -17,6 +17,45 @@
           />
         </div>
 
+        <!-- Output Destination (Merged Folder + File Name) -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-gray-400">
+              {{ $t('render.output_destination') || 'Output Destination & Filename' }}
+            </label>
+            <span v-if="!renderStore.customOutputPath" class="text-[10px] text-gray-500 font-mono">
+              {{ $t('render.default_location') || 'Default system folder' }}
+            </span>
+            <button
+              v-else
+              type="button"
+              class="text-[10px] text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
+              @click="renderStore.customOutputPath = ''"
+            >
+              {{ $t('render.reset_default') || 'Reset to default' }}
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input
+              v-model="renderStore.customOutputPath"
+              type="text"
+              :placeholder="defaultOutputPathPlaceholder"
+              class="flex-1 min-w-0 bg-gray-900 border border-gray-800 rounded px-2.5 py-1.5 font-mono text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+            />
+            <UButton
+              v-if="isDesktop"
+              size="xs"
+              color="primary"
+              variant="soft"
+              icon="i-heroicons-folder-open"
+              @click="browseOutputPath"
+            >
+              {{ $t('render.browse') || 'Browse...' }}
+            </UButton>
+          </div>
+        </div>
+
         <!-- GPU Acceleration -->
         <div>
           <label class="block text-gray-400 mb-1">{{ $t('render.gpu_acceleration') }}</label>
@@ -242,19 +281,37 @@
 import { useProjectStore } from '~/stores/project'
 import { useRenderStore } from '~/stores/render'
 import { useTimelineStore } from '~/stores/timeline'
+import { useDesktop } from '~/composables/useDesktop'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
 const renderStore = useRenderStore()
 const timelineStore = useTimelineStore()
+const { isDesktop, saveVideoFileDialog } = useDesktop()
 
-const formatOptions = [
-  { label: 'MP4 Video (H.264 / AAC - Standard Web)', value: 'mp4' },
-  { label: 'MKV Video (Matroska High Fidelity)', value: 'mkv' },
-  { label: 'MOV Video (QuickTime ProRes / H.264)', value: 'mov' },
-  { label: 'WebM Video (VP9 / Opus)', value: 'webm' },
-  { label: 'GIF Animation (Palettegen / Loop)', value: 'gif' },
-]
+const defaultOutputPathPlaceholder = computed(() => {
+  const ext = renderStore.selectedFormat || 'mp4'
+  const projName = projectStore.currentProject?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '_') || 'video'
+  return `${projName}.${ext}`
+})
+
+async function browseOutputPath() {
+  const projName = projectStore.currentProject?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '_') || 'composition'
+  const ext = renderStore.selectedFormat || 'mp4'
+  const defaultName = `${projName}.${ext}`
+  const chosenPath = await saveVideoFileDialog(defaultName, ext)
+  if (chosenPath) {
+    renderStore.customOutputPath = chosenPath
+  }
+}
+
+const formatOptions = computed(() => [
+  { label: t('render.formats.mp4'), value: 'mp4' },
+  { label: t('render.formats.mkv'), value: 'mkv' },
+  { label: t('render.formats.mov'), value: 'mov' },
+  { label: t('render.formats.webm'), value: 'webm' },
+  { label: t('render.formats.gif'), value: 'gif' },
+])
 
 const gpuOptions = computed(() => [
   { label: t('render.gpus.none'), value: 'none' },
@@ -264,11 +321,11 @@ const gpuOptions = computed(() => [
   { label: t('render.gpus.vaapi'), value: 'vaapi' },
 ])
 
-const presetOptions = [
-  { label: 'YouTube Standard 1080p 60fps', value: 'youtube_1080p' },
-  { label: 'YouTube 4K Ultra HD 60fps', value: 'youtube_4k' },
-  { label: 'TikTok / Shorts / Reels Vertical 1080p 60fps', value: 'tiktok' },
-]
+const presetOptions = computed(() => [
+  { label: t('render.presets.youtube_1080p'), value: 'youtube_1080p' },
+  { label: t('render.presets.youtube_4k'), value: 'youtube_4k' },
+  { label: t('render.presets.tiktok'), value: 'tiktok' },
+])
 
 const isErrorDetailsOpen = ref(false)
 const isCopied = ref(false)

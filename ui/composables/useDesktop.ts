@@ -22,6 +22,8 @@ export interface ImportedAssetResult {
   error?: string
 }
 
+const cachedServerInfo = ref<DesktopServerInfo | null>(null)
+
 export function useDesktop() {
   const isDesktop = computed(() => {
     if (typeof window === 'undefined') return false
@@ -29,9 +31,14 @@ export function useDesktop() {
   })
 
   async function getServerInfo(): Promise<DesktopServerInfo | null> {
+    if (cachedServerInfo.value) return cachedServerInfo.value
     if (!isDesktop.value) return null
     try {
-      return await (window as any).go.desktop.App.GetServerInfo()
+      const info = await (window as any).go.desktop.App.GetServerInfo()
+      if (info) {
+        cachedServerInfo.value = info
+      }
+      return info
     } catch (err) {
       console.warn('[Desktop] Failed retrieving server info', err)
       return null
@@ -89,6 +96,16 @@ export function useDesktop() {
     }
   }
 
+  async function saveVideoFileDialog(defaultName = 'rendered_composition.mp4', format = 'mp4'): Promise<string> {
+    if (!isDesktop.value) return ''
+    try {
+      return await (window as any).go.desktop.App.SaveVideoFileDialog(defaultName, format)
+    } catch (err) {
+      console.error('[Desktop] Failed opening video save dialog', err)
+      return ''
+    }
+  }
+
   async function importLocalMedia(projectID: string, filePaths: string[]): Promise<ImportedAssetResult[]> {
     if (!isDesktop.value || filePaths.length === 0) return []
     try {
@@ -99,14 +116,34 @@ export function useDesktop() {
     }
   }
 
+  function resolveMediaUrl(source?: string): string {
+    if (!source) return ''
+    if (
+      source.startsWith('http://') ||
+      source.startsWith('https://') ||
+      source.startsWith('data:') ||
+      source.startsWith('blob:')
+    ) {
+      return source
+    }
+    const cleanPath = source.replace(/^\/+/, '')
+    if (isDesktop.value && cachedServerInfo.value?.url) {
+      return `${cachedServerInfo.value.url}/api/media/files/${cleanPath}`
+    }
+    return `/api/media/files/${cleanPath}`
+  }
+
   return {
     isDesktop,
+    cachedServerInfo,
     getServerInfo,
     getSystemCapabilities,
     selectMediaFiles,
     saveProjectFileDialog,
     openProjectFileDialog,
     selectExportDirectory,
+    saveVideoFileDialog,
     importLocalMedia,
+    resolveMediaUrl,
   }
 }

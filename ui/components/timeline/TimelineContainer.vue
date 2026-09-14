@@ -158,7 +158,10 @@
         <TimelineRuler />
 
         <!-- Track Rows Lane Container -->
-        <div class="relative min-w-full flex-1">
+        <div
+          class="relative min-w-full flex-1"
+          :style="{ width: `${timelineStore.timelineDuration * timelineStore.pixelsPerSecond}px` }"
+        >
           <!-- Playhead Needle -->
           <TimelinePlayhead />
 

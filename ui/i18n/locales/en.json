@@ -40,17 +40,31 @@
   },
   "media": {
     "title": "Media Library",
-    "upload": "Upload Media",
-    "dropzone": "Drag & drop video, audio, or image files here, or click to browse",
+    "upload": "Add Media",
+    "search_placeholder": "Search media...",
+    "tree_view": "Tree View (Compact)",
+    "grid_view": "Grid View",
+    "categories": {
+      "video": "Videos",
+      "audio": "Audio & Music",
+      "image": "Images",
+      "subtitle": "Subtitles & Text",
+      "other": "Other Assets"
+    },
+    "dropzone": "Drag & drop files here or click to browse",
     "empty": "No media assets uploaded yet",
+    "no_results": "No media matches your search",
+    "drag_hint": "Drag and drop onto timeline tracks",
     "add_to_timeline": "Add to Timeline",
     "probe_details": "Inspect Metadata",
     "delete": "Delete Asset",
+    "file_name": "File Name",
     "duration": "Duration",
     "resolution": "Resolution",
     "size": "File Size",
     "video_tracks": "Video Streams",
     "audio_tracks": "Audio Channels",
+    "channels": "Audio Channels",
     "fps": "FPS",
     "sample_rate": "Sample Rate"
   },
@@ -269,7 +283,23 @@
   "render": {
     "title": "Render & Export Video",
     "output_format": "Output Container",
+    "output_destination": "Output Destination & Filename (Save As)",
+    "default_location": "Save to default system folder",
+    "reset_default": "Reset to default",
+    "browse": "Browse...",
     "preset": "Platform Encoding Preset",
+    "presets": {
+      "youtube_1080p": "YouTube Standard 1080p 60fps",
+      "youtube_4k": "YouTube 4K Ultra HD 60fps",
+      "tiktok": "TikTok / Shorts / Reels Vertical 1080p 60fps"
+    },
+    "formats": {
+      "mp4": "MP4 Video (H.264 / AAC - Standard Web)",
+      "mkv": "MKV Video (Matroska High Fidelity)",
+      "mov": "MOV Video (QuickTime ProRes / H.264)",
+      "webm": "WebM Video (VP9 / Opus)",
+      "gif": "GIF Animation (Palettegen / Loop)"
+    },
     "gpu_acceleration": "Hardware GPU Accelerator",
     "gpus": {
       "none": "Software Encoder (CPU - libx264)",

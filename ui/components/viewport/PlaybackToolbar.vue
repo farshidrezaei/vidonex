@@ -148,6 +148,7 @@
 <script setup lang="ts">
 import { usePlaybackStore } from '~/stores/playback'
 import { useProjectStore } from '~/stores/project'
+import { useTimelineStore } from '~/stores/timeline'
 import { useViewportZoom } from '~/composables/useViewportZoom'
 
 const emit = defineEmits<{
@@ -156,6 +157,7 @@ const emit = defineEmits<{
 
 const playbackStore = usePlaybackStore()
 const projectStore = useProjectStore()
+const timelineStore = useTimelineStore()
 const {
   zoom,
   zoomDisplay,
@@ -168,7 +170,10 @@ const {
 } = useViewportZoom()
 
 const formattedTime = computed(() => playbackStore.formatTimecode(playbackStore.currentTime, projectStore.frameRate))
-const formattedDuration = computed(() => playbackStore.formatTimecode(playbackStore.duration, projectStore.frameRate))
+const formattedDuration = computed(() => {
+  const dur = timelineStore.contentDuration > 0 ? timelineStore.contentDuration : 0
+  return playbackStore.formatTimecode(dur, projectStore.frameRate)
+})
 
 const zoomMenuItems = computed(() => [
   ZOOM_PRESETS.map((p) => ({

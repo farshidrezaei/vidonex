@@ -85,12 +85,14 @@ import { useProjectStore } from '~/stores/project'
 import { useMediaStore } from '~/stores/media'
 import { useTimelineStore } from '~/stores/timeline'
 import { useWebSocket } from '~/composables/useWebSocket'
+import { useDesktop } from '~/composables/useDesktop'
 import { useGlobalShortcuts, isShortcutsModalOpen } from '~/composables/useGlobalShortcuts'
 
 const { locale } = useI18n()
 const projectStore = useProjectStore()
 const mediaStore = useMediaStore()
 const timelineStore = useTimelineStore()
+const { isDesktop, getServerInfo } = useDesktop()
 const { connect } = useWebSocket()
 const { registerGlobalListeners, unregisterGlobalListeners } = useGlobalShortcuts()
 
@@ -154,8 +156,12 @@ onMounted(async () => {
   // Register global shortcuts capture listener
   registerGlobalListeners()
 
+  if (isDesktop.value) {
+    await getServerInfo()
+  }
+
   // Connect live WebSocket hub
-  connect()
+  await connect()
 
   // Fetch or create initial project
   await projectStore.fetchProjects()

@@ -34,6 +34,7 @@ export const useRenderStore = defineStore('render', () => {
   const selectedGpu = ref('none')
   const selectedCrf = ref(23)
   const selectedBitrate = ref('6000k')
+  const customOutputPath = ref('')
 
   async function startRender(spec: VideoSpec) {
     if (!projectStore.currentProject) return null
@@ -55,6 +56,7 @@ export const useRenderStore = defineStore('render', () => {
           output_format: selectedFormat.value,
           preset: selectedPreset.value,
           hardware_acceleration: selectedGpu.value === 'none' ? undefined : selectedGpu.value,
+          output_path: customOutputPath.value.trim() || undefined,
         },
       })
 
@@ -117,6 +119,7 @@ export const useRenderStore = defineStore('render', () => {
     selectedGpu,
     selectedCrf,
     selectedBitrate,
+    customOutputPath,
     startRender,
     cancelRender,
     handleProgressEvent,

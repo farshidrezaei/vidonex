@@ -1,7 +1,7 @@
 <template>
   <div
     ref="trackRowRef"
-    class="h-14 border-b border-gray-800/80 bg-gray-950/40 relative timeline-subgrid transition-colors"
+    class="h-14 border-b border-gray-800/80 bg-gray-950/40 relative timeline-subgrid transition-colors min-w-full"
     :class="[
       isDragTarget && isCompatibleDrag && !isOverlapping ? 'bg-indigo-950/20' : '',
       isDragTarget && (!isCompatibleDrag || isOverlapping) ? 'bg-red-950/20 cursor-not-allowed' : ''
@@ -45,7 +45,7 @@
         <div class="w-6 h-6 rounded overflow-hidden flex-shrink-0 border border-indigo-300/60 bg-gray-900 shadow-md flex items-center justify-center">
           <img
             v-if="previewThumbnail"
-            :src="`/api/media/files/${previewThumbnail}`"
+            :src="resolveMediaUrl(previewThumbnail)"
             class="w-full h-full object-cover"
             alt=""
           />
@@ -105,10 +105,12 @@
 <script setup lang="ts">
 import { useTimelineStore, isSourceCompatibleWithTrack } from '~/stores/timeline'
 import { usePlaybackStore } from '~/stores/playback'
-import { useMediaStore } from '~/stores/media'
 import { useSnapping } from '~/composables/useSnapping'
+import { useDesktop } from '~/composables/useDesktop'
 import type { TrackSpec, ClipSpec, TransitionSpec } from '~/types/spec'
 import type { MediaAsset } from '~/types/project'
+
+const { resolveMediaUrl } = useDesktop()
 
 const props = defineProps<{
   track: TrackSpec
@@ -180,7 +182,7 @@ const incompatibleErrorMessage = computed(() => {
   return 'Incompatible track type'
 })
 
-const totalTimelineWidth = computed(() => playbackStore.duration * timelineStore.pixelsPerSecond)
+const totalTimelineWidth = computed(() => timelineStore.timelineDuration * timelineStore.pixelsPerSecond)
 
 const adjacentClipPairs = computed(() => {
   const clips = props.track.clips || []

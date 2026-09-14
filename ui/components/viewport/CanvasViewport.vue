@@ -159,12 +159,14 @@ import {
   getTransitionStyleModifiers,
 } from '~/composables/useTransitionPreview'
 import { useTimelineAudio } from '~/composables/useTimelineAudio'
+import { useDesktop } from '~/composables/useDesktop'
 import type { ClipSpec, TrackSpec } from '~/types/spec'
 
 const projectStore = useProjectStore()
 const playbackStore = usePlaybackStore()
 const timelineStore = useTimelineStore()
 const mediaStore = useMediaStore()
+const { resolveMediaUrl } = useDesktop()
 const { startDrag } = useTransformGizmo()
 const {
   zoom,
@@ -405,11 +407,7 @@ function getClipCurrentTime(clip: ClipSpec): number {
 }
 
 function getMediaSourceUrl(source?: string): string {
-  if (!source) return ''
-  if (source.startsWith('http://') || source.startsWith('https://')) {
-    return source
-  }
-  return `/api/media/files/${source}`
+  return resolveMediaUrl(source)
 }
 
 const videoElements = new Map<string, HTMLVideoElement>()

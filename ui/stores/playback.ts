@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 
 export const usePlaybackStore = defineStore('playback', () => {
   const currentTime = ref(0)
-  const duration = ref(30)
+  const duration = ref(120)
+  const contentDuration = ref(0)
   const isPlaying = ref(false)
   const playbackRate = ref(1.0)
   const volume = ref(1.0)
@@ -14,7 +15,8 @@ export const usePlaybackStore = defineStore('playback', () => {
 
   function play() {
     if (isPlaying.value) return
-    if (currentTime.value >= duration.value) {
+    const maxPlayTime = contentDuration.value > 0 ? contentDuration.value : duration.value
+    if (currentTime.value >= maxPlayTime) {
       currentTime.value = 0
     }
     isPlaying.value = true
@@ -66,11 +68,15 @@ export const usePlaybackStore = defineStore('playback', () => {
 
     currentTime.value += deltaTime * playbackRate.value
 
-    if (currentTime.value >= duration.value) {
+    const effectiveEndTime = contentDuration.value > 0 && (currentTime.value - deltaTime * playbackRate.value) < contentDuration.value
+      ? contentDuration.value
+      : duration.value
+
+    if (currentTime.value >= effectiveEndTime) {
       if (isLooping.value) {
         currentTime.value = 0
       } else {
-        currentTime.value = duration.value
+        currentTime.value = effectiveEndTime
         pause()
         return
       }
@@ -94,6 +100,7 @@ export const usePlaybackStore = defineStore('playback', () => {
   return {
     currentTime,
     duration,
+    contentDuration,
     isPlaying,
     playbackRate,
     volume,

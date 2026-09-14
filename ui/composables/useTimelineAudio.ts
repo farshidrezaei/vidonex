@@ -1,5 +1,6 @@
 import { usePlaybackStore } from '~/stores/playback'
 import { useTimelineStore } from '~/stores/timeline'
+import { useDesktop } from '~/composables/useDesktop'
 import type { ClipSpec, TrackSpec } from '~/types/spec'
 
 const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif', 'bmp', 'ico'])
@@ -13,6 +14,7 @@ function isAudioPlayableSource(source?: string): boolean {
 export function useTimelineAudio() {
   const playbackStore = usePlaybackStore()
   const timelineStore = useTimelineStore()
+  const { resolveMediaUrl } = useDesktop()
 
   // Cache of clipId -> HTMLAudioElement
   const audioElementPool = new Map<string, HTMLAudioElement>()
@@ -22,7 +24,7 @@ export function useTimelineAudio() {
       return null
     }
 
-    const expectedSrc = `/api/media/files/${clip.source}`
+    const expectedSrc = resolveMediaUrl(clip.source)
     let audio = audioElementPool.get(clip.id)
 
     if (!audio) {
@@ -31,8 +33,7 @@ export function useTimelineAudio() {
       audioElementPool.set(clip.id, audio)
     } else {
       // Check if source changed
-      const currentSrcUrl = new URL(audio.src, window.location.origin).pathname
-      if (currentSrcUrl !== expectedSrc) {
+      if (audio.src !== expectedSrc) {
         audio.src = expectedSrc
       }
     }

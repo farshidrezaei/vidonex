@@ -117,7 +117,7 @@ export const useTimelineStore = defineStore('timeline', () => {
     return tracks.value.find((track) => track.id === selectedTrackId.value) || null
   })
 
-  // Content duration of all tracks (no artificial floor or padding)
+  // Exact content duration of all tracks (used for export rendering and video duration display)
   const contentDuration = computed(() => {
     let maxTime = 0
     for (const track of tracks.value) {
@@ -132,14 +132,21 @@ export const useTimelineStore = defineStore('timeline', () => {
     return maxTime
   })
 
-  // Synchronize playback duration to exact content duration (or default 5s if empty)
-  watch(contentDuration, (newDuration) => {
-    if (newDuration > 0) {
-      playbackStore.duration = Number(newDuration.toFixed(2))
-    } else {
-      playbackStore.duration = 5.0
-    }
-  }, { immediate: true })
+  // Working timeline workspace duration (includes generous empty runway ahead for drag-and-drop)
+  const timelineDuration = computed(() => {
+    // Keep at least 60s of empty runway past the last clip, and at least 120s minimum total timeline length
+    return Math.max(contentDuration.value + 60, 120)
+  })
+
+  // Synchronize playbackStore duration and contentDuration so the playhead can scrub and seek freely
+  watch(
+    [contentDuration, timelineDuration],
+    ([newContentDuration, newTimelineDuration]) => {
+      playbackStore.contentDuration = Number(newContentDuration.toFixed(2))
+      playbackStore.duration = Number(newTimelineDuration.toFixed(2))
+    },
+    { immediate: true }
+  )
 
   let isInternalLoading = false
   let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null
@@ -492,6 +499,8 @@ export const useTimelineStore = defineStore('timeline', () => {
 
   return {
     tracks,
+    contentDuration,
+    timelineDuration,
     selectedClipId,
     selectedTrackId,
     selectedClip,

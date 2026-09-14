@@ -462,6 +462,26 @@ func (h *Handlers) HandleStartRender(responseWriter http.ResponseWriter, httpReq
 
 	outputFileName := fmt.Sprintf("render_%s%s", jobID, outputExtension)
 	outputFilePath := filepath.Join(h.exportDirectory, outputFileName)
+	downloadURL := fmt.Sprintf("/api/exports/%s", outputFileName)
+
+	if request.OutputPath != "" {
+		customPath := filepath.Clean(request.OutputPath)
+		if !filepath.IsAbs(customPath) {
+			customPath = filepath.Join(h.exportDirectory, customPath)
+		}
+		outputFilePath = customPath
+		outputFileName = filepath.Base(customPath)
+		if parentDir := filepath.Dir(outputFilePath); parentDir != "" {
+			if err := os.MkdirAll(parentDir, 0755); err != nil {
+				h.logger.Error("failed creating output directory", "directory", parentDir, "error", err)
+			}
+		}
+		if strings.HasPrefix(outputFilePath, h.exportDirectory) {
+			downloadURL = fmt.Sprintf("/api/exports/%s", filepath.Base(outputFilePath))
+		} else {
+			downloadURL = fmt.Sprintf("/api/media/files/%s", strings.TrimPrefix(outputFilePath, "/"))
+		}
+	}
 
 	// Resolve media sources in spec to absolute paths
 	for trackIndex := range request.Specification.Tracks {
@@ -565,9 +585,9 @@ func (h *Handlers) HandleStartRender(responseWriter http.ResponseWriter, httpReq
 		h.logger.Info("render job completed successfully", "job_id", jobID, "output_path", renderResult.OutputPath)
 		_ = h.database.CompleteRenderJob(context.Background(), jobID, "completed", "")
 		h.websocketHub.Broadcast("render_complete", map[string]any{
-			"job_id":      jobID,
-			"output_path": outputFileName,
-			"download_url": fmt.Sprintf("/api/exports/%s", outputFileName),
+			"job_id":       jobID,
+			"output_path":  outputFileName,
+			"download_url": downloadURL,
 		})
 	}()
 

@@ -2,6 +2,7 @@ package api_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -168,6 +169,57 @@ func TestAPIEndpoints_Table(t *testing.T) {
 
 		if resp.Format != "mermaid" || len(resp.Content) == 0 {
 			t.Fatalf("unexpected graph response: %+v", resp)
+		}
+	})
+
+	t.Run("Start Render API with Custom OutputPath", func(t *testing.T) {
+		_ = databaseInstance.CreateProject(context.Background(), db.ProjectRecord{
+			ID:              "proj_test_123",
+			Name:            "Test Project",
+			Width:           1280,
+			Height:          720,
+			FrameRate:       30,
+			BackgroundColor: "#000000",
+		})
+		customOutput := filepath.Join(tempDirectory, "custom_export", "my_custom_video.mp4")
+		renderPayload := api.StartRenderRequest{
+			ProjectID: "proj_test_123",
+			Specification: &spec.VideoSpec{
+				Version: "1.0",
+				Canvas: spec.CanvasSpec{
+					Width:  1280,
+					Height: 720,
+				},
+				Tracks: []spec.TrackSpec{
+					{
+						ID:    "video_track_1",
+						Kind:  "video",
+						Clips: []spec.ClipSpec{},
+					},
+				},
+			},
+			OutputFormat: "mp4",
+			OutputPath:   customOutput,
+		}
+		bodyBytes, _ := json.Marshal(renderPayload)
+
+		req := httptest.NewRequest(http.MethodPost, "/api/render/start", bytes.NewReader(bodyBytes))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		apiHandlers.HandleStartRender(rr, req)
+
+		if rr.Code != http.StatusAccepted {
+			t.Fatalf("expected status 202 Accepted, got %d: %s", rr.Code, rr.Body.String())
+		}
+
+		var resp api.StartRenderResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("failed decoding render response: %v", err)
+		}
+
+		if resp.OutputPath != "my_custom_video.mp4" {
+			t.Fatalf("expected OutputPath 'my_custom_video.mp4', got %q", resp.OutputPath)
 		}
 	})
 }

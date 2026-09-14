@@ -59,6 +59,7 @@ type StartRenderRequest struct {
 	OutputFormat         string                     `json:"output_format,omitempty"` // "mp4", "mkv", "mov", "webm", "gif"
 	Preset               string                     `json:"preset,omitempty"`
 	HardwareAcceleration presets.HardwareAccelerator `json:"hardware_acceleration,omitempty"`
+	OutputPath           string                     `json:"output_path,omitempty"`
 }
 
 // StartRenderResponse returns the dispatched job identifier.

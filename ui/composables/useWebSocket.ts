@@ -1,17 +1,29 @@
 import { useRenderStore } from '~/stores/render'
+import { useDesktop } from '~/composables/useDesktop'
 
 export function useWebSocket() {
   const renderStore = useRenderStore()
+  const { isDesktop, getServerInfo } = useDesktop()
   const isConnected = ref(false)
   let socket: WebSocket | null = null
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
 
-  function connect() {
+  async function connect() {
     if (import.meta.server) return
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const host = window.location.host
-    const wsUrl = `${protocol}//${host}/ws`
+    let wsUrl = ''
+    if (isDesktop.value) {
+      const serverInfo = await getServerInfo()
+      if (serverInfo?.ws) {
+        wsUrl = serverInfo.ws
+      }
+    }
+
+    if (!wsUrl) {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const host = window.location.host
+      wsUrl = `${protocol}//${host}/ws`
+    }
 
     try {
       socket = new WebSocket(wsUrl)

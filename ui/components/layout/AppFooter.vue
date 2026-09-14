@@ -73,7 +73,10 @@ const projectStore = useProjectStore()
 const timelineStore = useTimelineStore()
 
 const formattedTime = computed(() => playbackStore.formatTimecode(playbackStore.currentTime, projectStore.frameRate))
-const formattedDuration = computed(() => playbackStore.formatTimecode(playbackStore.duration, projectStore.frameRate))
+const formattedDuration = computed(() => {
+  const dur = timelineStore.contentDuration > 0 ? timelineStore.contentDuration : 0
+  return playbackStore.formatTimecode(dur, projectStore.frameRate)
+})
 
 function zoomIn() {
   timelineStore.pixelsPerSecond = Math.min(200, timelineStore.pixelsPerSecond + 15)

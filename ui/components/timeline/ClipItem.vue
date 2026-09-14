@@ -132,6 +132,7 @@ import { useTimelineStore } from '~/stores/timeline'
 import { usePlaybackStore } from '~/stores/playback'
 import { useMediaStore } from '~/stores/media'
 import { useSnapping } from '~/composables/useSnapping'
+import { useDesktop } from '~/composables/useDesktop'
 import type { ClipSpec, TrackKind } from '~/types/spec'
 
 const props = defineProps<{
@@ -144,6 +145,7 @@ const timelineStore = useTimelineStore()
 const playbackStore = usePlaybackStore()
 const mediaStore = useMediaStore()
 const { snapTime } = useSnapping()
+const { resolveMediaUrl } = useDesktop()
 
 const isTrimming = ref(false)
 
@@ -173,8 +175,7 @@ const nativeDuration = computed(() => {
 const thumbnailUrl = computed(() => {
   const rawPath = matchedAsset.value?.thumbnail_path || props.clip.source
   if (!rawPath) return null
-  if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) return rawPath
-  return `/api/media/files/${rawPath.replace(/^\/+/, '')}`
+  return resolveMediaUrl(rawPath)
 })
 
 const clipStyle = computed(() => {
