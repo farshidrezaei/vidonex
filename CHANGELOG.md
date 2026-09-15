@@ -9,9 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for v1.3.0
-- **Modern Codec Profiles**: Turnkey export profiles for AV1 (`libsvtav1`), Apple ProRes 4444 (with alpha transparency), WebM (VP9/Opus), and 2-Pass GIF.
-- **WebAssembly (WASM) Pipeline**: Standalone Go WASM build target (`vidonex.wasm`) for in-browser timeline compilation, DAG generation, and Mermaid preview.
+### Planned for v1.4.0
+- **Interactive OpenAPI & Scalar Documentation (`/docs`)**: Embedded interactive REST sandbox directly in `vidonex serve`.
+- **Compiler Performance Benchmark Suite**: Memory allocation and throughput benchmark tests comparing Go DAG compiler against industry alternatives.
+- **GitHub Action Workflow (`farshidrezaei/vidonex-action`)**: Reusable CI action for automated video composition and changelog renders.
+- **DevContainer Environment**: Turnkey containerized workspace with Go, Node, Wails, and FFmpeg pre-configured.
+
+---
+
+## [1.3.0] - 2026-09-15
+
+### Next-Gen Codecs & WebAssembly Browser Engine Release 🌐
+
+Vidonex v1.3.0 introduces production export profiles for next-generation video formats (AV1, ProRes 4444 with Alpha, WebM) and compiles the core declarative composition engine into WebAssembly (`vidonex.wasm`) for pure client-side execution in web browsers.
+
+### Added
+
+#### 🎞️ Next-Generation Video Codec Profiles (`presets/codecs.go`)
+- **`ProfileAV1()`**: Turnkey SVT-AV1 (`libsvtav1`) encoding configuration featuring 10-bit color (`yuv420p10le`), Opus audio, and tune flags delivering 35% higher compression than H.264/HEVC.
+- **`ProfileProRes4444()`**: Apple ProRes 4444 configuration with 10-bit color and alpha channel preservation (`yuva444p10le`) for visual effects workflows and transparent overlays.
+- **`ProfileProRes422HQ()`**: Apple ProRes 422 HQ broadcast mastering preset with uncompressed 24-bit PCM audio.
+- **`ProfileWebMVP9()` & `ProfileWebMAlpha()`**: High-compatibility open web delivery presets supporting standard video and transparent overlay alphas.
+- Table-driven unit test suite in [`presets/codecs_test.go`](file:///home/farshid/Desktop/projects/vidonyx/presets/codecs_test.go).
+
+#### 🌐 WebAssembly (WASM) In-Browser Pipeline (`cmd/wasm/main.go`)
+- **Standalone Go WebAssembly Engine**: Compiled with `GOOS=js GOARCH=wasm` into a 5.2MB self-contained WebAssembly binary (`ui/public/vidonex.wasm`).
+- Exposes `globalThis.vidonex` to JavaScript:
+  - `vidonex.validate(specString)`: Performs full AST validation and returns `{ valid, duration, tracks, error }`.
+  - `vidonex.compile(specString, outputPath)`: Generates the full FFmpeg filter complex, CLI arguments, and execution commands with zero server roundtrips.
+  - `vidonex.mermaid(specString)`: Generates real-time Mermaid.js DAG flowchart code directly in-browser.
+  - `vidonex.version()`: Returns engine version string (`"1.3.0"`).
+- **Nuxt Composable (`useWasmCompiler.ts`)**: Reactive WebAssembly loader and typed bridge for client-side timeline compilation.
+- **Build Target**: Added `make wasm` to the root [`Makefile`](file:///home/farshid/Desktop/projects/vidonyx/Makefile).
 
 ---
 

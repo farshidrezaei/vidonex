@@ -116,6 +116,14 @@ cli: ## Compile the Vidonex standalone CLI binary (bin/vidonex)
 	@go build -trimpath -ldflags="$(GO_LDFLAGS)" -o $(CLI_BINARY) ./cmd/vidonex
 	@printf "$(GREEN)✅ CLI binary compiled: $(BOLD)%s$(RESET)\n" "$(CLI_BINARY)"
 
+.PHONY: wasm
+wasm: ## Compile the Go engine to WebAssembly (ui/public/vidonex.wasm)
+	@printf "$(CYAN)🌐 Compiling Vidonex engine to WebAssembly...$(RESET)\n"
+	@mkdir -p ui/public
+	@GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o ui/public/vidonex.wasm ./cmd/wasm
+	@cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" ui/public/wasm_exec.js 2>/dev/null || cp "$$(go env GOROOT)/misc/wasm/wasm_exec.js" ui/public/wasm_exec.js 2>/dev/null || true
+	@printf "$(GREEN)✅ WebAssembly binary compiled: $(BOLD)ui/public/vidonex.wasm$(RESET) (%s)\n" "$$(du -h ui/public/vidonex.wasm | cut -f1)"
+
 # ─── Runtime & Execution ──────────────────────────────────────────────────────
 .PHONY: serve
 serve: cli ## Start the embedded HTTP/WebSocket server and serve Web Studio
