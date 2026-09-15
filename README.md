@@ -38,7 +38,7 @@
 </p>
 
 <p align="center">
-  <img src=".github/assets/studio-preview.png" width="940" alt="Vidonex Studio Workstation Preview" />
+  <img src=".github/assets/vidonex-studio-demo.gif" width="940" alt="Vidonex Studio Workstation Live Demo" />
 </p>
 
 ---

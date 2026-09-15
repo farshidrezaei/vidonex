@@ -58,12 +58,14 @@ coverage.txt
 *.srt
 *.vtt
 
-# Exclude generated/test pngs but keep repository assets
+# Exclude generated/test pngs and gifs but keep repository assets
 *.png
 !/.github/assets/**
 !/build/**/*.png
 !/build/appicon.png
 !/ui/public/**/*.png
+!/docs/public/**
+!/.github/assets/*.gif
 
 # ── Demo project ──
 demo_project/

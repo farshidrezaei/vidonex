@@ -4,6 +4,10 @@
 
 It provides the fluid tactile experience of Premiere Pro and CapCut without the memory overhead and lag of Electron-based apps.
 
+<p align="center" style="margin-top: 1.5rem; margin-bottom: 2rem;">
+  <img src="/vidonex-studio-demo.gif" alt="Vidonex Studio Live Demo" style="border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); max-width: 100%;" />
+</p>
+
 ---
 
 ## Workspace Layout

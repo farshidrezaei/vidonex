@@ -43,6 +43,10 @@ features:
     details: Native one-flag auto-detection for NVIDIA NVENC, Apple VideoToolbox, Intel QSV, and VAAPI.
 ---
 
+<p align="center" style="margin-top: 2rem; margin-bottom: 2rem;">
+  <img src="/vidonex-studio-demo.gif" alt="Vidonex Studio Demo" style="border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04); max-width: 100%;" />
+</p>
+
 ## 🚀 Quick Example
 
 Compose and render a multi-layered video with picture-in-picture in pure Go:
