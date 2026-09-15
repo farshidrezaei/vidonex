@@ -16,8 +16,51 @@ export function useTimelineAudio() {
   const timelineStore = useTimelineStore()
   const { resolveMediaUrl } = useDesktop()
 
-  // Cache of clipId -> HTMLAudioElement
-  const audioElementPool = new Map<string, HTMLAudioElement>()
+  // Web Audio Context for unlocking autoplay policy on first user interaction
+  let audioContext: AudioContext | null = null
+  let isUnlocked = false
+
+  function unlockAudio() {
+    if (isUnlocked && audioContext && audioContext.state === 'running') return
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+      if (AudioCtx) {
+        if (!audioContext) {
+          audioContext = new AudioCtx()
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume().catch(() => {})
+        }
+      }
+      // Play and immediately pause any dormant elements to acquire user-gesture blessing
+      for (const audio of audioElementPool.values()) {
+        const promise = audio.play()
+        if (promise !== undefined) {
+          promise.then(() => {
+            if (!playbackStore.isPlaying) {
+              audio.pause()
+            }
+          }).catch(() => {})
+        }
+      }
+      isUnlocked = true
+    } catch {
+      // Audio context unlock failure ignored
+    }
+  }
+
+  // Bind global user gesture unlockers
+  if (typeof window !== 'undefined') {
+    const handleGesture = () => {
+      unlockAudio()
+      window.removeEventListener('click', handleGesture)
+      window.removeEventListener('keydown', handleGesture)
+      window.removeEventListener('touchstart', handleGesture)
+    }
+    window.addEventListener('click', handleGesture, { passive: true, once: true })
+    window.addEventListener('keydown', handleGesture, { passive: true, once: true })
+    window.addEventListener('touchstart', handleGesture, { passive: true, once: true })
+  }
 
   function getOrCreateAudio(clip: ClipSpec): HTMLAudioElement | null {
     if (!isAudioPlayableSource(clip.source)) {
@@ -25,15 +68,18 @@ export function useTimelineAudio() {
     }
 
     const expectedSrc = resolveMediaUrl(clip.source)
+    if (!expectedSrc) return null
+
     let audio = audioElementPool.get(clip.id)
 
     if (!audio) {
-      audio = new Audio(expectedSrc)
+      audio = new Audio()
       audio.preload = 'auto'
+      audio.crossOrigin = 'anonymous'
+      audio.src = expectedSrc
       audioElementPool.set(clip.id, audio)
     } else {
-      // Check if source changed
-      if (audio.src !== expectedSrc) {
+      if (audio.src !== expectedSrc && !audio.src.endsWith(expectedSrc)) {
         audio.src = expectedSrc
       }
     }
@@ -64,9 +110,9 @@ export function useTimelineAudio() {
     // Collect all clips that can emit audio
     const activeClipIds = new Set<string>()
 
-    // Retain only audio tracks and unmuted video tracks
+    // Retain audio tracks, waveform tracks, and unmuted video tracks
     for (const track of timelineStore.tracks) {
-      if (track.kind !== 'audio' && track.kind !== 'video') continue
+      if (track.kind !== 'audio' && track.kind !== 'video' && track.kind !== 'waveform') continue
       if (track.muted) continue
 
       const trackVolume = track.volume ?? 1.0
@@ -108,21 +154,23 @@ export function useTimelineAudio() {
           audio.playbackRate = Math.max(0.25, Math.min(4.0, speed * playbackStore.playbackRate))
 
           if (isPlaying) {
-            // Check drift against target time
+            // Only seek if audio is paused or drifting by more than 0.35s to prevent continuous stutter
             const drift = Math.abs(audio.currentTime - targetAudioTime)
-            if (audio.paused || drift > 0.15) {
+            if (audio.paused || drift > 0.35) {
               audio.currentTime = targetAudioTime
             }
             if (audio.paused) {
-              audio.play().catch(() => {
-                // Autoplay policy or media abort ignored
-              })
+              const playPromise = audio.play()
+              if (playPromise !== undefined) {
+                playPromise.catch((err) => {
+                  console.warn('[useTimelineAudio] Playback interrupted or blocked:', err)
+                })
+              }
             }
           } else {
             if (!audio.paused) {
               audio.pause()
             }
-            // Sync playhead scrubbing while paused
             if (Math.abs(audio.currentTime - targetAudioTime) > 0.05) {
               audio.currentTime = targetAudioTime
             }

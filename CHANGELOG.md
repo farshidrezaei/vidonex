@@ -30,13 +30,44 @@ Vidonex v1.5.0 delivers a major feature release focused on professional non-line
   - Dedicated "Crop" toggle button in timeline toolbar next to Split and Duplicate tools.
   - Floating action pill showing live percentage readouts, Reset, and Done buttons.
 
-#### 🎛️ Pro Color & Light Adjustments (`ui/components/panels/ColorAdjustmentInspector.vue`)
-- **Inspector Controls**:
-  - Real-time sliders for Brightness (-100% to +100%), Contrast (-100% to +100%), Saturation (-100% to +100%), Gamma (0.1 to 3.0), Temperature (-100 to +100 Kelvin bias), and Tint (-100 to +100 Magenta/Green bias).
-  - Instant Reset button to revert all adjustments to default neutral values.
-- **Live Canvas Preview & FFmpeg Compiler Integration**:
-  - Mapped adjustments to live CSS `filter` in `ui/components/viewport/CanvasViewport.vue` during playback.
-  - Integrated `ColorGradingFilter` and `LUT3DFilter` in `compiler/planner.go` (`ProcessClipVideo`), compiling directly to FFmpeg `colorbalance` / `eq` filter nodes.
+#### 🎛️ Pro Color & Light Adjustments & Centered Sliders (`ui/components/panels/ColorAdjustmentInspector.vue`)
+- **Centered-Zero Bipolar Sliders**:
+  - Re-architected all bipolar adjustment controls (Brightness, Contrast, Highlights, Shadows, Whites, Blacks, Saturation, Gamma, Temperature, Tint) with symmetric `-100` to `+100` ranges and visual center markers where neutral `0` is physically aligned at exactly 50% across all sliders.
+  - Dynamic dual-direction fill bars radiating from the center mark (left for negative values, right for positive values) with double-click reset to neutral.
+- **Extended Adjustment Filters (`effects/color.go`, `compiler/planner.go`, `timeline/clip.go`, `spec/`)**:
+  - Added Gaussian `Blur` (`gblur` filter) and Edge `Sharpen` (`unsharp` filter) controls (0 to 100).
+  - Added `Highlights`, `Shadows`, `Whites`, and `Blacks` dynamic tone controls mapped to FFmpeg `colorbalance` and live canvas CSS simulation.
+
+#### 🌊 Modern Multi-Mode Audio Waveform Suite & On-Canvas Gizmo
+- **5 High-Impact Visualizer Modes**:
+  - `peak_to_peak`: Mirrored vertical bars with capsule rounding and dual-color gradients.
+  - `spectrum`: Bottom-aligned frequency spectrum with floating glowing peak caps.
+  - `wave`: Smooth neon oscilloscope curve with glow blur and subtle area fill.
+  - `circular`: Radial podcast audiogram with inner avatar hole and pulsing frequency rays.
+  - `dots`: Modern matrix particle dots with dynamic beat scaling.
+- **On-Canvas Direct Manipulation Gizmo (`ui/components/viewport/ViewportWaveformVisualizer.vue`)**:
+  - Click-to-select waveform directly on the preview stage.
+  - 8-handle bounding box for intuitive real-time width and height resizing.
+  - Interactive drag-to-reposition with magnetic smart guidelines snapping to center and margins.
+- **Advanced Inspector Controls (`ui/components/panels/WaveformInspector.vue`)**:
+  - One-click style presets: *Cyberpunk Neon*, *Podcast Minimal*, *Studio Retro*, and *Spotify Radial*.
+  - Dual-color gradient picker (Primary & Secondary colors).
+  - Fine-tuning subpanels for bar density, corner roundness, neon glow radius, line width, and inner radius.
+- **Go Engine & Backend Tests (`waveform/waveform.go`, `waveform/waveform_test.go`)**:
+  - Extended `waveform.Options` with `SecondaryColor`, `Density`, `Roundness`, `Glow`, and modern mode normalization.
+  - Table-driven unit test suite (`TestApplyWaveformVisualizerTable`) covering all 7 operational scenarios and mode mappings with 100% pass rate.
+
+#### 🎬 Comprehensive Transition Simulation Engine (`ui/composables/useTransitionPreview.ts`)
+- Implemented realistic CSS transform, clip-path, and opacity simulations for all FFmpeg xfade transition types:
+  - `zoomin` (incoming clip scales up from center into view) and `zoomout` (outgoing clip scales down into distance).
+  - `slideup` and `slidedown` with true vertical translation.
+  - `smoothleft`, `smoothright`, `smoothup`, and `smoothdown` with sinusoidal ease curves.
+  - `circleclose` (closing iris transition).
+  - `rectcrop` (expanding/contracting rectangular mask).
+  - `horzopen` / `horzclose` and `vertopen` / `vertclose` split curtains.
+  - `wipetl`, `wipetr`, `wipebl`, `wipebr` corner wipes.
+  - `squeezeh` and `squeezev` squeeze transitions.
+  - `fadeblack`, `fadewhite`, and `fadegrays` dip transitions.
 
 #### 🔄 Categorized Transitions & Instant Search (`ui/components/timeline/TransitionHandle.vue`)
 - **Organized Category Tabs**:
