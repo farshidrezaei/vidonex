@@ -93,43 +93,43 @@
         <!-- Center Vertical Line (X = 0) -->
         <div
           v-if="showGuideCenterX"
-          class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-0.5 bg-cyan-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(34,211,238,0.9)] animate-pulse"
+          class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-0.5 bg-cyan-400 z-[9990] pointer-events-none shadow-[0_0_10px_rgba(34,211,238,0.9)] animate-pulse"
         ></div>
 
         <!-- Center Horizontal Line (Y = 0) -->
         <div
           v-if="showGuideCenterY"
-          class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-cyan-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(34,211,238,0.9)] animate-pulse"
+          class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-cyan-400 z-[9990] pointer-events-none shadow-[0_0_10px_rgba(34,211,238,0.9)] animate-pulse"
         ></div>
 
         <!-- Center Pivot Magnet Crosshair Dot -->
         <div
           v-if="showGuideCenterX && showGuideCenterY"
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white ring-4 ring-cyan-400/60 z-30 pointer-events-none shadow-[0_0_15px_rgba(34,211,238,1)] animate-ping"
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white ring-4 ring-cyan-400/60 z-[9995] pointer-events-none shadow-[0_0_15px_rgba(34,211,238,1)] animate-ping"
         ></div>
 
         <!-- Left Canvas Border -->
         <div
           v-if="showGuideLeft"
-          class="absolute top-0 bottom-0 left-0 w-1 bg-indigo-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
+          class="absolute top-0 bottom-0 left-0 w-1 bg-indigo-400 z-[9990] pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
         ></div>
 
         <!-- Right Canvas Border -->
         <div
           v-if="showGuideRight"
-          class="absolute top-0 bottom-0 right-0 w-1 bg-indigo-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
+          class="absolute top-0 bottom-0 right-0 w-1 bg-indigo-400 z-[9990] pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
         ></div>
 
         <!-- Top Canvas Border -->
         <div
           v-if="showGuideTop"
-          class="absolute left-0 right-0 top-0 h-1 bg-indigo-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
+          class="absolute left-0 right-0 top-0 h-1 bg-indigo-400 z-[9990] pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
         ></div>
 
         <!-- Bottom Canvas Border -->
         <div
           v-if="showGuideBottom"
-          class="absolute left-0 right-0 bottom-0 h-1 bg-indigo-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
+          class="absolute left-0 right-0 bottom-0 h-1 bg-indigo-400 z-[9990] pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
         ></div>
 
         <!-- Transform & Crop Gizmo Overlays -->

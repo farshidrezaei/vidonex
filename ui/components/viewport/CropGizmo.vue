@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="selectedClip"
-    class="absolute pointer-events-auto border-2 border-dashed border-amber-400 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.3)] select-none z-30"
+    class="absolute pointer-events-auto border-2 border-dashed border-amber-400 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.3)] select-none z-[9999]"
     :style="cropGizmoStyle"
   >
     <!-- Crop Dimmed Inset Mask Visualizer -->

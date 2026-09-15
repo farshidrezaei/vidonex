@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="selectedClip"
-    class="absolute pointer-events-auto border-2 border-indigo-500 bg-indigo-500/5 hover:bg-indigo-500/10 cursor-move transition-shadow shadow-lg shadow-indigo-500/30 select-none"
+    class="absolute pointer-events-auto border-2 border-indigo-500 bg-indigo-500/5 hover:bg-indigo-500/10 cursor-move transition-shadow shadow-lg shadow-indigo-500/30 select-none z-[9999]"
     :style="gizmoStyle"
     @mousedown.stop.prevent="handleDrag"
   >
