@@ -6,13 +6,26 @@ This project strictly adheres to [Semantic Versioning](https://semver.org/spec/v
 
 ---
 
-## [Unreleased] <Badge text="In Development" type="warning" />
+## [v1.6.0] - 2026-09-16 <Badge text="Latest Stable" type="tip" />
 
-### Roadmap for v1.1.0
-- **Direct Viewport Acceleration**: Embedded MPV / OpenGL surface rendering for real-time 4K60 video playback.
-- **WebAssembly (Wasm) In-Browser Pipeline**: Pure client-side timeline composition without needing a local server.
-- **Multicam Switcher**: Synchronized multi-angle camera switching for podcasts and studio interviews.
-- **LUT & 3D Color Grading Engine**: Import `.cube` 3D LUTs with real-time lift/gamma/gain wheels.
+### 38 Real-Time Viewport Transitions, Advanced Audio Waveforms & Stacking Isolation 🌊✨
+
+Vidonex v1.6.0 brings high-fidelity visual parity and studio-grade media tools across both desktop workstation and headless CLI automation:
+
+::: tip 🎬 38 Real-Time Viewport Transitions
+- **Full FFmpeg xfade Parity**: Live CSS `clip-path` & matrix simulations for all 38 transition types directly inside the viewport player.
+- **Sub-frame Timing**: Centered cut-boundary interpolation ensuring 100% frame synchronization with rendered MP4 files.
+:::
+
+::: tip 🎙️ Advanced Multi-Mode Audio Waveforms
+- **8 Animated Visual Modes**: Peak-to-Peak (`p2p`), Line, Centered Line, Dots, Rounded Bars, Frequency Spectrum, Classic Wave, and Circular/Radial.
+- **Direct Canvas Manipulation**: Reposition and scale waveforms interactively in the viewport with live neon glow and custom color gradients.
+:::
+
+::: tip 🛡️ Layer Stacking & Overlay Isolation
+- **Intra-Track Isolation**: Prevents transition animations on lower tracks from bleeding over upper overlay and logo tracks.
+- **Top-Tier Control Gizmos**: Transform and crop handles maintain priority (`z-[9999]`) above all media content.
+:::
 
 ---
 

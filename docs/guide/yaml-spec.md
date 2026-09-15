@@ -81,16 +81,28 @@ tracks:
 
 ### Track Kinds
 - `video`: Primary video layer (normalized to canvas size).
-- `overlay`: Picture-in-picture or transparent graphics layer.
+- `overlay`: Picture-in-picture, logos, or transparent graphics layer.
 - `audio`: Background music, sound effects, or voiceover.
 - `subtitle`: Burned-in caption tracks.
+- `waveform`: Dynamic animated audiogram visualizer generated from audio source.
+
+### Track Properties
+- `id` *(string)*: Unique identifier for the track layer.
+- `kind` *(string)*: One of `video`, `audio`, `overlay`, `subtitle`, `waveform`.
+- `z_index` *(integer, optional)*: Explicit stacking layer priority (defaults to track order).
+- `muted` *(boolean, optional)*: Mutes audio output for this track.
+- `duck_under` *(string, optional)*: Target voice track ID for sidechain compression.
+- `waveform` *(object, optional)*: Configuration for waveform visualization (`source_audio`, `mode`, `color`, `secondary_color`, `scale`, `density`, `glow`).
 
 ### Clip Properties
 - `source` *(string)*: Relative or absolute path to media asset.
-- `offset` *(duration)*: Placement time on timeline (e.g. `2s`, `500ms`).
+- `start` / `offset` *(duration)*: Placement time on timeline (e.g. `2s`, `500ms`).
 - `duration` *(duration)*: Duration to render on timeline.
 - `trim_start` *(duration)*: Internal source trim offset.
 - `scale` *(float)*: Size scaling multiplier (default: `1.0`).
-- `position` *({ x, y })*: Canvas pixel coordinates.
+- `position` *({ x, y, alignment })*: Canvas pixel coordinates and optional alignment anchor.
 - `opacity` *(float)*: Alpha transparency `0.0` to `1.0`.
 - `volume` *(float)*: Audio volume multiplier (`1.0` = 100%).
+- `crop` *({ top, bottom, left, right })*: Percentage insets for rectangular cropping.
+- `color_grading` *({ brightness, contrast, saturation, temperature, tint, blur, sharpen, highlights, shadows })*: Color grading and sharpening parameters.
+- `blend_mode` *(string)*: Blend mode: `normal`, `multiply`, `screen`, `overlay`, `add`, `darken`, `lighten`, `difference`.

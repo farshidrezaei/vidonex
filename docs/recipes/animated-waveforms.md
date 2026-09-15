@@ -43,3 +43,39 @@ func main() {
 	_, _ = c.Render(context.Background(), tl, "audiogram.mp4", nil)
 }
 ```
+
+---
+
+## Declarative YAML & CLI Automation
+
+You can also define audiograms declaratively and render directly via the `vidonex` CLI:
+
+```yaml
+version: "1.0"
+canvas:
+  preset: "square_1080"
+tracks:
+  - id: "voice_track"
+    kind: "audio"
+    clips:
+      - id: "podcast_audio"
+        source: "assets/podcast.mp3"
+        duration: 30s
+
+  - id: "audiogram_track"
+    kind: "waveform"
+    z_index: 2
+    waveform:
+      source_audio: "voice_track"
+      mode: "p2p" # p2p, line, cline, dot, bars, spectrum, wave, circular
+      color: "#00FFCC"
+      secondary_color: "#6366F1"
+      scale: "log"
+      density: 50
+      glow: true
+```
+
+Render with CLI:
+```bash
+vidonex render audiogram.yaml -o audiogram.mp4
+```

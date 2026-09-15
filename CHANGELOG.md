@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0] - 2026-09-16
+
+### 38 Real-Time Viewport Transitions, Advanced Multi-Mode Audio Waveforms, Color Adjustment Filters & Multi-Track Stacking Isolation 🌊✨
+
+Vidonex v1.6.0 introduces real-time viewport simulation for all 38 video transitions, an overhaul of the animated audio waveform engine with interactive on-canvas positioning and multiple rendering modes, expanded color adjustment filters (Gaussian Blur, Edge Sharpening, Highlights/Shadows/Whites/Blacks tonal controls), multi-track audio autoplay unlocking with drift smoothing, and a rock-solid track stacking isolation architecture ensuring overlays, watermarks, and logos remain strictly on top during transitions.
+
+### Added
+
+#### 🎬 38 Real-Time Video Transitions (`ui/composables/useTransitionPreview.ts`, `compiler/`)
+- **Full Viewport Preview Coverage**:
+  - Implemented real-time CSS `clip-path` and WebGL/transform simulations for all 38 FFmpeg `xfade` transition types (Dissolve, Fade, Wipe Left/Right/Up/Down, Slide Left/Right/Up/Down, Smooth Left/Right/Up/Down, Circle Open/Close, Rect Crop, Radial, Pixelize, Zoom In, Squeeze Horizontal/Vertical, Wipe Top-Left/Top-Right/Bottom-Left/Bottom-Right, Fade Black/White, and more).
+  - Centered cut boundary interpolation window `[cutTime - duration/2, cutTime + duration/2]` matching exact FFmpeg `xfade` timeline alignment.
+  - Symmetrical transition durations and curves with seamless visual parity between live canvas playback and final exported MP4 renders.
+
+#### 🎙️ Advanced Customizable Audio Waveforms (`waveform/`, `ui/components/viewport/ViewportWaveformVisualizer.vue`, `spec/`)
+- **Multi-Mode Waveform Generation**:
+  - Implemented multiple visual modes: Peak-to-Peak (`p2p`), Line (`line`), Centered Line (`cline`), Dot (`dot`), Rounded Bars (`bars`), Frequency Spectrum (`spectrum`), Classic Wave (`wave`), and Circular/Radial (`circular`).
+  - Direct canvas manipulation: drag to reposition, resize with bounding box handles, and live preview of animated audiograms.
+  - Configurable parameters: bar density, roundness, line width, outer/inner radius, primary and secondary neon colors, glow radius, and opacity.
+  - Declarative YAML/JSON specification support via `waveform` track properties, fully integrated with CLI batch rendering.
+
+#### 🎨 Color & Tone Adjustment Filters (`effects/color.go`, `compiler/planner.go`, `spec/model.go`)
+- **Expanded Tone Controls**:
+  - Added Gaussian Blur (`gblur`) with configurable sigma radius.
+  - Added Edge Sharpening (`unsharp`) with dynamic contrast thresholding.
+  - Added Highlights, Shadows, Whites, and Blacks tone curve remapping.
+  - Declarative specification fields in `ClipSpec.color_grading` supported across CLI, YAML/JSON, and Go SDK.
+
+### Fixed
+
+#### 🛡️ Track Stacking Hierarchy & Overlay Isolation During Transitions (`ui/components/viewport/`)
+- **Track-Isolated Z-Index Engine**:
+  - Isolated track layer index space with 100-integer slot allocations per track (`BaseZIndex = (LayerIndex + 1) * 100`).
+  - Restricted transition `zIndexExtra` (+5) to intra-track scope, preventing transition animations on lower video tracks from ever bleeding over upper tracks (e.g. logos, PiP overlays, watermarks, and graphics).
+  - Ensured interactive transform and crop gizmos (`ViewportTransformGizmo`, `ViewportCropGizmo`) and alignment guidelines maintain top-level priority (`z-[9999]`) above all media content.
+
+#### 🔊 Audio Playback & Synchronization Engine (`ui/composables/useTimelineAudio.ts`)
+- **Autoplay Unlocker & Drift Compensation**:
+  - Added automatic audio context unlocker on first user gesture.
+  - Implemented progressive drift smoothing to prevent audio-video desynchronization during rapid scrubbing or timeline seeks.
+
+---
+
 ## [1.5.0] - 2026-09-15
 
 ### Visual Studio Suite: Interactive Canvas Crop, Pro Color Grading, Categorized Transitions, Project Switcher & Deletion Protection 🎨🎬
