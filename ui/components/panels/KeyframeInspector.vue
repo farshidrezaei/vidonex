@@ -46,6 +46,9 @@
           @change="updateKenBurns"
         />
       </div>
+
+      <!-- Visual Bezier Curve Editor -->
+      <PanelsCurveEditor :easing="easing" />
     </div>
   </div>
 </template>

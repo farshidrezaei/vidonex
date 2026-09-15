@@ -260,7 +260,9 @@
         "easeOutQuad": "پایان نرم (Ease Out Quad)",
         "easeInOutQuad": "شروع و پایان نرم (Ease In/Out Quad)",
         "easeInOutCubic": "منحنی درجه سه (Ease In/Out Cubic)"
-      }
+      },
+      "curve_preview": "نمودار گرافیکی منحنی نرمی",
+      "test_curve": "پیش‌نمایش حرکت منحنی"
     },
     "keyframes": {
       "title": "انیمیشن و کین‌برنز",
@@ -337,5 +339,30 @@
     "copied": "کپی شد!",
     "export_svg": "خروجی گرفتن تصویر SVG",
     "refresh": "بروزرسانی"
+  },
+  "command_palette": {
+    "button": "دستورات سریع",
+    "placeholder": "دستور، ابزار یا عملیات مورد نظر را جستجو کنید...",
+    "groups": {
+      "editing": "ویرایش تایم‌لاین",
+      "tracks": "مدیریت لاین‌ها و ترک‌ها",
+      "aspect_ratio": "نسبت ابعاد بوم",
+      "playback": "پخش و ناوبری بوم",
+      "project": "پروژه و پنجره‌ها"
+    },
+    "actions": {
+      "split_clip": "برش کلیپ در محل پلی‌هد (Split)",
+      "split_clip_desc": "قیچی زدن کلیپ انتخاب شده در زمان جاری",
+      "duplicate_clip": "تکرار و کپی کلیپ (Duplicate)",
+      "duplicate_clip_desc": "تکثیر کلیپ انتخاب شده روی لاین",
+      "delete_clip": "حذف کلیپ انتخابی",
+      "delete_clip_desc": "پاک کردن کلیپ از تایم‌لاین",
+      "undo_desc": "بازگردانی آخرین تغییرات",
+      "redo_desc": "اعمال مجدد تغییرات واگرد شده",
+      "toggle_snapping": "تغییر حالت چسبندگی مگنتی",
+      "add_video_track": "افزودن لاین ویدیو",
+      "add_audio_track": "افزودن لاین صدا / موسیقی",
+      "add_waveform_track": "افزودن لاین ویژوالایزر صوتی"
+    }
   }
 }

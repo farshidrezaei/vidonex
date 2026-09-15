@@ -95,6 +95,9 @@
         />
       </div>
 
+      <!-- Live Stereo Audio Peak / VU Meter -->
+      <ViewportAudioPeakMeter class="hidden sm:flex" />
+
       <!-- Divider -->
       <div class="h-4 w-px bg-gray-800"></div>
 

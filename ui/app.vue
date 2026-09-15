@@ -75,6 +75,7 @@
       <PanelsRenderExportModal />
       <PanelsProbeDetailsModal />
       <PanelsKeyboardShortcutsModal v-model="isShortcutsModalOpen" />
+      <PanelsCommandPaletteModal />
     </div>
   </UApp>
 </template>

@@ -3,6 +3,7 @@ import { usePlaybackStore } from '~/stores/playback'
 import { useProjectStore } from '~/stores/project'
 
 export const isShortcutsModalOpen = ref(false)
+export const isCommandPaletteOpen = ref(false)
 
 export function useGlobalShortcuts() {
   const timelineStore = useTimelineStore()
@@ -24,6 +25,14 @@ export function useGlobalShortcuts() {
     const isCtrlOrCmd = event.ctrlKey || event.metaKey
     const code = event.code
     const key = event.key ? event.key.toLowerCase() : ''
+
+    // 0. Command Palette: Ctrl+K / Cmd+K
+    if (isCtrlOrCmd && (code === 'KeyK' || key === 'k' || key === 'ن')) {
+      event.preventDefault()
+      event.stopPropagation()
+      isCommandPaletteOpen.value = !isCommandPaletteOpen.value
+      return
+    }
 
     // 1. Undo: Ctrl+Z / Cmd+Z (without Shift)
     if (isCtrlOrCmd && (code === 'KeyZ' || key === 'z' || key === 'ظ') && !event.shiftKey) {

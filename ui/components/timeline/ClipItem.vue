@@ -15,56 +15,40 @@
   >
     <UContextMenu :items="contextMenuItems">
       <div class="w-full h-full relative">
-        <!-- Background Filmstrip Thumbnail for Video / Image Clips -->
+        <!-- Professional Repeating Filmstrip for Video / Image Clips -->
         <div
           v-if="thumbnailUrl && (trackKind === 'video' || trackKind === 'overlay')"
-          class="absolute inset-0 opacity-25 pointer-events-none overflow-hidden flex items-center"
+          class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center"
         >
-          <img
-            :src="thumbnailUrl"
-            class="w-full h-full object-cover filter brightness-75 contrast-125"
-            alt=""
-          />
-          <div class="absolute inset-0 bg-gradient-to-r from-gray-950/85 via-transparent to-gray-950/85"></div>
+          <div
+            class="w-full h-full"
+            :style="{
+              backgroundImage: `url(${thumbnailUrl})`,
+              backgroundRepeat: 'repeat-x',
+              backgroundSize: 'auto 100%',
+            }"
+          ></div>
+          <!-- Filmstrip Frame Dividing Lines -->
+          <div
+            class="absolute inset-0 pointer-events-none"
+            style="background: repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(0, 0, 0, 0.7) 78px, rgba(0, 0, 0, 0.7) 80px);"
+          ></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-gray-950/80 via-transparent to-gray-950/80"></div>
         </div>
 
-        <!-- Audio Waveform Visualization SVG for Audio / Waveform Clips -->
+        <!-- High-Fidelity Audio Waveform Visualization for Audio / Waveform Clips -->
         <div
           v-else-if="trackKind === 'audio' || trackKind === 'waveform'"
-          class="absolute inset-0 pointer-events-none flex items-center px-1 overflow-hidden"
+          class="absolute inset-0 pointer-events-none overflow-hidden"
         >
-          <svg
-            class="w-full h-6"
-            :class="trackKind === 'audio' ? 'text-emerald-400/50' : 'text-purple-400/50'"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <pattern
-                :id="`waveform-pattern-${clip.id}`"
-                width="48"
-                height="24"
-                patternUnits="userSpaceOnUse"
-              >
-                <!-- Subtle Center Baseline -->
-                <line x1="0" y1="12" x2="48" y2="12" stroke="currentColor" stroke-width="0.75" opacity="0.25" />
-
-                <!-- Symmetrical Bounded Waveform Bars -->
-                <rect x="1" y="7" width="2" height="10" rx="1" fill="currentColor" />
-                <rect x="5" y="4" width="2" height="16" rx="1" fill="currentColor" />
-                <rect x="9" y="8" width="2" height="8" rx="1" fill="currentColor" />
-                <rect x="13" y="2" width="2" height="20" rx="1" fill="currentColor" />
-                <rect x="17" y="5" width="2" height="14" rx="1" fill="currentColor" />
-                <rect x="21" y="9" width="2" height="6" rx="1" fill="currentColor" />
-                <rect x="25" y="3" width="2" height="18" rx="1" fill="currentColor" />
-                <rect x="29" y="6" width="2" height="12" rx="1" fill="currentColor" />
-                <rect x="33" y="1" width="2" height="22" rx="1" fill="currentColor" />
-                <rect x="37" y="7" width="2" height="10" rx="1" fill="currentColor" />
-                <rect x="41" y="4" width="2" height="16" rx="1" fill="currentColor" />
-                <rect x="45" y="8" width="2" height="8" rx="1" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" :fill="`url(#waveform-pattern-${clip.id})`" />
-          </svg>
+          <TimelineClipWaveform
+            :clip-id="clip.id"
+            :source="clip.source"
+            :duration="Number(clip.duration) || 10"
+            :in-trim="Number(clip.in_trim) || 0"
+            :track-kind="trackKind"
+            :width="clipWidth"
+          />
         </div>
 
         <!-- Left Trim / Resize Handle (100% Isolated from Drag) -->
@@ -178,15 +162,18 @@ const thumbnailUrl = computed(() => {
   return resolveMediaUrl(rawPath)
 })
 
+const clipWidth = computed(() => {
+  const duration = Number(props.clip.duration) || 0
+  return Math.max(10, duration * timelineStore.pixelsPerSecond)
+})
+
 const clipStyle = computed(() => {
   const start = Number(props.clip.start) || 0
-  const duration = Number(props.clip.duration) || 0
   const left = start * timelineStore.pixelsPerSecond
-  const width = Math.max(10, duration * timelineStore.pixelsPerSecond)
 
   return {
     left: `${left}px`,
-    width: `${width}px`,
+    width: `${clipWidth.value}px`,
   }
 })
 

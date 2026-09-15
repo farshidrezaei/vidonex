@@ -260,7 +260,9 @@
         "easeOutQuad": "Ease Out Quad",
         "easeInOutQuad": "Ease In/Out Quad",
         "easeInOutCubic": "Ease In/Out Cubic"
-      }
+      },
+      "curve_preview": "Easing Curve Graph",
+      "test_curve": "Preview Curve Motion"
     },
     "keyframes": {
       "title": "Motion & Keyframes",
@@ -337,5 +339,30 @@
     "copied": "Copied!",
     "export_svg": "Export Diagram",
     "refresh": "Refresh"
+  },
+  "command_palette": {
+    "button": "Commands",
+    "placeholder": "Type a command or search actions...",
+    "groups": {
+      "editing": "Timeline Editing",
+      "tracks": "Track Management",
+      "aspect_ratio": "Canvas Aspect Ratio",
+      "playback": "Playback & Viewport",
+      "project": "Project & Modals"
+    },
+    "actions": {
+      "split_clip": "Split Clip at Playhead",
+      "split_clip_desc": "Cut clip at current playhead position",
+      "duplicate_clip": "Duplicate Selected Clip",
+      "duplicate_clip_desc": "Clone selected clip",
+      "delete_clip": "Delete Selected Clip",
+      "delete_clip_desc": "Remove clip from timeline",
+      "undo_desc": "Revert last timeline change",
+      "redo_desc": "Reapply last undone change",
+      "toggle_snapping": "Toggle Magnetic Snapping",
+      "add_video_track": "Add Video Track",
+      "add_audio_track": "Add Audio Track",
+      "add_waveform_track": "Add Audiogram Track"
+    }
   }
 }

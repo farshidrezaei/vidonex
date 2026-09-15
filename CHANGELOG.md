@@ -9,11 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for v1.1.0
-- **Hardware-accelerated Viewport Preview**: Embedded MPV / OpenGL direct surface rendering for 4K60 real-time playback.
-- **WebAssembly (Wasm) In-Browser Pipeline**: Client-side timeline preview without requiring local server installation.
-- **Multicam Switcher**: Synchronized multi-angle camera switching for podcast and interview setups.
-- **LUT & Color Grading Engine**: `.cube` 3D LUT importing with real-time lift/gamma/gain color wheels.
+### Planned for v1.2.0
+- **EBU R128 Broadcast Audio Normalization (`loudnorm`)**: Dual-pass and single-pass audio loudness normalization matching Spotify, YouTube (-14 LUFS) and TV broadcast standards.
+- **3D LUT (.cube) & Cinematic Color Grading**: In-engine `.cube` LUT application with shadow/midtone/highlight color balance and grading controls.
+- **Extended XFade Transitions Catalog**: 50+ FFmpeg cinematic video transitions.
+- **Social Media Production Templates**: Reusable templates for YouTube End-Screen, TikTok 9:16, and Podcast Audiograms.
+
+---
+
+## [1.1.0] - 2026-09-15
+
+### Studio Ergonomics & UX Powerhouse Release 🚀
+
+Vidonex v1.1.0 focuses on workstation responsiveness, tactile editing controls, and professional NLE ergonomics.
+
+### Added
+
+#### ⚡ Studio Workstation & Editing Ergonomics
+- **Studio Command Palette (`Ctrl+K` / `Cmd+K`)**:
+  - Searchable command palette built with `@nuxt/ui` v4 `UCommandPalette` and `UModal`.
+  - Instant access to timeline operations (Split Clip `S`, Duplicate `Ctrl+D`, Delete `Del`, Toggle Snapping `N`), track additions, canvas aspect ratios (16:9, 9:16, 1:1, 21:9), playback transport controls, and modals.
+  - Dedicated Command Palette button and keyboard shortcut indicator in the workstation header.
+- **Live Stereo VU / Audio Peak Meter (`AudioPeakMeter.vue`)**:
+  - Real-time dual-channel (L/R) peak level indicator displaying dynamic green (-60 dB to -12 dB), yellow (-12 dB to -3 dB), and red clip warnings.
+  - Responsive Peak Hold ticks and live numeric dBFS telemetry integrated directly into the playback transport bar.
+- **Dynamic Audio Waveform Visualization (`ClipWaveform.vue`)**:
+  - Multi-sample responsive audio peaks drawn via HTML5 canvas with symmetrical dual-polarity envelopes and track-themed gradients (`emerald` for audio, `purple` for waveforms).
+  - Automatically updates when clips are moved, trimmed, or resized.
+- **Professional Repeating Filmstrip on Video Clips**:
+  - Tiled background filmstrip with periodic frame dividers and border vignette, matching industry-standard NLEs (DaVinci Resolve, Premiere Pro, Final Cut).
+- **Interactive Bezier & Easing Curve Graph Editor (`CurveEditor.vue`)**:
+  - Interactive curve visualizer in the Keyframe Inspector displaying animated trajectory acceleration curves (Linear, EaseInQuad, EaseOutQuad, EaseInOutQuad, EaseInOutCubic) with animated preview play button.
+- **Bilingual Internationalization**: Full English and Persian (`fa`) translations for all Command Palette commands, actions, and curve visualization tools.
 
 ---
 

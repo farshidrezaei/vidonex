@@ -80,6 +80,19 @@
 
     <!-- Right: View Graph, Shortcuts Button, Render Export, Language -->
     <div class="flex items-center gap-2">
+      <!-- Command Palette Button -->
+      <UButton
+        icon="i-heroicons-magnifying-glass"
+        size="sm"
+        color="neutral"
+        variant="ghost"
+        :title="$t('command_palette.button') || 'Command Palette (Ctrl+K)'"
+        @click="isCommandPaletteOpen = true"
+      >
+        <span class="hidden xl:inline text-xs font-medium">{{ $t('command_palette.button') || 'Commands' }}</span>
+        <UKbd size="xs" class="hidden sm:inline ml-1 font-mono text-[10px]">⌘K</UKbd>
+      </UButton>
+
       <!-- Keyboard Shortcuts Button -->
       <UButton
         icon="i-heroicons-command-line"
@@ -134,7 +147,7 @@
 <script setup lang="ts">
 import { useProjectStore, ASPECT_RATIO_PRESETS } from '~/stores/project'
 import { useTimelineStore } from '~/stores/timeline'
-import { isShortcutsModalOpen } from '~/composables/useGlobalShortcuts'
+import { isShortcutsModalOpen, isCommandPaletteOpen } from '~/composables/useGlobalShortcuts'
 
 const { locale, setLocale } = useI18n()
 const projectStore = useProjectStore()

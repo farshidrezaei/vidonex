@@ -15,6 +15,12 @@ export const ZOOM_PRESETS = [
   { label: '200%', value: 2.0 },
 ]
 
+export function resetViewportZoom() {
+  zoom.value = 1.0
+  panX.value = 0
+  panY.value = 0
+}
+
 if (typeof window !== 'undefined') {
   window.addEventListener('fullscreenchange', () => {
     isFullscreen.value = !!document.fullscreenElement
