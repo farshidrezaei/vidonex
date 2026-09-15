@@ -51,6 +51,12 @@ type ColorGradingOptions struct {
 	Gamma       float64
 	Temperature float64
 	Tint        float64
+	Highlights  float64
+	Shadows     float64
+	Whites      float64
+	Blacks      float64
+	Blur        float64
+	Sharpen     float64
 	LUTFile     string
 }
 

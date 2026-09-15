@@ -86,6 +86,12 @@ type ColorGradingSpec struct {
 	Gamma       float64 `json:"gamma,omitempty" yaml:"gamma,omitempty"`
 	Temperature float64 `json:"temperature,omitempty" yaml:"temperature,omitempty"`
 	Tint        float64 `json:"tint,omitempty" yaml:"tint,omitempty"`
+	Highlights  float64 `json:"highlights,omitempty" yaml:"highlights,omitempty"`
+	Shadows     float64 `json:"shadows,omitempty" yaml:"shadows,omitempty"`
+	Whites      float64 `json:"whites,omitempty" yaml:"whites,omitempty"`
+	Blacks      float64 `json:"blacks,omitempty" yaml:"blacks,omitempty"`
+	Blur        float64 `json:"blur,omitempty" yaml:"blur,omitempty"`
+	Sharpen     float64 `json:"sharpen,omitempty" yaml:"sharpen,omitempty"`
 	LUTFile     string  `json:"lut_file,omitempty" yaml:"lut_file,omitempty"`
 }
 
@@ -136,14 +142,19 @@ type DuckingSpec struct {
 
 // WaveformSpec configures animated audio waveform generation.
 type WaveformSpec struct {
-	SourceAudio string        `json:"source_audio" yaml:"source_audio"`
-	Mode        string        `json:"mode,omitempty" yaml:"mode,omitempty"` // "p2p", "line", "cline", "dot"
-	Color       string        `json:"color,omitempty" yaml:"color,omitempty"`
-	Scale       string        `json:"scale,omitempty" yaml:"scale,omitempty"` // "sqrt", "log", "lin"
-	Width       int           `json:"width,omitempty" yaml:"width,omitempty"`
-	Height      int           `json:"height,omitempty" yaml:"height,omitempty"`
-	Position    *PositionSpec `json:"position,omitempty" yaml:"position,omitempty"`
-	Opacity     float64       `json:"opacity,omitempty" yaml:"opacity,omitempty"`
+	SourceAudio    string        `json:"source_audio" yaml:"source_audio"`
+	Mode           string        `json:"mode,omitempty" yaml:"mode,omitempty"` // "p2p", "line", "cline", "dot", "bars", "spectrum", "wave", "circular"
+	Color          string        `json:"color,omitempty" yaml:"color,omitempty"`
+	SecondaryColor string        `json:"secondary_color,omitempty" yaml:"secondary_color,omitempty"`
+	Scale          string        `json:"scale,omitempty" yaml:"scale,omitempty"` // "sqrt", "log", "lin"
+	Width          int           `json:"width,omitempty" yaml:"width,omitempty"`
+	Height         int           `json:"height,omitempty" yaml:"height,omitempty"`
+	Position       *PositionSpec `json:"position,omitempty" yaml:"position,omitempty"`
+	Opacity        float64       `json:"opacity,omitempty" yaml:"opacity,omitempty"`
+	Density        int           `json:"density,omitempty" yaml:"density,omitempty"`
+	Roundness      int           `json:"roundness,omitempty" yaml:"roundness,omitempty"`
+	Glow           bool          `json:"glow,omitempty" yaml:"glow,omitempty"`
+	LineWidth      int           `json:"line_width,omitempty" yaml:"line_width,omitempty"`
 }
 
 // ChromaKeySpec configures green/blue screen removal.

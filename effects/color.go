@@ -107,7 +107,7 @@ func (filter ColorBalanceFilter) Apply(
 	return outputPad, nil
 }
 
-// ColorGradingFilter controls primary image grading parameters: contrast, brightness, saturation, gamma, temperature, and tint.
+// ColorGradingFilter controls primary image grading parameters: contrast, brightness, saturation, gamma, temperature, tint, highlights, shadows, whites, blacks, blur, and sharpen.
 type ColorGradingFilter struct {
 	// Contrast multiplier (e.g. 1.0 = normal, 1.2 = punchier). Default is 1.0.
 	Contrast float64
@@ -121,9 +121,21 @@ type ColorGradingFilter struct {
 	Temperature float64
 	// Tint shifts tint (-1.0 to 1.0: negative is green, positive is magenta).
 	Tint float64
+	// Highlights shifts high luminance regions (-1.0 to 1.0).
+	Highlights float64
+	// Shadows shifts low luminance regions (-1.0 to 1.0).
+	Shadows float64
+	// Whites expands/compresses white peak points (-1.0 to 1.0).
+	Whites float64
+	// Blacks expands/compresses black floor points (-1.0 to 1.0).
+	Blacks float64
+	// Blur applies Gaussian blur radius (0.0 to 100.0).
+	Blur float64
+	// Sharpen applies unsharp mask strength (0.0 to 100.0).
+	Sharpen float64
 }
 
-// Apply attaches an eq (and optional colorbalance for temperature/tint) filter node to the given graph.
+// Apply attaches an eq (and optional colorbalance, gblur, unsharp) filter node to the given graph.
 func (filter ColorGradingFilter) Apply(
 	graph *filtergraph.Graph,
 	nodeIdentifier string,
@@ -157,22 +169,68 @@ func (filter ColorGradingFilter) Apply(
 		return nil, err
 	}
 
-	// If Temperature or Tint are non-zero, chain a colorbalance filter node
-	if filter.Temperature != 0 || filter.Tint != 0 {
+	currentPad := eqOutputPad
+
+	// If Temperature, Tint, Highlights, Shadows, Whites, or Blacks are non-zero, chain colorbalance
+	hasColorBalance := filter.Temperature != 0 || filter.Tint != 0 ||
+		filter.Highlights != 0 || filter.Shadows != 0 ||
+		filter.Whites != 0 || filter.Blacks != 0
+
+	if hasColorBalance {
+		shadowOffset := filter.Shadows*0.3 - filter.Blacks*0.2
+		highlightOffset := filter.Highlights*0.3 + filter.Whites*0.2
+
 		balanceFilter := ColorBalanceFilter{
+			Shadows: ColorBalanceAdjustments{
+				Red:   shadowOffset,
+				Green: shadowOffset,
+				Blue:  shadowOffset,
+			},
 			Midtones: ColorBalanceAdjustments{
 				Red:   filter.Temperature * 0.3,
 				Blue:  -filter.Temperature * 0.3,
 				Green: -filter.Tint * 0.3,
 			},
 			Highlights: ColorBalanceAdjustments{
-				Red:   filter.Temperature * 0.2,
-				Blue:  -filter.Temperature * 0.2,
-				Green: -filter.Tint * 0.2,
+				Red:   highlightOffset + (filter.Temperature * 0.2),
+				Blue:  highlightOffset - (filter.Temperature * 0.2),
+				Green: highlightOffset - (filter.Tint * 0.2),
 			},
 		}
-		return balanceFilter.Apply(graph, nodeIdentifier+"_temp", eqOutputPad)
+		balancePad, err := balanceFilter.Apply(graph, nodeIdentifier+"_temp", currentPad)
+		if err != nil {
+			return nil, err
+		}
+		currentPad = balancePad
 	}
 
-	return eqOutputPad, nil
+	// If Blur is greater than 0, chain gblur filter
+	if filter.Blur > 0 {
+		blurNode := graph.NewNode(nodeIdentifier+"_blur", "gblur")
+		blurNode.SetParam("sigma", fmt.Sprintf("%.2f", filter.Blur*0.5))
+		blurInputPad := blurNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		blurOutputPad := blurNode.AddOutput(graph.NextPadID("blur_out"), filtergraph.StreamTypeVideo)
+
+		if err := graph.Connect(currentPad, blurInputPad); err != nil {
+			return nil, err
+		}
+		currentPad = blurOutputPad
+	}
+
+	// If Sharpen is greater than 0, chain unsharp filter
+	if filter.Sharpen > 0 {
+		sharpenNode := graph.NewNode(nodeIdentifier+"_sharpen", "unsharp")
+		sharpenNode.SetParam("luma_msize_x", "5")
+		sharpenNode.SetParam("luma_msize_y", "5")
+		sharpenNode.SetParam("luma_amount", fmt.Sprintf("%.2f", filter.Sharpen*0.03))
+		sharpenInputPad := sharpenNode.AddInput(currentPad.ID, filtergraph.StreamTypeVideo)
+		sharpenOutputPad := sharpenNode.AddOutput(graph.NextPadID("sharpen_out"), filtergraph.StreamTypeVideo)
+
+		if err := graph.Connect(currentPad, sharpenInputPad); err != nil {
+			return nil, err
+		}
+		currentPad = sharpenOutputPad
+	}
+
+	return currentPad, nil
 }

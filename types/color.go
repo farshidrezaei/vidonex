@@ -113,3 +113,8 @@ func (c Color) HexRGB() string {
 func (c Color) HexRGBA() string {
 	return fmt.Sprintf("#%02X%02X%02X%02X", c.R, c.G, c.B, c.A)
 }
+
+// IsZero reports whether the color has all zero channels.
+func (c Color) IsZero() bool {
+	return c == Color{}
+}

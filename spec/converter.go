@@ -351,12 +351,25 @@ func buildWaveformTrack(trackSpec TrackSpec) (*timeline.Track, error) {
 		}
 		waveformOptions.Color = parsedColor
 	}
+	if waveSpec.SecondaryColor != "" {
+		parsedSecondaryColor, colorErr := ParseColorValue(waveSpec.SecondaryColor)
+		if colorErr == nil {
+			waveformOptions.SecondaryColor = parsedSecondaryColor
+		}
+	}
 	if waveSpec.Position != nil {
 		waveformOptions.Position = types.Point{X: waveSpec.Position.X, Y: waveSpec.Position.Y}
 	}
 	if waveSpec.Opacity > 0 {
 		waveformOptions.Opacity = waveSpec.Opacity
 	}
+	if waveSpec.Density > 0 {
+		waveformOptions.Density = waveSpec.Density
+	}
+	if waveSpec.Roundness > 0 {
+		waveformOptions.Roundness = waveSpec.Roundness
+	}
+	waveformOptions.Glow = waveSpec.Glow
 
 	return timeline.NewWaveformTrack(trackSpec.ID, waveSpec.SourceAudio, waveformOptions), nil
 }
@@ -514,6 +527,12 @@ func buildClip(clipSpec ClipSpec) (*timeline.Clip, error) {
 			Gamma:       clipSpec.ColorGrading.Gamma,
 			Temperature: clipSpec.ColorGrading.Temperature,
 			Tint:        clipSpec.ColorGrading.Tint,
+			Highlights:  clipSpec.ColorGrading.Highlights,
+			Shadows:     clipSpec.ColorGrading.Shadows,
+			Whites:      clipSpec.ColorGrading.Whites,
+			Blacks:      clipSpec.ColorGrading.Blacks,
+			Blur:        clipSpec.ColorGrading.Blur,
+			Sharpen:     clipSpec.ColorGrading.Sharpen,
 			LUTFile:     clipSpec.ColorGrading.LUTFile,
 		}
 		clip.WithColorGrading(gradingOpts)

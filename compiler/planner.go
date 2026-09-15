@@ -214,6 +214,12 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 			Gamma:       clip.ColorGrading.Gamma,
 			Temperature: clip.ColorGrading.Temperature,
 			Tint:        clip.ColorGrading.Tint,
+			Highlights:  clip.ColorGrading.Highlights,
+			Shadows:     clip.ColorGrading.Shadows,
+			Whites:      clip.ColorGrading.Whites,
+			Blacks:      clip.ColorGrading.Blacks,
+			Blur:        clip.ColorGrading.Blur,
+			Sharpen:     clip.ColorGrading.Sharpen,
 		}
 		gradePad, err := colorFilter.Apply(graph, fmt.Sprintf("colorgrade_%s", clip.ID), currentPad)
 		if err != nil {

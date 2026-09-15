@@ -122,6 +122,19 @@ func TestColorGradingFilter_Table(t *testing.T) {
 			},
 			expectChainedNodes: true,
 		},
+		{
+			name: "Highlights, shadows, blur and sharpen chaining",
+			filter: effects.ColorGradingFilter{
+				Contrast:   1.0,
+				Highlights: 0.4,
+				Shadows:    -0.2,
+				Whites:     0.1,
+				Blacks:     -0.1,
+				Blur:       2.5,
+				Sharpen:    15.0,
+			},
+			expectChainedNodes: true,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -153,6 +166,26 @@ func TestColorGradingFilter_Table(t *testing.T) {
 				}
 				if tempNode.FilterName != "colorbalance" {
 					t.Errorf("expected colorbalance filter for temperature, got %s", tempNode.FilterName)
+				}
+			}
+
+			if tc.filter.Blur > 0 {
+				blurNode, exists := graph.GetNode("grade_blur")
+				if !exists || blurNode == nil {
+					t.Fatalf("expected grade_blur node in graph")
+				}
+				if blurNode.FilterName != "gblur" {
+					t.Errorf("expected gblur filter, got %s", blurNode.FilterName)
+				}
+			}
+
+			if tc.filter.Sharpen > 0 {
+				sharpenNode, exists := graph.GetNode("grade_sharpen")
+				if !exists || sharpenNode == nil {
+					t.Fatalf("expected grade_sharpen node in graph")
+				}
+				if sharpenNode.FilterName != "unsharp" {
+					t.Errorf("expected unsharp filter, got %s", sharpenNode.FilterName)
 				}
 			}
 		})
