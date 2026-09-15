@@ -197,7 +197,9 @@ const commandGroups = computed(() => [
     items: [
       {
         id: 'toggle-play',
-        label: playbackStore.isPlaying ? 'Pause Playback' : 'Play Video',
+        label: playbackStore.isPlaying
+          ? (t('command_palette.actions.pause_video') || 'Pause Playback')
+          : (t('command_palette.actions.play_video') || 'Play Video'),
         icon: playbackStore.isPlaying ? 'i-heroicons-pause' : 'i-heroicons-play',
         kbds: ['Space'],
         action: () => {
@@ -206,8 +208,8 @@ const commandGroups = computed(() => [
       },
       {
         id: 'jump-start',
-        label: 'Jump to Start',
-        description: 'Move playhead to 00:00:00',
+        label: t('command_palette.actions.jump_start') || 'Jump to Start',
+        description: t('command_palette.actions.jump_start_desc') || 'Move playhead to 00:00:00',
         icon: 'i-heroicons-backward',
         kbds: ['Home'],
         action: () => {
@@ -216,7 +218,8 @@ const commandGroups = computed(() => [
       },
       {
         id: 'jump-end',
-        label: 'Jump to End of Timeline',
+        label: t('command_palette.actions.jump_end') || 'Jump to End of Timeline',
+        description: t('command_palette.actions.jump_end_desc') || 'Move playhead to end of timeline',
         icon: 'i-heroicons-forward',
         kbds: ['End'],
         action: () => {
@@ -225,8 +228,8 @@ const commandGroups = computed(() => [
       },
       {
         id: 'reset-zoom',
-        label: 'Fit Viewport to Screen',
-        description: 'Reset canvas zoom and pan to 100% fit',
+        label: t('command_palette.actions.fit_screen') || 'Fit Viewport to Screen',
+        description: t('command_palette.actions.fit_screen_desc') || 'Reset canvas zoom and pan to fit',
         icon: 'i-heroicons-arrows-pointing-out',
         kbds: ['Shift', 'Z'],
         action: () => {
@@ -241,8 +244,8 @@ const commandGroups = computed(() => [
     items: [
       {
         id: 'render-export',
-        label: t('app.export') || 'Render & Export Video...',
-        description: 'Compile and encode composition with FFmpeg',
+        label: t('command_palette.actions.render_export') || 'Render & Export Video...',
+        description: t('command_palette.actions.render_export_desc') || 'Compile and encode composition with FFmpeg',
         icon: 'i-heroicons-arrow-up-tray',
         kbds: ['Ctrl', 'E'],
         action: () => {
@@ -250,9 +253,18 @@ const commandGroups = computed(() => [
         },
       },
       {
+        id: 'new-project',
+        label: t('app.new_project') || 'New Project...',
+        description: 'Create a new video composition project',
+        icon: 'i-heroicons-plus-circle',
+        action: () => {
+          projectStore.isNewProjectOpen = true
+        },
+      },
+      {
         id: 'project-settings',
-        label: t('project.title') || 'Project Settings...',
-        description: 'Adjust resolution, frame rate and background color',
+        label: t('command_palette.actions.project_settings') || 'Project Settings...',
+        description: t('command_palette.actions.project_settings_desc') || 'Adjust resolution, frame rate and background color',
         icon: 'i-heroicons-cog-6-tooth',
         action: () => {
           projectStore.isSettingsOpen = true
@@ -260,8 +272,8 @@ const commandGroups = computed(() => [
       },
       {
         id: 'shortcuts-modal',
-        label: t('shortcuts.button') || 'Keyboard Shortcuts Reference...',
-        description: 'View complete hotkey cheat sheet',
+        label: t('command_palette.actions.keyboard_shortcuts') || 'Keyboard Shortcuts Reference...',
+        description: t('command_palette.actions.keyboard_shortcuts_desc') || 'View complete hotkey cheat sheet',
         icon: 'i-heroicons-command-line',
         kbds: ['?'],
         action: () => {
@@ -270,8 +282,8 @@ const commandGroups = computed(() => [
       },
       {
         id: 'graph-inspector',
-        label: t('app.view_graph') || 'Filtergraph Visualizer...',
-        description: 'Inspect live DAG flowchart in Mermaid.js',
+        label: t('command_palette.actions.filtergraph') || 'Filtergraph Visualizer...',
+        description: t('command_palette.actions.filtergraph_desc') || 'Inspect live DAG flowchart in Mermaid.js',
         icon: 'i-heroicons-cpu-chip',
         action: () => {
           projectStore.isGraphOpen = true

@@ -355,6 +355,8 @@
       "split_clip_desc": "Cut clip at current playhead position",
       "duplicate_clip": "Duplicate Selected Clip",
       "duplicate_clip_desc": "Clone selected clip",
+      "crop_clip": "Crop Selected Clip",
+      "crop_clip_desc": "Adjust visual crop insets on canvas",
       "delete_clip": "Delete Selected Clip",
       "delete_clip_desc": "Remove clip from timeline",
       "undo_desc": "Revert last timeline change",
@@ -362,7 +364,57 @@
       "toggle_snapping": "Toggle Magnetic Snapping",
       "add_video_track": "Add Video Track",
       "add_audio_track": "Add Audio Track",
-      "add_waveform_track": "Add Audiogram Track"
+      "add_waveform_track": "Add Audiogram Track",
+      "play_video": "Play Video",
+      "pause_video": "Pause Playback",
+      "jump_start": "Jump to Start",
+      "jump_start_desc": "Move playhead to 00:00:00",
+      "jump_end": "Jump to End",
+      "jump_end_desc": "Move playhead to end of timeline",
+      "fit_screen": "Fit Viewport to Screen",
+      "fit_screen_desc": "Reset zoom and center canvas",
+      "render_export": "Render & Export Video...",
+      "render_export_desc": "Compile and encode composition with FFmpeg",
+      "project_settings": "Project Settings...",
+      "project_settings_desc": "Adjust resolution, frame rate and background",
+      "keyboard_shortcuts": "Keyboard Shortcuts...",
+      "keyboard_shortcuts_desc": "View complete hotkey reference",
+      "filtergraph": "Filtergraph Visualizer...",
+      "filtergraph_desc": "Inspect live DAG flowchart in Mermaid.js"
     }
+  },
+  "adjustments": {
+    "title": "Color & Light Adjustments",
+    "reset": "Reset to Neutral",
+    "brightness": "Brightness",
+    "contrast": "Contrast",
+    "saturation": "Saturation",
+    "gamma": "Gamma",
+    "temperature": "Temperature (Warmth)",
+    "tint": "Tint",
+    "lut": "3D LUT (.cube)"
+  },
+  "crop": {
+    "title": "Crop Tool",
+    "done": "Done Cropping",
+    "reset": "Reset Crop",
+    "top": "Top",
+    "bottom": "Bottom",
+    "left": "Left",
+    "right": "Right",
+    "tooltip": "Crop Clip (C)"
+  },
+  "confirm": {
+    "title": "Confirm Deletion",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "delete_track_title": "Delete Track",
+    "delete_track_message": "Are you sure you want to delete track \"{name}\"? All clips within this track will be permanently removed.",
+    "delete_clip_title": "Delete Clip",
+    "delete_clip_message": "Are you sure you want to remove clip \"{name}\" from the timeline?",
+    "delete_asset_title": "Delete Media Asset",
+    "delete_asset_message": "Are you sure you want to delete \"{name}\"? This will permanently delete the file from the media library.",
+    "delete_project_title": "Delete Project",
+    "delete_project_message": "Are you sure you want to delete project \"{name}\"? This action cannot be undone."
   }
 }

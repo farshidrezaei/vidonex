@@ -11,12 +11,25 @@
 
       <div class="h-5 w-px bg-gray-800 mx-1"></div>
 
-      <!-- Project Name Input -->
-      <div class="flex items-center gap-2 group">
+      <!-- Project Switcher & Name Input -->
+      <div class="flex items-center gap-1.5 group">
+        <UDropdownMenu :items="projectMenuItems">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            class="p-1 text-gray-400 hover:text-white"
+            :title="$t('project.title')"
+          >
+            <UIcon name="i-heroicons-folder" class="w-4 h-4 text-indigo-400" />
+            <UIcon name="i-heroicons-chevron-down" class="w-3 h-3 text-gray-500" />
+          </UButton>
+        </UDropdownMenu>
+
         <input
           v-if="projectStore.currentProject"
           v-model="projectStore.currentProject.name"
-          class="bg-transparent hover:bg-gray-900 focus:bg-gray-900 border border-transparent hover:border-gray-700 focus:border-indigo-500 rounded px-2 py-1 text-sm font-medium text-gray-200 focus:outline-none transition"
+          class="bg-transparent hover:bg-gray-900 focus:bg-gray-900 border border-transparent hover:border-gray-700 focus:border-indigo-500 rounded px-2 py-1 text-sm font-medium text-gray-200 focus:outline-none transition max-w-[180px] truncate"
           @blur="saveProject"
         />
         <span v-if="projectStore.isSaving" class="text-xs text-indigo-400 animate-pulse flex items-center gap-1">
@@ -148,12 +161,65 @@
 import { useProjectStore, ASPECT_RATIO_PRESETS } from '~/stores/project'
 import { useTimelineStore } from '~/stores/timeline'
 import { isShortcutsModalOpen, isCommandPaletteOpen } from '~/composables/useGlobalShortcuts'
+import { useConfirmDialog } from '~/composables/useConfirmDialog'
 
-const { locale, setLocale } = useI18n()
+const { locale, setLocale, t } = useI18n()
+const { confirm } = useConfirmDialog()
 const projectStore = useProjectStore()
 const timelineStore = useTimelineStore()
 
 const currentLocale = computed(() => locale.value)
+
+const projectMenuItems = computed(() => {
+  const currentId = projectStore.currentProject?.id
+  const projects = projectStore.projectsList.map((p) => ({
+    label: p.name || 'Untitled Project',
+    icon: p.id === currentId ? 'i-heroicons-check' : 'i-heroicons-film',
+    color: p.id === currentId ? ('primary' as const) : undefined,
+    onSelect: async () => {
+      if (p.id !== currentId) {
+        await projectStore.switchProject(p.id)
+      }
+    },
+  }))
+
+  return [
+    projects,
+    [
+      {
+        label: t('app.new_project') || 'New Project...',
+        icon: 'i-heroicons-plus-circle',
+        color: 'primary' as const,
+        onSelect: () => {
+          projectStore.isNewProjectOpen = true
+        },
+      },
+      ...(projectStore.projectsList.length > 1
+        ? [
+            {
+              label: t('confirm.delete_project_title') || 'Delete Project',
+              icon: 'i-heroicons-trash',
+              color: 'error' as const,
+              onSelect: async () => {
+                if (!projectStore.currentProject) return
+                const currentName = projectStore.currentProject.name
+                const ok = await confirm({
+                  title: t('confirm.delete_project_title'),
+                  message: t('confirm.delete_project_message', { name: currentName }),
+                  confirmText: t('confirm.delete'),
+                  cancelText: t('confirm.cancel'),
+                  isDanger: true,
+                })
+                if (ok) {
+                  await projectStore.deleteProject(projectStore.currentProject.id)
+                }
+              },
+            },
+          ]
+        : []),
+    ],
+  ]
+})
 
 function toggleLanguage() {
   const next = currentLocale.value === 'en' ? 'fa' : 'en'

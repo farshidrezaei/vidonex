@@ -72,14 +72,44 @@
             </div>
           </div>
 
-          <!-- Transition Types Grid -->
-          <div class="space-y-2">
-            <label class="block text-gray-400 font-medium uppercase tracking-wider text-[10px]">
-              {{ $t('timeline.transitions.select_type') || 'Transition Type' }}
-            </label>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <!-- Categorized Transition Gallery -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <label class="block text-gray-400 font-medium uppercase tracking-wider text-[10px]">
+                {{ $t('timeline.transitions.select_type') || 'Transition Type' }}
+              </label>
+              <!-- Search filter -->
+              <div class="relative w-44">
+                <UIcon name="i-heroicons-magnifying-glass" class="w-3.5 h-3.5 text-gray-500 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  v-model="transitionSearchQuery"
+                  type="text"
+                  placeholder="Filter transitions..."
+                  class="w-full bg-gray-900 border border-gray-800 rounded-md pl-7 pr-2 py-1 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <!-- Category Pills Filter -->
+            <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] scrollbar-none">
               <button
-                v-for="opt in transitionOptions"
+                v-for="cat in transitionCategories"
+                :key="cat.id"
+                type="button"
+                class="px-2.5 py-1 rounded-full whitespace-nowrap transition cursor-pointer"
+                :class="selectedCategory === cat.id
+                  ? 'bg-amber-500 text-black font-semibold shadow-sm'
+                  : 'bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-800'"
+                @click="selectedCategory = cat.id"
+              >
+                {{ cat.label }} ({{ cat.count }})
+              </button>
+            </div>
+
+            <!-- Transition Cards Grid (Scrollable) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
+              <button
+                v-for="opt in filteredTransitionOptions"
                 :key="opt.value"
                 type="button"
                 class="flex items-center gap-2.5 p-2 rounded-lg border text-left transition cursor-pointer"
@@ -103,6 +133,9 @@
                   <div class="text-[9px] text-gray-500 truncate">{{ opt.desc }}</div>
                 </div>
               </button>
+            </div>
+            <div v-if="filteredTransitionOptions.length === 0" class="text-center py-6 text-gray-500 text-xs">
+              No transitions found matching "{{ transitionSearchQuery }}"
             </div>
           </div>
 
@@ -242,94 +275,104 @@ const availablePresets = computed(() => {
   return filtered
 })
 
-const transitionIcon = computed(() => {
-  const type = (props.transition?.type || selectedType.value || 'dissolve').toLowerCase()
-  switch (type) {
-    case 'fade':
-      return 'i-heroicons-eye-slash'
-    case 'wipeleft':
-      return 'i-heroicons-arrow-left'
-    case 'wiperight':
-      return 'i-heroicons-arrow-right'
-    case 'wipeup':
-      return 'i-heroicons-arrow-up'
-    case 'wipedown':
-      return 'i-heroicons-arrow-down'
-    case 'slideleft':
-      return 'i-heroicons-arrow-left-start-on-rectangle'
-    case 'slideright':
-      return 'i-heroicons-arrow-right-start-on-rectangle'
-    case 'circleopen':
-    case 'circlecrop':
-      return 'i-heroicons-lifebuoy'
-    case 'dissolve':
-    default:
-      return 'i-heroicons-sparkles'
+const transitionSearchQuery = ref('')
+const selectedCategory = ref('all')
+
+const transitionCategories = computed(() => {
+  const counts: Record<string, number> = {
+    all: allTransitionsCatalog.length,
+    fades: allTransitionsCatalog.filter((t) => t.category === 'fades').length,
+    wipes: allTransitionsCatalog.filter((t) => t.category === 'wipes').length,
+    slides: allTransitionsCatalog.filter((t) => t.category === 'slides').length,
+    shapes: allTransitionsCatalog.filter((t) => t.category === 'shapes').length,
+    zooms: allTransitionsCatalog.filter((t) => t.category === 'zooms').length,
   }
+  return [
+    { id: 'all', label: 'All', count: counts.all },
+    { id: 'fades', label: 'Fades & Dissolve', count: counts.fades },
+    { id: 'wipes', label: 'Wipes', count: counts.wipes },
+    { id: 'slides', label: 'Slides & Pushes', count: counts.slides },
+    { id: 'shapes', label: 'Shapes & Iris', count: counts.shapes },
+    { id: 'zooms', label: 'Zooms & Warps', count: counts.zooms },
+  ]
 })
 
-const transitionOptions = computed(() => [
-  {
-    value: 'none',
-    label: t('timeline.transitions.none') || 'None',
-    desc: t('timeline.transitions.none_desc') || 'No transition (Cut)',
-    icon: 'i-heroicons-no-symbol',
-  },
-  {
-    value: 'dissolve',
-    label: t('timeline.transitions.dissolve') || 'Dissolve',
-    desc: 'Cross dissolve',
-    icon: 'i-heroicons-sparkles',
-  },
-  {
-    value: 'fade',
-    label: t('timeline.transitions.fade') || 'Fade',
-    desc: 'Dip to black',
-    icon: 'i-heroicons-eye-slash',
-  },
-  {
-    value: 'wipeleft',
-    label: t('timeline.transitions.wipeleft') || 'Wipe Left',
-    desc: 'Right to left',
-    icon: 'i-heroicons-arrow-left',
-  },
-  {
-    value: 'wiperight',
-    label: t('timeline.transitions.wiperight') || 'Wipe Right',
-    desc: 'Left to right',
-    icon: 'i-heroicons-arrow-right',
-  },
-  {
-    value: 'wipeup',
-    label: t('timeline.transitions.wipeup') || 'Wipe Up',
-    desc: 'Bottom to top',
-    icon: 'i-heroicons-arrow-up',
-  },
-  {
-    value: 'wipedown',
-    label: t('timeline.transitions.wipedown') || 'Wipe Down',
-    desc: 'Top to bottom',
-    icon: 'i-heroicons-arrow-down',
-  },
-  {
-    value: 'slideleft',
-    label: t('timeline.transitions.slideleft') || 'Slide Left',
-    desc: 'Slide left',
-    icon: 'i-heroicons-arrow-left-start-on-rectangle',
-  },
-  {
-    value: 'slideright',
-    label: t('timeline.transitions.slideright') || 'Slide Right',
-    desc: 'Slide right',
-    icon: 'i-heroicons-arrow-right-start-on-rectangle',
-  },
-  {
-    value: 'circleopen',
-    label: t('timeline.transitions.circleopen') || 'Circle Open',
-    desc: 'Iris circle open',
-    icon: 'i-heroicons-lifebuoy',
-  },
-])
+interface TransitionItem {
+  value: string
+  label: string
+  desc: string
+  category: 'fades' | 'wipes' | 'slides' | 'shapes' | 'zooms' | 'none'
+  icon: string
+}
+
+const allTransitionsCatalog: TransitionItem[] = [
+  { value: 'none', label: 'None (Cut)', desc: 'Cut immediately', category: 'none', icon: 'i-heroicons-no-symbol' },
+  // Fades
+  { value: 'dissolve', label: 'Cross Dissolve', desc: 'Smooth cross fade', category: 'fades', icon: 'i-heroicons-sparkles' },
+  { value: 'fade', label: 'Dip to Black', desc: 'Fade through black', category: 'fades', icon: 'i-heroicons-eye-slash' },
+  { value: 'fadeblack', label: 'Fade Black', desc: 'Full dip black', category: 'fades', icon: 'i-heroicons-moon' },
+  { value: 'fadewhite', label: 'Flash to White', desc: 'Bright flash fade', category: 'fades', icon: 'i-heroicons-sun' },
+  { value: 'fadegrays', label: 'Fade Grayscale', desc: 'Desaturate cross fade', category: 'fades', icon: 'i-heroicons-adjustments-horizontal' },
+  // Wipes
+  { value: 'wipeleft', label: 'Wipe Left', desc: 'Linear wipe to left', category: 'wipes', icon: 'i-heroicons-arrow-left' },
+  { value: 'wiperight', label: 'Wipe Right', desc: 'Linear wipe to right', category: 'wipes', icon: 'i-heroicons-arrow-right' },
+  { value: 'wipeup', label: 'Wipe Up', desc: 'Linear wipe upward', category: 'wipes', icon: 'i-heroicons-arrow-up' },
+  { value: 'wipedown', label: 'Wipe Down', desc: 'Linear wipe downward', category: 'wipes', icon: 'i-heroicons-arrow-down' },
+  { value: 'wipetl', label: 'Wipe Top-Left', desc: 'Diagonal wipe top-left', category: 'wipes', icon: 'i-heroicons-arrow-up-left' },
+  { value: 'wipetr', label: 'Wipe Top-Right', desc: 'Diagonal wipe top-right', category: 'wipes', icon: 'i-heroicons-arrow-up-right' },
+  { value: 'wipebl', label: 'Wipe Bottom-Left', desc: 'Diagonal wipe bottom-left', category: 'wipes', icon: 'i-heroicons-arrow-down-left' },
+  { value: 'wipebr', label: 'Wipe Bottom-Right', desc: 'Diagonal wipe bottom-right', category: 'wipes', icon: 'i-heroicons-arrow-down-right' },
+  // Slides & Pushes
+  { value: 'slideleft', label: 'Slide Left', desc: 'Slide over from right', category: 'slides', icon: 'i-heroicons-arrow-left-start-on-rectangle' },
+  { value: 'slideright', label: 'Slide Right', desc: 'Slide over from left', category: 'slides', icon: 'i-heroicons-arrow-right-start-on-rectangle' },
+  { value: 'slideup', label: 'Slide Up', desc: 'Slide up from bottom', category: 'slides', icon: 'i-heroicons-arrow-up' },
+  { value: 'slidedown', label: 'Slide Down', desc: 'Slide down from top', category: 'slides', icon: 'i-heroicons-arrow-down' },
+  { value: 'smoothleft', label: 'Smooth Left', desc: 'Soft directional push left', category: 'slides', icon: 'i-heroicons-chevron-double-left' },
+  { value: 'smoothright', label: 'Smooth Right', desc: 'Soft directional push right', category: 'slides', icon: 'i-heroicons-chevron-double-right' },
+  { value: 'smoothup', label: 'Smooth Up', desc: 'Soft directional push up', category: 'slides', icon: 'i-heroicons-chevron-double-up' },
+  { value: 'smoothdown', label: 'Smooth Down', desc: 'Soft directional push down', category: 'slides', icon: 'i-heroicons-chevron-double-down' },
+  // Shapes & Iris
+  { value: 'circleopen', label: 'Iris Circle Open', desc: 'Expanding circle', category: 'shapes', icon: 'i-heroicons-lifebuoy' },
+  { value: 'circleclose', label: 'Iris Circle Close', desc: 'Closing circle mask', category: 'shapes', icon: 'i-heroicons-stop-circle' },
+  { value: 'circlecrop', label: 'Circle Crop Iris', desc: 'Circular reveal', category: 'shapes', icon: 'i-heroicons-arrow-path' },
+  { value: 'rectcrop', label: 'Rectangle Crop', desc: 'Expanding rectangle aperture', category: 'shapes', icon: 'i-heroicons-rectangle-stack' },
+  { value: 'horzopen', label: 'Horizontal Open', desc: 'Doors open horizontally', category: 'shapes', icon: 'i-heroicons-arrows-pointing-out' },
+  { value: 'horzclose', label: 'Horizontal Close', desc: 'Doors close horizontally', category: 'shapes', icon: 'i-heroicons-arrows-pointing-in' },
+  { value: 'vertopen', label: 'Vertical Open', desc: 'Doors open vertically', category: 'shapes', icon: 'i-heroicons-arrows-up-down' },
+  { value: 'vertclose', label: 'Vertical Close', desc: 'Doors close vertically', category: 'shapes', icon: 'i-heroicons-bars-2' },
+  // Zooms & Warps
+  { value: 'zoomin', label: 'Zoom In', desc: 'Dynamic scale burst zoom', category: 'zooms', icon: 'i-heroicons-magnifying-glass-plus' },
+  { value: 'radial', label: 'Radial Clock Wipe', desc: 'Circular radar sweep', category: 'zooms', icon: 'i-heroicons-clock' },
+  { value: 'pixelize', label: 'Pixelize / Glitch', desc: 'Mosaic block pixelation', category: 'zooms', icon: 'i-heroicons-squares-plus' },
+  { value: 'squeezev', label: 'Squeeze Vertical', desc: 'Vertical compression', category: 'zooms', icon: 'i-heroicons-bars-3-bottom-left' },
+  { value: 'squeezeh', label: 'Squeeze Horizontal', desc: 'Horizontal compression', category: 'zooms', icon: 'i-heroicons-bars-3' },
+  { value: 'hlslice', label: 'Horizontal Slice', desc: 'Multi-slice blinds', category: 'zooms', icon: 'i-heroicons-table-cells' },
+  { value: 'vuslice', label: 'Vertical Slice', desc: 'Vertical louvers blinds', category: 'zooms', icon: 'i-heroicons-queue-list' },
+  { value: 'distance', label: 'Distance Fade', desc: '3D distance perspective', category: 'zooms', icon: 'i-heroicons-cube' },
+]
+
+const filteredTransitionOptions = computed(() => {
+  return allTransitionsCatalog.filter((opt) => {
+    // 1. Category Filter
+    if (selectedCategory.value !== 'all') {
+      if (opt.value !== 'none' && opt.category !== selectedCategory.value) {
+        return false
+      }
+    }
+    // 2. Search Query Filter
+    if (transitionSearchQuery.value.trim()) {
+      const q = transitionSearchQuery.value.toLowerCase().trim()
+      return opt.label.toLowerCase().includes(q) || opt.value.toLowerCase().includes(q) || opt.desc.toLowerCase().includes(q)
+    }
+    return true
+  })
+})
+
+const transitionIcon = computed(() => {
+  const type = (props.transition?.type || selectedType.value || 'dissolve').toLowerCase()
+  const found = allTransitionsCatalog.find((t) => t.value === type)
+  return found?.icon || 'i-heroicons-sparkles'
+})
 
 function openModal() {
   if (props.transition) {

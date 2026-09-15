@@ -355,6 +355,8 @@
       "split_clip_desc": "قیچی زدن کلیپ انتخاب شده در زمان جاری",
       "duplicate_clip": "تکرار و کپی کلیپ (Duplicate)",
       "duplicate_clip_desc": "تکثیر کلیپ انتخاب شده روی لاین",
+      "crop_clip": "کراپ و برش ابعاد کلیپ (Crop)",
+      "crop_clip_desc": "تنظیم حاشیه‌های نمایشی تصویر روی بوم",
       "delete_clip": "حذف کلیپ انتخابی",
       "delete_clip_desc": "پاک کردن کلیپ از تایم‌لاین",
       "undo_desc": "بازگردانی آخرین تغییرات",
@@ -362,7 +364,57 @@
       "toggle_snapping": "تغییر حالت چسبندگی مگنتی",
       "add_video_track": "افزودن لاین ویدیو",
       "add_audio_track": "افزودن لاین صدا / موسیقی",
-      "add_waveform_track": "افزودن لاین ویژوالایزر صوتی"
+      "add_waveform_track": "افزودن لاین ویژوالایزر صوتی",
+      "play_video": "پخش ویدیو",
+      "pause_video": "توقف موقت پخش (Pause)",
+      "jump_start": "پرش به ابتدای تایم‌لاین",
+      "jump_start_desc": "انتقال نشانگر زمان به 00:00:00",
+      "jump_end": "پرش به انتهای تایم‌لاین",
+      "jump_end_desc": "انتقال نشانگر به پایان آخرین کلیپ",
+      "fit_screen": "تنظیم بوم در صفحه (Fit Viewport)",
+      "fit_screen_desc": "بازنشانی بزرگنمایی و قرارگیری بوم در مرکز",
+      "render_export": "رندر و خروجی نهایی ویدیو...",
+      "render_export_desc": "کامپایل و انکود پروژه با موتور FFmpeg",
+      "project_settings": "تنظیمات پروژه...",
+      "project_settings_desc": "تغییر ابعاد بوم، نرخ فریم و رنگ پس‌زمینه",
+      "keyboard_shortcuts": "راهنمای کلیدهای میانبر...",
+      "keyboard_shortcuts_desc": "مشاهده لیست کامل کلیدهای دسترسی سریع",
+      "filtergraph": "نمایشگر گراف فیلترها (Filtergraph)...",
+      "filtergraph_desc": "بررسی شماتیک فلوچارت DAG در Mermaid.js"
     }
+  },
+  "adjustments": {
+    "title": "تنظیمات نور و رنگ (Adjust)",
+    "reset": "بازنشانی به حالت پیش‌فرض",
+    "brightness": "روشنایی (Brightness)",
+    "contrast": "کنتراست (Contrast)",
+    "saturation": "غلظت رنگ (Saturation)",
+    "gamma": "گاما (Gamma)",
+    "temperature": "دما / گرمای رنگ (Temperature)",
+    "tint": "تینت سبز / سرخابی (Tint)",
+    "lut": "فایل جدول رنگی سه‌بعدی (.cube)"
+  },
+  "crop": {
+    "title": "ابزار کراپ تصویر",
+    "done": "تایید و پایان کراپ",
+    "reset": "ریست کراپ",
+    "top": "بالا",
+    "bottom": "پایین",
+    "left": "چپ",
+    "right": "راست",
+    "tooltip": "کراپ تصویر (C)"
+  },
+  "confirm": {
+    "title": "تایید عملیات حذف",
+    "delete": "حذف قطعی",
+    "cancel": "انصراف",
+    "delete_track_title": "حذف ترک و لاین",
+    "delete_track_message": "آیا از حذف لاین «{name}» اطمینان دارید؟ تمام کلیپ‌های موجود در این لاین به طور کامل پاک خواهند شد.",
+    "delete_clip_title": "حذف کلیپ",
+    "delete_clip_message": "آیا از حذف کلیپ «{name}» از روی تایم‌لاین اطمینان دارید؟",
+    "delete_asset_title": "حذف فایل از کتابخانه مدیا",
+    "delete_asset_message": "آیا از حذف فایل «{name}» اطمینان دارید؟ این فایل از دیتابیس مدیا حذف خواهد شد.",
+    "delete_project_title": "حذف پروژه",
+    "delete_project_message": "آیا از حذف پروژه «{name}» مطمئن هستید؟ این عملیات غیرقابل بازگشت است."
   }
 }

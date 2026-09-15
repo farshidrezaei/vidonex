@@ -130,6 +130,8 @@ const playbackStore = usePlaybackStore()
 const mediaStore = useMediaStore()
 const { snapTime } = useSnapping()
 const { resolveMediaUrl } = useDesktop()
+const { confirm } = useConfirmDialog()
+const { t } = useI18n()
 
 const isTrimming = ref(false)
 
@@ -277,11 +279,22 @@ const contextMenuItems = computed(() => {
     // Destructive
     [
       {
-        label: 'Delete Clip',
+        label: t('confirm.delete_clip_title'),
         icon: 'i-heroicons-trash',
         color: 'error' as const,
         kbds: ['Del'],
-        onSelect: () => timelineStore.removeClip(props.clip.id),
+        onSelect: async () => {
+          const ok = await confirm({
+            title: t('confirm.delete_clip_title'),
+            message: t('confirm.delete_clip_message', { name: props.clip.id }),
+            confirmText: t('confirm.delete'),
+            cancelText: t('confirm.cancel'),
+            isDanger: true,
+          })
+          if (ok) {
+            timelineStore.removeClip(props.clip.id)
+          }
+        },
       },
     ],
   ]

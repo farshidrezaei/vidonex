@@ -81,6 +81,7 @@ export function calculateClipBounds(
 export const isDragging = ref(false)
 export const isResizing = ref(false)
 export const isRotating = ref(false)
+export const isCropping = ref(false)
 export const activeHandle = ref<HandleType | null>(null)
 
 export function useTransformGizmo() {

@@ -28,7 +28,7 @@
       <button
         class="p-1 rounded text-gray-600 hover:text-red-400 transition"
         :title="$t('timeline.tracks')"
-        @click.stop="timelineStore.removeTrack(track.id)"
+        @click.stop="confirmDeleteTrack"
       >
         <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5" />
       </button>
@@ -38,11 +38,15 @@
 
 <script setup lang="ts">
 import { useTimelineStore } from '~/stores/timeline'
+import { useConfirmDialog } from '~/composables/useConfirmDialog'
 import type { TrackSpec } from '~/types/spec'
 
 const props = defineProps<{
   track: TrackSpec
 }>()
+
+const { t } = useI18n()
+const { confirm } = useConfirmDialog()
 
 const timelineStore = useTimelineStore()
 const isSelected = computed(() => timelineStore.selectedTrackId === props.track.id)
@@ -78,5 +82,18 @@ const kindBadgeClass = computed(() => {
 function toggleMute() {
   props.track.muted = !props.track.muted
   timelineStore.pushHistoryState('Toggle Track Mute')
+}
+
+async function confirmDeleteTrack() {
+  const ok = await confirm({
+    title: t('confirm.delete_track_title'),
+    message: t('confirm.delete_track_message', { name: props.track.id }),
+    confirmText: t('confirm.delete'),
+    cancelText: t('confirm.cancel'),
+    isDanger: true,
+  })
+  if (ok) {
+    timelineStore.removeTrack(props.track.id)
+  }
 }
 </script>

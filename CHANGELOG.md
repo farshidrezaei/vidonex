@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-09-15
+
+### Visual Studio Suite: Interactive Canvas Crop, Pro Color Grading, Categorized Transitions, Project Switcher & Deletion Protection 🎨🎬
+
+Vidonex v1.5.0 delivers a major feature release focused on professional non-linear editing ergonomics: interactive canvas crop mode with an on-screen rule-of-thirds gizmo, comprehensive color and lighting adjustments in the inspector with live CSS simulation and FFmpeg compiler integration, a categorized transition selector with instant search covering 50+ transitions, an integrated project switcher and creator with aspect ratio presets, and a universal confirmation modal system protecting all destructive delete actions.
+
+### Added
+
+#### ✂️ Interactive Visual Crop Mode & FFmpeg Crop Compiler
+- **FFmpeg Crop Filter (`effects/crop.go`)**:
+  - Implemented `CropFilter` with exact pixel dimensions (`Width`, `Height`, `X`, `Y`) or percentage insets (`Top`, `Right`, `Bottom`, `Left`).
+  - Strict parameter validation ensuring positive, even output dimensions (required by H.264/HEVC codecs).
+  - Table-driven unit tests in `effects/crop_test.go` (`TestCropFilter_Table`).
+- **Timeline & Spec Model Integration (`timeline/clip.go`, `spec/model.go`, `spec/converter.go`)**:
+  - Added `CropOptions` struct and `WithCrop()` fluent builder to `timeline.Clip`.
+  - Added `crop` specification fields (`top`, `bottom`, `left`, `right`) to `ClipSpec` and YAML/JSON deserializer.
+  - Integrated `CropFilter` directly into `compiler/planner.go` (`ProcessClipVideo`) prior to scaling and geometry transformations.
+- **On-Screen Canvas Crop Gizmo (`ui/components/viewport/CropGizmo.vue`)**:
+  - Interactive rule-of-thirds grid with 4 drag handles (Top, Bottom, Left, Right) and corner markers.
+  - Real-time CSS `clip-path: inset(...)` preview during viewport playback.
+  - Dedicated "Crop" toggle button in timeline toolbar next to Split and Duplicate tools.
+  - Floating action pill showing live percentage readouts, Reset, and Done buttons.
+
+#### 🎛️ Pro Color & Light Adjustments (`ui/components/panels/ColorAdjustmentInspector.vue`)
+- **Inspector Controls**:
+  - Real-time sliders for Brightness (-100% to +100%), Contrast (-100% to +100%), Saturation (-100% to +100%), Gamma (0.1 to 3.0), Temperature (-100 to +100 Kelvin bias), and Tint (-100 to +100 Magenta/Green bias).
+  - Instant Reset button to revert all adjustments to default neutral values.
+- **Live Canvas Preview & FFmpeg Compiler Integration**:
+  - Mapped adjustments to live CSS `filter` in `ui/components/viewport/CanvasViewport.vue` during playback.
+  - Integrated `ColorGradingFilter` and `LUT3DFilter` in `compiler/planner.go` (`ProcessClipVideo`), compiling directly to FFmpeg `colorbalance` / `eq` filter nodes.
+
+#### 🔄 Categorized Transitions & Instant Search (`ui/components/timeline/TransitionHandle.vue`)
+- **Organized Category Tabs**:
+  - Categorized 50+ XFade transitions into 6 intuitive pill tabs: `All`, `Fades & Dissolve`, `Wipes`, `Slides & Pushes`, `Shapes & Iris`, `Zooms & Warps`.
+- **Instant Search Filter**:
+  - Real-time search query box filtering transitions by name, description, and visual category.
+
+#### 📁 Project Switcher & Project Manager (`ui/components/layout/AppHeader.vue`, `ui/components/panels/NewProjectModal.vue`)
+- **Project Switcher Dropdown**:
+  - Integrated dropdown menu in header displaying active project with checkmark, project list, quick project switching, and project deletion.
+- **New Project Modal**:
+  - Sleek dialog with custom project name, aspect ratio preset cards (16:9 Landscape, 9:16 Vertical, 1:1 Square, 4K UHD, 21:9 Cinema), custom resolution inputs, and frame rate selector.
+  - Synchronized state management in `ui/stores/project.ts` (`switchProject`, `deleteProject`, `isNewProjectOpen`).
+
+#### 🛡️ Universal Confirmation Dialog System (`ui/composables/useConfirmDialog.ts`, `ui/components/common/ConfirmModal.vue`)
+- **Promise-Based Dialog Composable**:
+  - Universal `useConfirmDialog` with customizable title, message, danger styling, confirm and cancel button labels.
+- **Destructive Action Protection**:
+  - Wired into Track Header deletion (deleting tracks and clips).
+  - Wired into Timeline toolbar & context menu clip deletion.
+  - Wired into Media Library asset deletion (both Tree View and Grid View).
+  - Wired into Project Switcher project deletion.
+
+### Fixed
+- **Command Palette Localization (`ui/components/panels/CommandPaletteModal.vue`, `ui/locales/en.json`, `ui/locales/fa.json`)**:
+  - Fixed raw translation keys appearing in Command Palette (`Ctrl+K`); all action titles, descriptions, and categories now display localized Persian and English strings with graceful fallbacks.
+  - Added new actions for Crop Mode and New Project directly in the Command Palette.
+
+---
+
 ## [1.4.0] - 2026-09-15
 
 ### Developer Standards, OpenAPI/Scalar Interactive Docs, Benchmarks & CI/CD Action 🚀

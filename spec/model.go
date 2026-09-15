@@ -62,10 +62,31 @@ type ClipSpec struct {
 	BlendMode   string          `json:"blend_mode,omitempty" yaml:"blend_mode,omitempty"`
 	FadeIn      any             `json:"fade_in,omitempty" yaml:"fade_in,omitempty"`
 	FadeOut     any             `json:"fade_out,omitempty" yaml:"fade_out,omitempty"`
-	Position    *PositionSpec   `json:"position,omitempty" yaml:"position,omitempty"`
-	ChromaKey   *ChromaKeySpec  `json:"chroma_key,omitempty" yaml:"chroma_key,omitempty"`
-	Keyframes   *KeyframesSpec  `json:"keyframes,omitempty" yaml:"keyframes,omitempty"`
-	HasAudio    *bool           `json:"has_audio,omitempty" yaml:"has_audio,omitempty"`
+	Position     *PositionSpec     `json:"position,omitempty" yaml:"position,omitempty"`
+	Crop         *CropSpec         `json:"crop,omitempty" yaml:"crop,omitempty"`
+	ColorGrading *ColorGradingSpec `json:"color_grading,omitempty" yaml:"color_grading,omitempty"`
+	ChromaKey    *ChromaKeySpec    `json:"chroma_key,omitempty" yaml:"chroma_key,omitempty"`
+	Keyframes    *KeyframesSpec    `json:"keyframes,omitempty" yaml:"keyframes,omitempty"`
+	HasAudio     *bool             `json:"has_audio,omitempty" yaml:"has_audio,omitempty"`
+}
+
+// CropSpec defines visual cropping insets.
+type CropSpec struct {
+	Top    float64 `json:"top,omitempty" yaml:"top,omitempty"`
+	Bottom float64 `json:"bottom,omitempty" yaml:"bottom,omitempty"`
+	Left   float64 `json:"left,omitempty" yaml:"left,omitempty"`
+	Right  float64 `json:"right,omitempty" yaml:"right,omitempty"`
+}
+
+// ColorGradingSpec configures primary color grading adjustments.
+type ColorGradingSpec struct {
+	Brightness  float64 `json:"brightness,omitempty" yaml:"brightness,omitempty"`
+	Contrast    float64 `json:"contrast,omitempty" yaml:"contrast,omitempty"`
+	Saturation  float64 `json:"saturation,omitempty" yaml:"saturation,omitempty"`
+	Gamma       float64 `json:"gamma,omitempty" yaml:"gamma,omitempty"`
+	Temperature float64 `json:"temperature,omitempty" yaml:"temperature,omitempty"`
+	Tint        float64 `json:"tint,omitempty" yaml:"tint,omitempty"`
+	LUTFile     string  `json:"lut_file,omitempty" yaml:"lut_file,omitempty"`
 }
 
 // PositionSpec sets the visual placement on the canvas.

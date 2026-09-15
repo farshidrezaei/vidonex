@@ -66,6 +66,19 @@
           @click="duplicateClip"
         />
 
+        <!-- Crop Clip (C) -->
+        <UButton
+          size="xs"
+          :color="isCropping ? 'primary' : 'neutral'"
+          :variant="isCropping ? 'soft' : 'ghost'"
+          icon="i-heroicons-viewfinder-circle"
+          :disabled="!timelineStore.selectedClipId || !isVisualClipSelected"
+          :title="$t('crop.tooltip') || 'Crop Clip (C)'"
+          @click="toggleCropMode"
+        >
+          <span class="text-[11px] font-medium hidden sm:inline">{{ $t('crop.title') || 'Crop' }}</span>
+        </UButton>
+
         <!-- Delete Selected (Del) -->
         <UButton
           size="xs"
@@ -181,10 +194,24 @@
 import { useTimelineStore } from '~/stores/timeline'
 import { usePlaybackStore } from '~/stores/playback'
 import { isShortcutsModalOpen } from '~/composables/useGlobalShortcuts'
+import { isCropping } from '~/composables/useTransformGizmo'
+import { useConfirmDialog } from '~/composables/useConfirmDialog'
 
 const { t } = useI18n()
+const { confirm } = useConfirmDialog()
 const timelineStore = useTimelineStore()
 const playbackStore = usePlaybackStore()
+
+const isVisualClipSelected = computed(() => {
+  const clip = timelineStore.selectedClip
+  if (!clip) return false
+  const track = timelineStore.tracks.find((t) => t.clips?.some((c) => c.id === clip.id))
+  return track ? track.kind === 'video' || track.kind === 'overlay' : false
+})
+
+function toggleCropMode() {
+  isCropping.value = !isCropping.value
+}
 
 const trackHeadersScrollRef = ref<HTMLDivElement | null>(null)
 const timelineScrollRef = ref<HTMLDivElement | null>(null)
@@ -229,9 +256,19 @@ function duplicateClip() {
   }
 }
 
-function deleteSelectedClip() {
+async function deleteSelectedClip() {
   if (timelineStore.selectedClipId) {
-    timelineStore.removeClip(timelineStore.selectedClipId)
+    const clipName = timelineStore.selectedClip?.id || 'Clip'
+    const ok = await confirm({
+      title: t('confirm.delete_clip_title'),
+      message: t('confirm.delete_clip_message', { name: clipName }),
+      confirmText: t('confirm.delete'),
+      cancelText: t('confirm.cancel'),
+      isDanger: true,
+    })
+    if (ok) {
+      timelineStore.removeClip(timelineStore.selectedClipId)
+    }
   }
 }
 

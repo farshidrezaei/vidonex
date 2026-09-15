@@ -251,7 +251,7 @@
                     type="button"
                     class="p-1 rounded hover:bg-red-950/80 text-gray-400 hover:text-red-400 transition-colors"
                     :title="$t('media.delete')"
-                    @click="mediaStore.deleteAsset(asset.id)"
+                    @click="confirmDeleteAsset(asset)"
                   >
                     <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5" />
                   </button>
@@ -326,7 +326,7 @@
                 type="button"
                 class="p-0.5 rounded text-gray-400 hover:text-red-400"
                 :title="$t('media.delete')"
-                @click="mediaStore.deleteAsset(asset.id)"
+                @click="confirmDeleteAsset(asset)"
               >
                 <UIcon name="i-heroicons-trash" class="w-3.5 h-3.5" />
               </button>
@@ -361,7 +361,11 @@
 import { useMediaStore } from '~/stores/media'
 import { useProjectStore } from '~/stores/project'
 import { useDesktop } from '~/composables/useDesktop'
+import { useConfirmDialog } from '~/composables/useConfirmDialog'
 import type { MediaAsset } from '~/types/project'
+
+const { t } = useI18n()
+const { confirm } = useConfirmDialog()
 
 interface CategoryDefinition {
   id: 'video' | 'audio' | 'image' | 'subtitle' | 'other'
@@ -534,6 +538,19 @@ async function handleUploadDrop(event: DragEvent) {
 
   for (const file of Array.from(event.dataTransfer.files)) {
     await mediaStore.uploadFile(projectStore.currentProject.id, file)
+  }
+}
+
+async function confirmDeleteAsset(asset: MediaAsset) {
+  const ok = await confirm({
+    title: t('confirm.delete_asset_title'),
+    message: t('confirm.delete_asset_message', { name: asset.file_name }),
+    confirmText: t('confirm.delete'),
+    cancelText: t('confirm.cancel'),
+    isDanger: true,
+  })
+  if (ok) {
+    await mediaStore.deleteAsset(asset.id)
   }
 }
 

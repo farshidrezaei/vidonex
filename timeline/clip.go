@@ -30,7 +30,28 @@ type Clip struct {
 	ScaleTrack        *animation.FloatKeyframeTrack
 	OpacityTrack      *animation.FloatKeyframeTrack
 	ChromaKeyOptions  *chromakey.Options
+	CropOptions       *CropOptions
+	ColorGrading      *ColorGradingOptions
 	Effects           []Effect // Attached filters and visual transformations
+}
+
+// CropOptions specifies visual cropping insets.
+type CropOptions struct {
+	Top    float64
+	Bottom float64
+	Left   float64
+	Right  float64
+}
+
+// ColorGradingOptions specifies color balance, contrast, saturation, and temperature adjustments.
+type ColorGradingOptions struct {
+	Brightness  float64
+	Contrast    float64
+	Saturation  float64
+	Gamma       float64
+	Temperature float64
+	Tint        float64
+	LUTFile     string
 }
 
 // NewClip creates a Clip with sensible defaults.
@@ -148,6 +169,18 @@ func (clip *Clip) WithBlendMode(mode string) *Clip {
 // WithHasAudio sets whether the clip source contains an audio stream.
 func (clip *Clip) WithHasAudio(hasAudio bool) *Clip {
 	clip.HasAudioStream = hasAudio
+	return clip
+}
+
+// WithCrop sets cropping insets on the clip.
+func (clip *Clip) WithCrop(options CropOptions) *Clip {
+	clip.CropOptions = &options
+	return clip
+}
+
+// WithColorGrading sets color adjustments and grading on the clip.
+func (clip *Clip) WithColorGrading(options ColorGradingOptions) *Clip {
+	clip.ColorGrading = &options
 	return clip
 }
 

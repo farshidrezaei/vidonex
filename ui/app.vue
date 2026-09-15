@@ -76,6 +76,8 @@
       <PanelsProbeDetailsModal />
       <PanelsKeyboardShortcutsModal v-model="isShortcutsModalOpen" />
       <PanelsCommandPaletteModal />
+      <PanelsNewProjectModal />
+      <CommonConfirmModal />
     </div>
   </UApp>
 </template>

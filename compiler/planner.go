@@ -190,6 +190,50 @@ func ProcessClipVideo(graph *filtergraph.Graph, rawInputPad *filtergraph.Pad, cl
 		currentPad = rotateFormatOutput
 	}
 
+	// 7. Crop insets handling
+	if clip.CropOptions != nil {
+		cropFilter := effects.CropFilter{
+			TopInset:    clip.CropOptions.Top,
+			BottomInset: clip.CropOptions.Bottom,
+			LeftInset:   clip.CropOptions.Left,
+			RightInset:  clip.CropOptions.Right,
+		}
+		cropPad, err := cropFilter.Apply(graph, fmt.Sprintf("crop_%s", clip.ID), currentPad)
+		if err != nil {
+			return nil, fmt.Errorf("compiler: failed cropping clip %q: %w", clip.ID, err)
+		}
+		currentPad = cropPad
+	}
+
+	// 8. Color grading & Adjustments handling
+	if clip.ColorGrading != nil {
+		colorFilter := effects.ColorGradingFilter{
+			Brightness:  clip.ColorGrading.Brightness,
+			Contrast:    clip.ColorGrading.Contrast,
+			Saturation:  clip.ColorGrading.Saturation,
+			Gamma:       clip.ColorGrading.Gamma,
+			Temperature: clip.ColorGrading.Temperature,
+			Tint:        clip.ColorGrading.Tint,
+		}
+		gradePad, err := colorFilter.Apply(graph, fmt.Sprintf("colorgrade_%s", clip.ID), currentPad)
+		if err != nil {
+			return nil, fmt.Errorf("compiler: failed color grading clip %q: %w", clip.ID, err)
+		}
+		currentPad = gradePad
+
+		if clip.ColorGrading.LUTFile != "" {
+			lutFilter := effects.LUT3DFilter{
+				FilePath:      clip.ColorGrading.LUTFile,
+				Interpolation: "tetrahedral",
+			}
+			lutPad, err := lutFilter.Apply(graph, fmt.Sprintf("lut3d_%s", clip.ID), currentPad)
+			if err != nil {
+				return nil, fmt.Errorf("compiler: failed applying 3D LUT to clip %q: %w", clip.ID, err)
+			}
+			currentPad = lutPad
+		}
+	}
+
 	return currentPad, nil
 }
 

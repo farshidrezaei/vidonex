@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import type { Project, AspectRatioPreset } from '~/types/project'
 import type { VideoSpec } from '~/types/spec'
+import { useMediaStore } from '~/stores/media'
+import { useTimelineStore } from '~/stores/timeline'
+import { usePlaybackStore } from '~/stores/playback'
 
 export const ASPECT_RATIO_PRESETS: AspectRatioPreset[] = [
   { id: 'youtube_16_9', name: '16:9 Landscape (1080p)', width: 1920, height: 1080, ratio: '16:9', icon: 'i-heroicons-tv' },
@@ -15,6 +18,7 @@ export const useProjectStore = defineStore('project', () => {
   const projectsList = ref<Project[]>([])
   const isSaving = ref(false)
   const isSettingsOpen = ref(false)
+  const isNewProjectOpen = ref(false)
   const isGraphOpen = ref(false)
   const isExportOpen = ref(false)
   const lastSavedAt = ref<Date | null>(null)
@@ -70,6 +74,78 @@ export const useProjectStore = defineStore('project', () => {
       console.error('Failed loading project', err)
     }
     return null
+  }
+
+  async function switchProject(id: string) {
+    const proj = await loadProject(id)
+    if (!proj) return null
+
+    const mediaStore = useMediaStore()
+    await mediaStore.fetchAssets(proj.id)
+
+    const timelineStore = useTimelineStore()
+    const playbackStore = usePlaybackStore()
+    playbackStore.pause()
+    playbackStore.seek(0)
+
+    const specData = proj.specification
+    if (typeof specData === 'string') {
+      try {
+        const parsed = JSON.parse(specData)
+        timelineStore.loadFromSpec(parsed)
+      } catch (err) {
+        console.error('Failed parsing project spec:', err)
+        timelineStore.loadFromSpec({
+          version: '1.0',
+          canvas: {
+            width: proj.width,
+            height: proj.height,
+            frame_rate: proj.frame_rate,
+            background_color: proj.background_color,
+          },
+          tracks: [{ id: 'video-1', kind: 'video', clips: [] }],
+        })
+      }
+    } else if (specData && typeof specData === 'object' && Object.keys(specData).length > 0) {
+      timelineStore.loadFromSpec(specData as any)
+    } else {
+      timelineStore.loadFromSpec({
+        version: '1.0',
+        canvas: {
+          width: proj.width,
+          height: proj.height,
+          frame_rate: proj.frame_rate,
+          background_color: proj.background_color,
+        },
+        tracks: [{ id: 'video-1', kind: 'video', clips: [] }],
+      })
+    }
+    return proj
+  }
+
+  async function deleteProject(id: string) {
+    try {
+      const response = await $fetch<{ success: boolean }>(`/api/projects/${id}`, {
+        method: 'DELETE',
+      })
+      if (response.success) {
+        await fetchProjects()
+        if (currentProject.value?.id === id) {
+          if (projectsList.value.length > 0) {
+            await switchProject(projectsList.value[0].id)
+          } else {
+            const newProj = await createProject('My First Composition', 1920, 1080, 30.0)
+            if (newProj) {
+              await switchProject(newProj.id)
+            }
+          }
+        }
+        return true
+      }
+    } catch (err) {
+      console.error('Failed deleting project', err)
+    }
+    return false
   }
 
   async function saveCurrentProject(spec: VideoSpec) {
@@ -129,6 +205,7 @@ export const useProjectStore = defineStore('project', () => {
     projectsList,
     isSaving,
     isSettingsOpen,
+    isNewProjectOpen,
     isGraphOpen,
     isExportOpen,
     lastSavedAt,
@@ -140,6 +217,8 @@ export const useProjectStore = defineStore('project', () => {
     fetchProjects,
     createProject,
     loadProject,
+    switchProject,
+    deleteProject,
     saveCurrentProject,
     setPreset,
     setAspectRatio,

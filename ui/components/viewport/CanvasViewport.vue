@@ -120,8 +120,16 @@
           class="absolute left-0 right-0 bottom-0 h-1 bg-indigo-400 z-20 pointer-events-none shadow-[0_0_10px_rgba(129,140,248,0.9)]"
         ></div>
 
-        <!-- Transform Gizmo Overlay -->
+        <!-- Transform & Crop Gizmo Overlays -->
+        <ViewportCropGizmo
+          v-if="isCropping"
+          :canvas-width="projectStore.canvasWidth"
+          :canvas-height="projectStore.canvasHeight"
+          :display-width="displayDimensions.width"
+          :display-height="displayDimensions.height"
+        />
         <ViewportTransformGizmo
+          v-else
           :canvas-width="projectStore.canvasWidth"
           :canvas-height="projectStore.canvasHeight"
           :display-width="displayDimensions.width"
@@ -152,6 +160,7 @@ import {
   isDragging,
   isResizing,
   isRotating,
+  isCropping,
   useTransformGizmo,
 } from '~/composables/useTransformGizmo'
 import {
@@ -384,7 +393,37 @@ function getClipRenderStyle(clip: ClipSpec) {
     zIndex: (track?.z_index || 0) + (modifiers.zIndexExtra || 0),
   }
 
-  if (modifiers.clipPath) {
+  // 1. Apply Live Color Grading Filter
+  const filterParts: string[] = []
+  if (clip.color_grading) {
+    const cg = clip.color_grading
+    if (cg.brightness && cg.brightness !== 0) {
+      filterParts.push(`brightness(${1 + cg.brightness})`)
+    }
+    if (cg.contrast && cg.contrast !== 1) {
+      filterParts.push(`contrast(${cg.contrast})`)
+    }
+    if (cg.saturation && cg.saturation !== 1) {
+      filterParts.push(`saturate(${cg.saturation})`)
+    }
+    if (cg.temperature && cg.temperature !== 0) {
+      // Warmth shift: positive adds slight sepia/warm hue, negative cool hue
+      const hueShift = cg.temperature * 15
+      filterParts.push(`hue-rotate(${hueShift}deg)`)
+    }
+  }
+  if (filterParts.length > 0) {
+    style.filter = filterParts.join(' ')
+  }
+
+  // 2. Apply Inset Crop
+  if (clip.crop && (clip.crop.top || clip.crop.bottom || clip.crop.left || clip.crop.right)) {
+    const top = clip.crop.top || 0
+    const right = clip.crop.right || 0
+    const bottom = clip.crop.bottom || 0
+    const left = clip.crop.left || 0
+    style.clipPath = `inset(${top}% ${right}% ${bottom}% ${left}%)`
+  } else if (modifiers.clipPath) {
     style.clipPath = modifiers.clipPath
   }
 

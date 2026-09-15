@@ -233,6 +233,11 @@
           </div>
         </div>
 
+        <!-- Section: Color & Light Adjustments -->
+        <div v-if="isVisualClip" class="pt-3 border-t border-gray-800/80">
+          <PanelsColorAdjustmentInspector />
+        </div>
+
         <!-- Section: Chroma Keying Panel (Green Screen) -->
         <div v-if="isVisualClip" class="pt-3 border-t border-gray-800/80">
           <h4 class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">{{ $t('inspector.chroma_key.title') }}</h4>

@@ -486,6 +486,39 @@ func buildClip(clipSpec ClipSpec) (*timeline.Clip, error) {
 		}
 	}
 
+	// Crop Insets
+	if clipSpec.Crop != nil {
+		cropOpts := timeline.CropOptions{
+			Top:    clipSpec.Crop.Top / 100.0,
+			Bottom: clipSpec.Crop.Bottom / 100.0,
+			Left:   clipSpec.Crop.Left / 100.0,
+			Right:  clipSpec.Crop.Right / 100.0,
+		}
+		// If values were specified directly in normalized 0.0-1.0 rather than percentage:
+		if clipSpec.Crop.Top <= 1.0 && clipSpec.Crop.Bottom <= 1.0 && clipSpec.Crop.Left <= 1.0 && clipSpec.Crop.Right <= 1.0 &&
+			(clipSpec.Crop.Top > 0 || clipSpec.Crop.Bottom > 0 || clipSpec.Crop.Left > 0 || clipSpec.Crop.Right > 0) {
+			cropOpts.Top = clipSpec.Crop.Top
+			cropOpts.Bottom = clipSpec.Crop.Bottom
+			cropOpts.Left = clipSpec.Crop.Left
+			cropOpts.Right = clipSpec.Crop.Right
+		}
+		clip.WithCrop(cropOpts)
+	}
+
+	// Color Grading & Adjustments
+	if clipSpec.ColorGrading != nil {
+		gradingOpts := timeline.ColorGradingOptions{
+			Brightness:  clipSpec.ColorGrading.Brightness,
+			Contrast:    clipSpec.ColorGrading.Contrast,
+			Saturation:  clipSpec.ColorGrading.Saturation,
+			Gamma:       clipSpec.ColorGrading.Gamma,
+			Temperature: clipSpec.ColorGrading.Temperature,
+			Tint:        clipSpec.ColorGrading.Tint,
+			LUTFile:     clipSpec.ColorGrading.LUTFile,
+		}
+		clip.WithColorGrading(gradingOpts)
+	}
+
 	return clip, nil
 }
 

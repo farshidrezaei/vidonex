@@ -57,8 +57,27 @@ export interface ClipSpec {
   fade_in?: number | string
   fade_out?: number | string
   position?: PositionSpec
+  crop?: CropSpec
+  color_grading?: ColorGradingSpec
   chroma_key?: ChromaKeySpec
   keyframes?: KeyframesSpec
+}
+
+export interface CropSpec {
+  top?: number // insets in percentage (0 to 100) or pixels
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export interface ColorGradingSpec {
+  brightness?: number // -1.0 to 1.0 (default 0.0)
+  contrast?: number // 0.0 to 3.0 (default 1.0)
+  saturation?: number // 0.0 to 3.0 (default 1.0)
+  gamma?: number // 0.1 to 3.0 (default 1.0)
+  temperature?: number // -1.0 to 1.0 (default 0.0)
+  tint?: number // -1.0 to 1.0 (default 0.0)
+  lut_file?: string
 }
 
 export interface PositionSpec {
