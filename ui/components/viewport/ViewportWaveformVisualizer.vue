@@ -155,13 +155,17 @@ const containerStyle = computed(() => {
   const left = (props.displayWidth - visualW) / 2 + posX
   const top = (props.displayHeight - visualH) / 2 + posY
 
+  const trackIndex = timelineStore.tracks.findIndex((t) => t.id === props.track.id)
+  const layerIndex = props.track.z_index !== undefined ? props.track.z_index : (trackIndex !== -1 ? trackIndex : 0)
+  const baseZIndex = (layerIndex + 1) * 100
+
   return {
     left: `${Math.round(left)}px`,
     top: `${Math.round(top)}px`,
     width: `${Math.round(visualW)}px`,
     height: `${Math.round(visualH)}px`,
     opacity: opacity.value,
-    zIndex: (props.track.z_index ?? 10) + (isSelected.value ? 10 : 0),
+    zIndex: baseZIndex + (isSelected.value ? 20 : 0),
     cursor: isSelected.value ? 'move' : 'pointer',
   }
 })

@@ -317,6 +317,21 @@ function findTrackForClip(clipId: string): TrackSpec | undefined {
   return timelineStore.tracks.find((t) => t.clips?.some((c) => c.id === clipId))
 }
 
+function findTrackIndexForClip(clipId: string): number {
+  return timelineStore.tracks.findIndex((t) => t.clips?.some((c) => c.id === clipId))
+}
+
+function getTrackBaseZIndex(trackId: string): number {
+  const trackIndex = timelineStore.tracks.findIndex((t) => t.id === trackId)
+  if (trackIndex === -1) return 10
+  const track = timelineStore.tracks[trackIndex]
+  // Base z-index derived from user-configured z_index (if provided) or its natural timeline index.
+  // We allocate 100 integer slots per track layer (e.g. Track 0: 100, Track 1: 200, Track 2: 300...)
+  // This completely prevents transition zIndexExtra (+5) from ever bleeding into higher tracks.
+  const layerIndex = track.z_index !== undefined ? track.z_index : trackIndex
+  return (layerIndex + 1) * 100
+}
+
 const activeVisualClips = computed(() => {
   const time = playbackStore.currentTime
   const visualTracks = timelineStore.tracks.filter((t) => t.kind === 'video' || t.kind === 'overlay')
@@ -364,7 +379,19 @@ const activeVisualClips = computed(() => {
     }
   }
 
-  return clips
+  // Stable sort clips by their effective track layer to ensure consistent DOM paint order
+  return clips.sort((a, b) => {
+    const trackIndexA = findTrackIndexForClip(a.id)
+    const trackIndexB = findTrackIndexForClip(b.id)
+    const trackA = trackIndexA !== -1 ? timelineStore.tracks[trackIndexA] : undefined
+    const trackB = trackIndexB !== -1 ? timelineStore.tracks[trackIndexB] : undefined
+    const zA = trackA?.z_index !== undefined ? trackA.z_index : trackIndexA
+    const zB = trackB?.z_index !== undefined ? trackB.z_index : trackIndexB
+    if (zA !== zB) {
+      return zA - zB
+    }
+    return (Number(a.start) || 0) - (Number(b.start) || 0)
+  })
 })
 
 interface ActiveWaveformLayer {
@@ -422,6 +449,8 @@ function getClipRenderStyle(clip: ClipSpec) {
     transform = `${transform} ${modifiers.transformExtra}`
   }
 
+  const baseZIndex = track ? getTrackBaseZIndex(track.id) : 100
+
   const style: Record<string, any> = {
     left: `${bounds.left}px`,
     top: `${bounds.top}px`,
@@ -431,7 +460,7 @@ function getClipRenderStyle(clip: ClipSpec) {
     opacity,
     mixBlendMode: (clip.blend_mode && clip.blend_mode !== 'normal') ? clip.blend_mode : 'normal',
     transformOrigin: 'center center',
-    zIndex: (track?.z_index || 0) + (modifiers.zIndexExtra || 0),
+    zIndex: baseZIndex + (modifiers.zIndexExtra || 0),
   }
 
   // 1. Apply Live Color Grading Filter
