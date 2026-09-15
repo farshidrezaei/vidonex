@@ -67,3 +67,82 @@ func TestEffects_Transitions(t *testing.T) {
 	}
 	_ = outPad
 }
+
+func TestEffects_MapTransitionToFFmpegXFadeTable(t *testing.T) {
+	testCases := []struct {
+		name                   string
+		transitionType         timeline.TransitionType
+		expectedFFmpegXFadeVal string
+	}{
+		{
+			name:                   "Vertical Squeeze maps to FFmpeg squeezeh",
+			transitionType:         timeline.TransitionSqueezeVert,
+			expectedFFmpegXFadeVal: "squeezeh",
+		},
+		{
+			name:                   "Horizontal Squeeze maps to FFmpeg squeezev",
+			transitionType:         timeline.TransitionSqueezeHorz,
+			expectedFFmpegXFadeVal: "squeezev",
+		},
+		{
+			name:                   "Horizontal Open doors maps to FFmpeg vertopen",
+			transitionType:         timeline.TransitionHorzOpen,
+			expectedFFmpegXFadeVal: "vertopen",
+		},
+		{
+			name:                   "Vertical Open blinds maps to FFmpeg horzopen",
+			transitionType:         timeline.TransitionVertOpen,
+			expectedFFmpegXFadeVal: "horzopen",
+		},
+		{
+			name:                   "Horizontal Close doors maps to FFmpeg vertclose",
+			transitionType:         timeline.TransitionHorzClose,
+			expectedFFmpegXFadeVal: "vertclose",
+		},
+		{
+			name:                   "Vertical Close blinds maps to FFmpeg horzclose",
+			transitionType:         timeline.TransitionVertClose,
+			expectedFFmpegXFadeVal: "horzclose",
+		},
+		{
+			name:                   "Dissolve maps 1:1",
+			transitionType:         timeline.TransitionDissolve,
+			expectedFFmpegXFadeVal: "dissolve",
+		},
+		{
+			name:                   "Fade maps 1:1",
+			transitionType:         timeline.TransitionFade,
+			expectedFFmpegXFadeVal: "fade",
+		},
+		{
+			name:                   "Wipe Left maps 1:1",
+			transitionType:         timeline.TransitionWipeLeft,
+			expectedFFmpegXFadeVal: "wipeleft",
+		},
+		{
+			name:                   "Radial clock wipe maps 1:1",
+			transitionType:         timeline.TransitionRadial,
+			expectedFFmpegXFadeVal: "radial",
+		},
+		{
+			name:                   "Zoom in maps 1:1",
+			transitionType:         timeline.TransitionZoomIn,
+			expectedFFmpegXFadeVal: "zoomin",
+		},
+		{
+			name:                   "Empty transition falls back to fade",
+			transitionType:         "",
+			expectedFFmpegXFadeVal: "fade",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := effects.MapTransitionToFFmpegXFade(tc.transitionType)
+			if actual != tc.expectedFFmpegXFadeVal {
+				t.Errorf("MapTransitionToFFmpegXFade(%q) = %q, expected %q", tc.transitionType, actual, tc.expectedFFmpegXFadeVal)
+			}
+		})
+	}
+}
+

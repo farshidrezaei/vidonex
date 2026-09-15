@@ -69,6 +69,18 @@ Vidonex v1.5.0 delivers a major feature release focused on professional non-line
   - `squeezeh` and `squeezev` squeeze transitions.
   - `fadeblack`, `fadewhite`, and `fadegrays` dip transitions.
 
+#### 🎞️ Universal Transition Fidelity & FFmpeg Filtergraph Alignment (`effects/transitions.go`, `ui/composables/useTransitionPreview.ts`)
+- **FFmpeg Filter Parameter Translation (`effects/transitions.go`)**:
+  - Implemented `MapTransitionToFFmpegXFade` adapter resolving discrepancies where FFmpeg's internal `vf_xfade.c` filters used inverted axis parameters.
+  - Aligned `TransitionSqueezeVert` ("squeezev") to emit `squeezeh` (vertical height compression in FFmpeg).
+  - Aligned `TransitionSqueezeHorz` ("squeezeh") to emit `squeezev` (horizontal width compression in FFmpeg).
+  - Aligned `TransitionHorzOpen` / `TransitionHorzClose` to emit `vertopen` / `vertclose` (doors opening/closing horizontally like double doors).
+  - Aligned `TransitionVertOpen` / `TransitionVertClose` to emit `horzopen` / `horzclose` (blinds opening/closing vertically).
+- **Web Studio Canvas Preview Simulator Alignment (`ui/composables/useTransitionPreview.ts`)**:
+  - Aligned diagonal wipes (`wipetl`, `wipetr`, `wipebl`, `wipebr`) to shrink the outgoing clip toward the target corner, revealing the incoming clip from the opposite corner.
+- **Audio Playback Engine Resilience (`ui/composables/useTimelineAudio.ts`)**:
+  - Restored clip audio element pool Map, unlocked browser autoplay restrictions on playback, and enabled preloading for seamless preview sound.
+
 #### 🔄 Categorized Transitions & Instant Search (`ui/components/timeline/TransitionHandle.vue`)
 - **Organized Category Tabs**:
   - Categorized 50+ XFade transitions into 6 intuitive pill tabs: `All`, `Fades & Dissolve`, `Wipes`, `Slides & Pushes`, `Shapes & Iris`, `Zooms & Warps`.

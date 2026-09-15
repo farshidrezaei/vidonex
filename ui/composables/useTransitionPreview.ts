@@ -348,8 +348,9 @@ export function getTransitionStyleModifiers(transitionInfo: TransitionActiveInfo
       return {}
 
     case 'wipetl':
-      if (role === 'to') {
-        const p = (1.0 - progress) * 100
+      // Wipes towards top-left: outgoing clip shrinks to top-left corner
+      if (role === 'from') {
+        const p = progress * 100
         return {
           clipPath: `polygon(0 0, ${100 - p}% 0, 0 ${100 - p}%)`,
           zIndexExtra: 5,
@@ -358,8 +359,9 @@ export function getTransitionStyleModifiers(transitionInfo: TransitionActiveInfo
       return {}
 
     case 'wipetr':
-      if (role === 'to') {
-        const p = (1.0 - progress) * 100
+      // Wipes towards top-right: outgoing clip shrinks to top-right corner
+      if (role === 'from') {
+        const p = progress * 100
         return {
           clipPath: `polygon(100% 0, 100% ${100 - p}%, ${p}% 0)`,
           zIndexExtra: 5,
@@ -368,8 +370,9 @@ export function getTransitionStyleModifiers(transitionInfo: TransitionActiveInfo
       return {}
 
     case 'wipebl':
-      if (role === 'to') {
-        const p = (1.0 - progress) * 100
+      // Wipes towards bottom-left: outgoing clip shrinks to bottom-left corner
+      if (role === 'from') {
+        const p = progress * 100
         return {
           clipPath: `polygon(0 100%, 0 ${p}%, ${100 - p}% 100%)`,
           zIndexExtra: 5,
@@ -378,8 +381,9 @@ export function getTransitionStyleModifiers(transitionInfo: TransitionActiveInfo
       return {}
 
     case 'wipebr':
-      if (role === 'to') {
-        const p = (1.0 - progress) * 100
+      // Wipes towards bottom-right: outgoing clip shrinks to bottom-right corner
+      if (role === 'from') {
+        const p = progress * 100
         return {
           clipPath: `polygon(100% 100%, ${p}% 100%, 100% ${p}%)`,
           zIndexExtra: 5,

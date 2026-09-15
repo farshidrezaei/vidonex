@@ -100,6 +100,29 @@ func TestChainTrackTransitions_Table(t *testing.T) {
 				"transition=slideright",
 			},
 		},
+		{
+			name: "Clips with Squeeze Vertical and Horizontal Open correctly map to FFmpeg squeezeh and vertopen",
+			clips: []*timeline.Clip{
+				timeline.NewClip("clip_v1", "assets/v1.mp4", 0, 4*time.Second),
+				timeline.NewClip("clip_v2", "assets/v2.mp4", 4*time.Second, 4*time.Second),
+				timeline.NewClip("clip_v3", "assets/v3.mp4", 8*time.Second, 4*time.Second),
+			},
+			transitions: func(clips []*timeline.Clip) []*timeline.Transition {
+				return []*timeline.Transition{
+					timeline.NewTransition("trans_squeeze", timeline.TransitionSqueezeVert, 1*time.Second, clips[0], clips[1]),
+					timeline.NewTransition("trans_horzopen", timeline.TransitionHorzOpen, 1*time.Second, clips[1], clips[2]),
+				}
+			},
+			expectedChainedDuration: 11 * time.Second, // 4 + 4 - 0.5 + 4 - 0.5 = 11s
+			expectedNodeSubstrings: []string{
+				"transition=squeezeh",
+				"transition=vertopen",
+			},
+			unexpectedNodeSubstrings: []string{
+				"transition=squeezev",
+				"transition=horzopen",
+			},
+		},
 	}
 
 	for _, scenario := range testScenarios {
