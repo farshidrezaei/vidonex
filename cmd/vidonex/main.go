@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	EngineVersion = "1.3.0"
+	EngineVersion = "1.4.0"
 )
 
 func main() {

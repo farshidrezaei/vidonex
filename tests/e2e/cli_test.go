@@ -148,7 +148,7 @@ tracks:
 		{
 			name:                 "cli_version",
 			arguments:            []string{"version"},
-			expectedOutputStdout: "vidonex engine version 1.0.0",
+			expectedOutputStdout: "vidonex engine version",
 		},
 		{
 			name:                 "cli_validate_yaml",

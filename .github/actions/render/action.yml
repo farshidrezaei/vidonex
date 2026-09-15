@@ -1,0 +1,77 @@
+name: "Vidonex Video Render Action"
+description: "Declarative video composition and rendering pipeline powered by Vidonex and FFmpeg in GitHub Actions"
+author: "Farshid Rezaei"
+branding:
+  icon: "video"
+  color: "purple"
+
+inputs:
+  project:
+    description: "Path to Vidonex timeline specification file (.yaml or .json)"
+    required: true
+  output:
+    description: "Destination file path for the rendered video (e.g. output.mp4)"
+    required: true
+  version:
+    description: "Vidonex engine version to install and run"
+    required: false
+    default: "1.4.0"
+  hwaccel:
+    description: "Hardware acceleration mode (none, nvenc, vaapi, videotoolbox)"
+    required: false
+    default: "none"
+  install-ffmpeg:
+    description: "Automatically install FFmpeg if not already available on the runner"
+    required: false
+    default: "true"
+
+outputs:
+  rendered-file:
+    description: "Absolute file path of the rendered video artifact"
+    value: ${{ steps.render.outputs.rendered-file }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Ensure FFmpeg is installed
+      if: inputs.install-ffmpeg == 'true'
+      shell: bash
+      run: |
+        if ! command -v ffmpeg &> /dev/null; then
+          echo "FFmpeg not detected. Installing via package manager..."
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            brew install ffmpeg
+          fi
+        fi
+        ffmpeg -version | head -n 1
+
+    - name: Set up Go toolchain
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.26"
+
+    - name: Install Vidonex CLI
+      shell: bash
+      run: |
+        echo "Installing Vidonex CLI..."
+        go install github.com/farshidrezaei/vidonex/cmd/vidonex@v${{ inputs.version }} || go install ./cmd/vidonex
+
+    - name: Render video timeline
+      id: render
+      shell: bash
+      run: |
+        echo "Rendering project: ${{ inputs.project }} to ${{ inputs.output }}"
+        
+        HWACCEL_FLAG=""
+        if [ "${{ inputs.hwaccel }}" != "none" ]; then
+          HWACCEL_FLAG="--hwaccel ${{ inputs.hwaccel }}"
+        fi
+
+        vidonex render "${{ inputs.project }}" --output "${{ inputs.output }}" $HWACCEL_FLAG
+        
+        OUTPUT_ABS_PATH="$(cd "$(dirname "${{ inputs.output }}")" && pwd)/$(basename "${{ inputs.output }}")"
+        echo "rendered-file=${OUTPUT_ABS_PATH}" >> "$GITHUB_OUTPUT"
+        echo "Video rendered successfully to ${OUTPUT_ABS_PATH}"

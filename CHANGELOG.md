@@ -7,13 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.4.0] - 2026-09-15
 
-### Planned for v1.4.0
-- **Interactive OpenAPI & Scalar Documentation (`/docs`)**: Embedded interactive REST sandbox directly in `vidonex serve`.
-- **Compiler Performance Benchmark Suite**: Memory allocation and throughput benchmark tests comparing Go DAG compiler against industry alternatives.
-- **GitHub Action Workflow (`farshidrezaei/vidonex-action`)**: Reusable CI action for automated video composition and changelog renders.
-- **DevContainer Environment**: Turnkey containerized workspace with Go, Node, Wails, and FFmpeg pre-configured.
+### Developer Standards, OpenAPI/Scalar Interactive Docs, Benchmarks & CI/CD Action 🚀
+
+Vidonex v1.4.0 establishes developer-first production infrastructure, including an embedded OpenAPI 3.0 specification with an interactive Scalar API sandbox, comprehensive compiler and topological sorting performance benchmarks, a turnkey DevContainer development environment, and an official reusable GitHub Action for automated cloud video rendering.
+
+### Added
+
+#### 📖 Interactive OpenAPI 3.0 & Scalar Documentation (`server/api/docs.go`)
+- **OpenAPI 3.0 Specification (`/docs/openapi.json`)**:
+  - Full schema definitions for all REST endpoints (`/api/projects`, `/api/media`, `/api/spec/validate`, `/api/spec/graph`, `/api/render`) and real-time WebSocket protocol (`/ws`).
+  - Strict parameter and request/response body schemas with example payloads.
+- **Embedded Scalar Interactive UI (`/docs` & `/docs/`)**:
+  - Zero-dependency modern API reference and testing sandbox served directly from the embedded Go server.
+  - Features dark mode, request generation, code snippets, and live endpoint testing without external tooling.
+- Table-driven unit test suite in [`server/server_test.go`](file:///home/farshid/Desktop/projects/vidonyx/server/server_test.go) verifying endpoint headers, schemas, and routing.
+
+#### ⚡ Compiler Performance Benchmark Suite (`compiler/benchmark_test.go`)
+- **`BenchmarkCompiler_SimpleTimeline`**: Verifies sub-millisecond timeline compilation (~70µs/op, 855 allocs) on multi-clip single-track timelines.
+- **`BenchmarkCompiler_ComplexMultiTrack`**: High-load benchmark covering simultaneous green screen chromakey, despill, sidechain audio ducking, and peak-to-peak waveform visualization (~118µs/op, 1204 allocs).
+- **`BenchmarkFiltergraph_TopologicalSort_500Nodes`**: Verifies linear-time $O(V + E)$ performance of Kahn's topological sort algorithm across deep 500-node DAG pipelines (~116µs/op).
+
+#### 🎬 Official Reusable GitHub Action (`.github/actions/render/`)
+- **`farshidrezaei/vidonex/.github/actions/render@v1.4.0`**:
+  - Turnkey composite action for continuous integration and automated video rendering pipelines.
+  - Automatically provisions FFmpeg & FFprobe on Linux and macOS runners if missing.
+  - Automatically compiles and executes `vidonex render` with hardware acceleration flags (`nvenc`, `vaapi`, `videotoolbox`).
+  - Exports `rendered-file` path output for direct artifact uploads.
+- Complete documentation and sample workflows in [`.github/actions/render/README.md`](file:///home/farshid/Desktop/projects/vidonyx/.github/actions/render/README.md).
+
+#### 🐳 Standardized DevContainer (`.devcontainer/devcontainer.json`)
+- Ubuntu 24.04-based containerized environment pre-configured with Go 1.26, Node.js 24, pnpm, FFmpeg, GTK3/WebKit2GTK, and Wails v2.
+- Pre-configured VS Code settings and extensions for Go language server, Tailwind CSS, Vue Volar, and TOML.
 
 ---
 

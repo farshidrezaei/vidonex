@@ -96,3 +96,70 @@ func TestServer_MediaFileServingTable(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_DocumentationEndpointsTable(t *testing.T) {
+	tempDir := t.TempDir()
+	dataDir := filepath.Join(tempDir, "data")
+
+	serverInstance, err := server.New(server.Config{
+		DataDirectory: dataDir,
+	})
+	if err != nil {
+		t.Fatalf("failed creating server: %v", err)
+	}
+
+	handler := serverInstance.Handler()
+
+	testScenarios := []struct {
+		name                string
+		requestURL          string
+		expectedStatus      int
+		expectedContentType string
+		expectedContains    string
+	}{
+		{
+			name:                "openapi spec json endpoint returns 200 with valid spec",
+			requestURL:          "/docs/openapi.json",
+			expectedStatus:      http.StatusOK,
+			expectedContentType: "application/json",
+			expectedContains:    `"openapi": "3.0.3"`,
+		},
+		{
+			name:                "scalar docs page returns 200 with interactive ui",
+			requestURL:          "/docs",
+			expectedStatus:      http.StatusOK,
+			expectedContentType: "text/html",
+			expectedContains:    "@scalar/api-reference",
+		},
+		{
+			name:                "scalar docs page with trailing slash returns 200",
+			requestURL:          "/docs/",
+			expectedStatus:      http.StatusOK,
+			expectedContentType: "text/html",
+			expectedContains:    `data-url="/docs/openapi.json"`,
+		},
+	}
+
+	for _, scenario := range testScenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
+			request := httptest.NewRequest(http.MethodGet, scenario.requestURL, nil)
+
+			handler.ServeHTTP(recorder, request)
+
+			if recorder.Code != scenario.expectedStatus {
+				t.Errorf("status = %d, want %d", recorder.Code, scenario.expectedStatus)
+			}
+
+			contentType := recorder.Header().Get("Content-Type")
+			if !strings.Contains(contentType, scenario.expectedContentType) {
+				t.Errorf("contentType = %q, want containing %q", contentType, scenario.expectedContentType)
+			}
+
+			bodyBytes, _ := io.ReadAll(recorder.Body)
+			if !strings.Contains(string(bodyBytes), scenario.expectedContains) {
+				t.Errorf("body missing %q", scenario.expectedContains)
+			}
+		})
+	}
+}

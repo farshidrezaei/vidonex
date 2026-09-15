@@ -79,6 +79,11 @@ func (s *Server) Handler() http.Handler {
 	// WebSocket endpoint
 	mux.HandleFunc("/ws", s.websocketHub.HandleWebSocket)
 
+	// API Documentation (OpenAPI 3.0 & Scalar Interactive UI)
+	mux.HandleFunc("/docs/openapi.json", s.apiHandlers.HandleOpenAPISpec)
+	mux.HandleFunc("/docs", s.apiHandlers.HandleScalarDocs)
+	mux.HandleFunc("/docs/", s.apiHandlers.HandleScalarDocs)
+
 	// API Endpoints
 	mux.HandleFunc("/api/projects", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -211,7 +216,7 @@ func (s *Server) Handler() http.Handler {
 	if s.config.StaticDirectory != "" {
 		fileServer := http.FileServer(http.Dir(s.config.StaticDirectory))
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, "/api/") || strings.HasPrefix(r.URL.Path, "/ws") {
+			if strings.HasPrefix(r.URL.Path, "/api/") || strings.HasPrefix(r.URL.Path, "/ws") || strings.HasPrefix(r.URL.Path, "/docs") {
 				http.NotFound(w, r)
 				return
 			}

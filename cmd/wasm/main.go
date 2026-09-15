@@ -14,7 +14,7 @@ import (
 	"github.com/farshidrezaei/vidonex/timeline"
 )
 
-const WasmEngineVersion = "1.3.0"
+const WasmEngineVersion = "1.4.0"
 
 func parseSpecFromString(content string) (*spec.VideoSpec, error) {
 	trimmed := strings.TrimSpace(content)
