@@ -9,11 +9,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for v1.2.0
-- **EBU R128 Broadcast Audio Normalization (`loudnorm`)**: Dual-pass and single-pass audio loudness normalization matching Spotify, YouTube (-14 LUFS) and TV broadcast standards.
-- **3D LUT (.cube) & Cinematic Color Grading**: In-engine `.cube` LUT application with shadow/midtone/highlight color balance and grading controls.
-- **Extended XFade Transitions Catalog**: 50+ FFmpeg cinematic video transitions.
-- **Social Media Production Templates**: Reusable templates for YouTube End-Screen, TikTok 9:16, and Podcast Audiograms.
+### Planned for v1.3.0
+- **Modern Codec Profiles**: Turnkey export profiles for AV1 (`libsvtav1`), Apple ProRes 4444 (with alpha transparency), WebM (VP9/Opus), and 2-Pass GIF.
+- **WebAssembly (WASM) Pipeline**: Standalone Go WASM build target (`vidonex.wasm`) for in-browser timeline compilation, DAG generation, and Mermaid preview.
+
+---
+
+## [1.2.0] - 2026-09-15
+
+### Broadcast Audio & Cinematic Color Grading Release 🎨
+
+Vidonex v1.2.0 elevates audio and video fidelity with industry-standard broadcast loudness normalization, 3D Look-Up Table (LUT) color grading, an expanded cinematic transition library, and turnkey social media templates.
+
+### Added
+
+#### 🎚️ Broadcast & Streaming Audio Normalization (`effects/loudnorm.go`)
+- **EBU R128 `LoudnormFilter`**:
+  - Implements full FFmpeg `loudnorm` filter integration for broadcast and streaming audio loudness compliance.
+  - Dedicated industry presets:
+    - `LoudnormSpotifyYouTube()`: -14.0 LUFS integrated loudness, 11.0 LU LRA, -1.0 dBFS true peak.
+    - `LoudnormEBUR128()`: -23.0 LUFS European broadcast standard, 7.0 LU LRA, -1.0 dBFS true peak.
+    - `LoudnormPodcast()`: -16.0 LUFS vocal speech optimization, 9.0 LU LRA, -1.5 dBFS true peak.
+    - `LoudnormAppleMusic()`: -16.0 LUFS Apple ecosystem preset, 11.0 LU LRA, -1.0 dBFS true peak.
+  - Full table-driven unit test coverage (`effects/loudnorm_test.go`).
+
+#### 🎨 Cinematic Color Grading & 3D LUTs (`effects/color.go`)
+- **`LUT3DFilter`**:
+  - Support for industry-standard `.cube` and `.3dl` Look-Up Tables with configurable tetrahedral, trilinear, or nearest-neighbor interpolation.
+- **`ColorBalanceFilter`**:
+  - Independent shadow, midtone, and highlight RGB color balance adjustments (`rs`, `gs`, `bs`, `rm`, `gm`, `bm`, `rh`, `gh`, `bh`).
+- **`ColorGradingFilter`**:
+  - Unified color pipeline controlling contrast, brightness, saturation, gamma, temperature (warm/cool), and tint (green/magenta) with automatic filter graph node chaining.
+  - Comprehensive table-driven unit tests (`effects/color_test.go`).
+
+#### 🎬 50+ Extended XFade Cinematic Transitions Catalog (`timeline/transition.go`)
+- Expanded `TransitionType` constants to support the complete FFmpeg `xfade` matrix:
+  - Directional wipes: `wipeleft`, `wiperight`, `wipeup`, `wipedown`, `wipetl`, `wipetr`, `wipebl`, `wipebr`.
+  - Directional slides & smooths: `slideleft`, `slideright`, `slideup`, `slidedown`, `smoothleft`, `smoothright`, `smoothup`, `smoothdown`.
+  - Shapes & Iris: `circlecrop`, `circleopen`, `circleclose`, `rectcrop`, `radial`, `distance`, `horzopen`, `horzclose`, `vertopen`, `vertclose`, `hlslice`, `vuslice`, `zoomin`, `squeezev`, `squeezeh`.
+  - Fades & textures: `fade`, `fadeblack`, `fadewhite`, `fadegrays`, `dissolve`, `pixelize`.
+  - Catalog query helpers: `AllVideoTransitions()` and `IsValidTransitionType()`.
+
+#### 📱 Turnkey Social Media Production Templates (`presets/templates.go`)
+- `TemplateTikTokSplitScreen()`: 9:16 vertical 1080x1920 layout with top gameplay/reaction half and bottom creator facecam half.
+- `TemplatePodcastAudiogram()`: 1:1 square layout combining background visuals, dynamic neon audio waveforms, and vocal tracks.
+- `TemplateYouTubeEndScreen()`: 16:9 1080p outro sequence with dedicated video and subscribe card zones.
 
 ---
 

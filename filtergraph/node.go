@@ -45,6 +45,16 @@ func (node *Node) SetParam(key string, value any) *Node {
 	return node
 }
 
+// GetParam retrieves a parameter value by key.
+func (node *Node) GetParam(key string) (any, bool) {
+	for _, param := range node.Params {
+		if param.Key == key {
+			return param.Value, true
+		}
+	}
+	return nil, false
+}
+
 // AddInput appends a new input pad to the node.
 func (node *Node) AddInput(id string, streamType StreamType) *Pad {
 	pad := &Pad{

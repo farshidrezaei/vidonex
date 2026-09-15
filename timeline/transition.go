@@ -12,34 +12,115 @@ type TransitionType string
 const (
 	// TransitionFade fades from clip A to clip B.
 	TransitionFade TransitionType = "fade"
+	// TransitionFadeBlack fades to black then into clip B.
+	TransitionFadeBlack TransitionType = "fadeblack"
+	// TransitionFadeWhite fades to white then into clip B.
+	TransitionFadeWhite TransitionType = "fadewhite"
+	// TransitionFadeGrays fades to grayscale then into clip B.
+	TransitionFadeGrays TransitionType = "fadegrays"
 	// TransitionDissolve dissolves smoothly between clip A and clip B.
 	TransitionDissolve TransitionType = "dissolve"
-	// TransitionWipeLeft wipes from right to left.
-	TransitionWipeLeft TransitionType = "wipeleft"
-	// TransitionWipeRight wipes from left to right.
-	TransitionWipeRight TransitionType = "wiperight"
-	// TransitionWipeUp wipes from bottom to top.
-	TransitionWipeUp TransitionType = "wipeup"
-	// TransitionWipeDown wipes from top to bottom.
-	TransitionWipeDown TransitionType = "wipedown"
-	// TransitionSlideLeft slides incoming clip leftwards.
-	TransitionSlideLeft TransitionType = "slideleft"
-	// TransitionSlideRight slides incoming clip rightwards.
-	TransitionSlideRight TransitionType = "slideright"
-	// TransitionSlideUp slides incoming clip upwards.
-	TransitionSlideUp TransitionType = "slideup"
-	// TransitionSlideDown slides incoming clip downwards.
-	TransitionSlideDown TransitionType = "slidedown"
-	// TransitionCircleCrop expands a circular crop into the next clip.
-	TransitionCircleCrop TransitionType = "circlecrop"
-	// TransitionCircleOpen opens a circle from the center into the next clip.
-	TransitionCircleOpen TransitionType = "circleopen"
-	// TransitionZoomIn zooms smoothly into the next clip.
-	TransitionZoomIn TransitionType = "zoomin"
+	// TransitionPixelize pixelates into clip B.
+	TransitionPixelize TransitionType = "pixelize"
 
-	// TransitionAcrossFade cross-fades audio streams.
+	// Directional Wipes
+	TransitionWipeLeft        TransitionType = "wipeleft"
+	TransitionWipeRight       TransitionType = "wiperight"
+	TransitionWipeUp          TransitionType = "wipeup"
+	TransitionWipeDown        TransitionType = "wipedown"
+	TransitionWipeTopLeft     TransitionType = "wipetl"
+	TransitionWipeTopRight    TransitionType = "wipetr"
+	TransitionWipeBottomLeft  TransitionType = "wipebl"
+	TransitionWipeBottomRight TransitionType = "wipebr"
+
+	// Directional Slides
+	TransitionSlideLeft  TransitionType = "slideleft"
+	TransitionSlideRight TransitionType = "slideright"
+	TransitionSlideUp    TransitionType = "slideup"
+	TransitionSlideDown  TransitionType = "slidedown"
+
+	// Smooth Directional Motion
+	TransitionSmoothLeft  TransitionType = "smoothleft"
+	TransitionSmoothRight TransitionType = "smoothright"
+	TransitionSmoothUp    TransitionType = "smoothup"
+	TransitionSmoothDown  TransitionType = "smoothdown"
+
+	// Shapes & Iris
+	TransitionCircleCrop   TransitionType = "circlecrop"
+	TransitionCircleOpen   TransitionType = "circleopen"
+	TransitionCircleClose  TransitionType = "circleclose"
+	TransitionRectCrop     TransitionType = "rectcrop"
+	TransitionRadial       TransitionType = "radial"
+	TransitionDistance     TransitionType = "distance"
+	TransitionHorzOpen     TransitionType = "horzopen"
+	TransitionHorzClose    TransitionType = "horzclose"
+	TransitionVertOpen     TransitionType = "vertopen"
+	TransitionVertClose    TransitionType = "vertclose"
+	TransitionHorzSlice    TransitionType = "hlslice"
+	TransitionVertSlice    TransitionType = "vuslice"
+	TransitionZoomIn       TransitionType = "zoomin"
+	TransitionSqueezeVert  TransitionType = "squeezev"
+	TransitionSqueezeHorz  TransitionType = "squeezeh"
+
+	// Audio Transitions
 	TransitionAcrossFade TransitionType = "acrossfade"
 )
+
+// AllVideoTransitions returns a list of all supported video transition types.
+func AllVideoTransitions() []TransitionType {
+	return []TransitionType{
+		TransitionFade,
+		TransitionFadeBlack,
+		TransitionFadeWhite,
+		TransitionFadeGrays,
+		TransitionDissolve,
+		TransitionPixelize,
+		TransitionWipeLeft,
+		TransitionWipeRight,
+		TransitionWipeUp,
+		TransitionWipeDown,
+		TransitionWipeTopLeft,
+		TransitionWipeTopRight,
+		TransitionWipeBottomLeft,
+		TransitionWipeBottomRight,
+		TransitionSlideLeft,
+		TransitionSlideRight,
+		TransitionSlideUp,
+		TransitionSlideDown,
+		TransitionSmoothLeft,
+		TransitionSmoothRight,
+		TransitionSmoothUp,
+		TransitionSmoothDown,
+		TransitionCircleCrop,
+		TransitionCircleOpen,
+		TransitionCircleClose,
+		TransitionRectCrop,
+		TransitionRadial,
+		TransitionDistance,
+		TransitionHorzOpen,
+		TransitionHorzClose,
+		TransitionVertOpen,
+		TransitionVertClose,
+		TransitionHorzSlice,
+		TransitionVertSlice,
+		TransitionZoomIn,
+		TransitionSqueezeVert,
+		TransitionSqueezeHorz,
+	}
+}
+
+// IsValidTransitionType reports whether the specified transition type is recognized.
+func IsValidTransitionType(transitionType TransitionType) bool {
+	if transitionType == TransitionAcrossFade {
+		return true
+	}
+	for _, supported := range AllVideoTransitions() {
+		if supported == transitionType {
+			return true
+		}
+	}
+	return false
+}
 
 // Transition specifies an overlap transition between two adjacent clips on a track.
 type Transition struct {
