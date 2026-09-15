@@ -29,11 +29,12 @@ export default defineConfig({
       { text: 'Studio', link: '/guide/desktop-studio' },
       { text: 'Changelog', link: '/changelog' },
       {
-        text: 'v1.0.0',
+        text: 'v1.6.0',
         items: [
-          { text: 'v1.0.0 (Latest Stable)', link: '/' },
-          { text: 'v1.1.0 (Next Roadmap)', link: '/changelog#unreleased' },
-          { text: 'All Releases', link: 'https://github.com/farshidrezaei/vidonex/releases' },
+          { text: 'v1.6.0 (Latest Stable)', link: '/changelog#v1-6-0' },
+          { text: 'v1.5.0 Release', link: 'https://github.com/farshidrezaei/vidonex/releases/tag/v1.5.0' },
+          { text: 'v1.0.0 (Initial Release)', link: '/changelog#v1-0-0' },
+          { text: 'All Releases & Assets', link: 'https://github.com/farshidrezaei/vidonex/releases' },
           { text: 'Versioning Policy', link: '/guide/versioning-policy' },
           { text: 'Contributing', link: 'https://github.com/farshidrezaei/vidonex/blob/main/CONTRIBUTING.md' }
         ]
