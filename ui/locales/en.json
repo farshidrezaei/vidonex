@@ -203,15 +203,37 @@
       "title": "Audio Waveform Visualizer",
       "mode": "Waveform Style",
       "modes": {
-        "peak_to_peak": "Peak to Peak",
-        "bars": "Equalizer Bars",
-        "circular": "Circular Wave",
-        "wave": "Smooth Wave"
+        "peak_to_peak": "Mirrored Bars",
+        "spectrum": "Equalizer Spectrum",
+        "wave": "Neon Oscilloscope",
+        "circular": "Circular Audiogram",
+        "dots": "Frequency Dots"
+      },
+      "presets_title": "Style Presets",
+      "presets": {
+        "cyberpunk": "Cyberpunk Neon",
+        "minimal": "Podcast Minimal",
+        "retro": "Studio Retro",
+        "glow": "Radial Glow"
       },
       "color": "Primary Color",
-      "secondary_color": "Gradient Color",
-      "height": "Height (px)",
-      "line_width": "Bar / Line Width"
+      "secondary_color": "Secondary Color (Gradient)",
+      "dimensions": "Dimensions & Placement",
+      "width": "Width",
+      "height": "Height",
+      "position_x": "Position X",
+      "position_y": "Position Y",
+      "align_center": "Center Canvas",
+      "align_bottom": "Lower Third",
+      "align_top": "Upper Third",
+      "align_banner": "Full Width Banner",
+      "glow": "Neon Glow Effect",
+      "glow_radius": "Glow Radius",
+      "density": "Bar / Dot Density",
+      "roundness": "Corner Rounding",
+      "line_width": "Wave Line Width",
+      "fill_area": "Area Fill",
+      "inner_radius": "Inner Circle Radius"
     },
     "subtitle": {
       "title": "Subtitle Burn-In",
@@ -389,9 +411,15 @@
     "brightness": "Brightness",
     "contrast": "Contrast",
     "saturation": "Saturation",
+    "highlights": "Highlights",
+    "shadows": "Shadows",
+    "whites": "Whites",
+    "blacks": "Blacks",
     "gamma": "Gamma",
     "temperature": "Temperature (Warmth)",
     "tint": "Tint",
+    "blur": "Blur",
+    "sharpen": "Sharpen",
     "lut": "3D LUT (.cube)"
   },
   "crop": {

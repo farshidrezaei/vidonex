@@ -263,9 +263,13 @@
         </div>
       </template>
 
-      <!-- Track Ducking Properties (When track selected) -->
+      <!-- Track Properties (When track selected) -->
       <template v-else-if="selectedTrack">
-        <div class="space-y-3">
+        <div v-if="selectedTrack.kind === 'waveform'" class="space-y-3">
+          <h4 class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ $t('inspector.waveform.title') }}</h4>
+          <PanelsWaveformInspector />
+        </div>
+        <div v-else class="space-y-3">
           <h4 class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ $t('inspector.ducking.title') }}</h4>
           <PanelsDuckingInspector />
         </div>

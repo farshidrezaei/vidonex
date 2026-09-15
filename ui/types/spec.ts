@@ -77,6 +77,12 @@ export interface ColorGradingSpec {
   gamma?: number // 0.1 to 3.0 (default 1.0)
   temperature?: number // -1.0 to 1.0 (default 0.0)
   tint?: number // -1.0 to 1.0 (default 0.0)
+  highlights?: number // -1.0 to 1.0 (default 0.0)
+  shadows?: number // -1.0 to 1.0 (default 0.0)
+  whites?: number // -1.0 to 1.0 (default 0.0)
+  blacks?: number // -1.0 to 1.0 (default 0.0)
+  blur?: number // 0 to 100 (default 0)
+  sharpen?: number // 0 to 100 (default 0)
   lut_file?: string
 }
 
@@ -119,11 +125,22 @@ export interface SubtitleStyleSpec {
 }
 
 export interface WaveformSpec {
-  mode?: 'peak_to_peak' | 'bars' | 'circular' | 'wave'
+  mode?: 'peak_to_peak' | 'bars' | 'spectrum' | 'wave' | 'circular' | 'dots' | 'line'
   color?: string
   secondary_color?: string
+  width?: number
   height?: number
   line_width?: number
+  bar_density?: number
+  bar_roundness?: number
+  glow?: boolean
+  glow_radius?: number
+  fill_area?: boolean
+  inner_radius?: number
+  position?: PositionSpec
+  opacity?: number
+  scale?: string
+  preset?: string
 }
 
 export interface TransitionSpec {

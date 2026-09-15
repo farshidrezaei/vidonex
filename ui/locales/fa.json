@@ -203,16 +203,38 @@
       "title": "امواج صوتی (Waveform)",
       "mode": "استایل نمایش امواج صوتی",
       "modes": {
-        "peak_to_peak": "قله به قله (Peak to Peak)",
-        "bars": "میله‌ای اکولایزر",
-        "circular": "دایره‌ای متحرک",
-        "wave": "موج پیوسته"
+        "peak_to_peak": "میله‌های متقارن",
+        "spectrum": "اکولایزر فرکانسی",
+        "wave": "موج نئونی اسیلوسکوپ",
+        "circular": "دایره‌ای رادیال",
+        "dots": "ماتریس نقطه‌ای"
       },
-      "color": "رنگ اصلی امواج",
-      "secondary_color": "رنگ دوم (گرادینت)",
-      "height": "ارتفاع باکس امواج (px)",
-      "line_width": "ضخامت میله‌ها / خطوط"
-    },
+      "presets_title": "استایل‌های آماده",
+      "presets": {
+        "cyberpunk": "سایبرپانک نئون",
+        "minimal": "پادکست مینیمال",
+        "retro": "استودیو رترو",
+        "glow": "درخشش رادیال"
+      },
+      "color": "رنگ اصلی",
+      "secondary_color": "رنگ دوم (گرادیان)",
+      "dimensions": "ابعاد و موقعیت",
+      "width": "عرض (Width)",
+      "height": "ارتفاع (Height)",
+      "position_x": "موقعیت افقی (X)",
+      "position_y": "موقعیت عمودی (Y)",
+      "align_center": "مرکز بوم",
+      "align_bottom": "یک‌سوم پایین",
+      "align_top": "یک‌سوم بالا",
+      "align_banner": "بنر تمام‌عرض",
+      "glow": "تابش نئونی (Glow)",
+      "glow_radius": "شدت تابش",
+      "density": "تراکم میله‌ها / نقاط",
+      "roundness": "گردی لبه‌ها (Corner Radius)",
+      "line_width": "ضخامت خط موج",
+      "fill_area": "پرشدگی زیر موج",
+      "inner_radius": "شعاع دایره داخلی"
+     },
     "subtitle": {
       "title": "زیرنویس",
       "import_srt": "وارد کردن فایل SRT",
@@ -389,9 +411,15 @@
     "brightness": "روشنایی (Brightness)",
     "contrast": "کنتراست (Contrast)",
     "saturation": "غلظت رنگ (Saturation)",
+    "highlights": "هایلایت‌ها (Highlights)",
+    "shadows": "سایه‌ها (Shadows)",
+    "whites": "سفیدی‌ها (Whites)",
+    "blacks": "سیاهی‌ها (Blacks)",
     "gamma": "گاما (Gamma)",
     "temperature": "دما / گرمای رنگ (Temperature)",
     "tint": "تینت سبز / سرخابی (Tint)",
+    "blur": "تاری تصویر (Blur)",
+    "sharpen": "وضوح لبه‌ها (Sharpen)",
     "lut": "فایل جدول رنگی سه‌بعدی (.cube)"
   },
   "crop": {

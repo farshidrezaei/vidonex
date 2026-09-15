@@ -75,6 +75,18 @@
               {{ clip.id }}
             </div>
           </div>
+
+          <!-- Render Active Waveform Visualizers -->
+          <ViewportWaveformVisualizer
+            v-for="(layer, idx) in activeWaveformLayers"
+            :key="`${layer.track.id}_${layer.clip?.id || idx}`"
+            :track="layer.track"
+            :clip="layer.clip"
+            :canvas-width="projectStore.canvasWidth"
+            :canvas-height="projectStore.canvasHeight"
+            :display-width="displayDimensions.width"
+            :display-height="displayDimensions.height"
+          />
         </div>
 
         <!-- Smart Alignment Guidelines Overlay -->
@@ -355,6 +367,35 @@ const activeVisualClips = computed(() => {
   return clips
 })
 
+interface ActiveWaveformLayer {
+  track: TrackSpec
+  clip?: ClipSpec | null
+}
+
+const activeWaveformLayers = computed<ActiveWaveformLayer[]>(() => {
+  const time = playbackStore.currentTime
+  const waveformTracks = timelineStore.tracks.filter((t) => t.kind === 'waveform')
+  const layers: ActiveWaveformLayer[] = []
+
+  for (const track of waveformTracks) {
+    if (track.muted) continue
+    if (track.clips && track.clips.length > 0) {
+      for (const clip of track.clips) {
+        const start = Number(clip.start) || 0
+        const duration = Number(clip.duration) || 0
+        if (time >= start && time <= start + duration) {
+          layers.push({ track, clip })
+        }
+      }
+    } else {
+      // Track-level waveform with no specific clips
+      layers.push({ track, clip: null })
+    }
+  }
+
+  return layers
+})
+
 function getClipRenderStyle(clip: ClipSpec) {
   const bounds = calculateClipBounds(
     clip,
@@ -410,6 +451,26 @@ function getClipRenderStyle(clip: ClipSpec) {
       // Warmth shift: positive adds slight sepia/warm hue, negative cool hue
       const hueShift = cg.temperature * 15
       filterParts.push(`hue-rotate(${hueShift}deg)`)
+    }
+    if (cg.blur && cg.blur > 0) {
+      const canvasScale = displayDimensions.value.width / (projectStore.canvasWidth || 1920)
+      const displayBlur = Math.max(0.5, cg.blur * 0.2 * canvasScale)
+      filterParts.push(`blur(${displayBlur.toFixed(1)}px)`)
+    }
+    // Highlights & Whites adjustment
+    const highlightEffect = (cg.highlights || 0) * 0.25 + (cg.whites || 0) * 0.15
+    if (highlightEffect !== 0) {
+      filterParts.push(`brightness(${Math.max(0.1, 1 + highlightEffect).toFixed(2)})`)
+    }
+    // Shadows & Blacks adjustment
+    const shadowEffect = (cg.shadows || 0) * 0.2 - (cg.blacks || 0) * 0.15
+    if (shadowEffect !== 0) {
+      filterParts.push(`contrast(${Math.max(0.2, 1 - shadowEffect).toFixed(2)})`)
+    }
+    // Sharpen edge contrast enhancement
+    if (cg.sharpen && cg.sharpen > 0) {
+      const sharpenContrast = 1 + (cg.sharpen / 100) * 0.35
+      filterParts.push(`contrast(${sharpenContrast.toFixed(2)})`)
     }
   }
   if (filterParts.length > 0) {
