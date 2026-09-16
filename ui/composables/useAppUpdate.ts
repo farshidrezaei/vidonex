@@ -37,6 +37,14 @@ const checkError = ref<string | null>(null)
 export const isAboutModalOpen = ref(false)
 export const isUpdateBannerDismissed = ref(false)
 
+// In-App Self-Update Reactive State
+const isUpgrading = ref(false)
+const upgradeProgress = ref(0)
+const upgradeStage = ref<string>('')
+const upgradeMessage = ref<string>('')
+const upgradeError = ref<string | null>(null)
+const isUpgradeComplete = ref(false)
+
 export function useAppUpdate() {
   async function checkForUpdates(force = false) {
     if (isChecking.value) return
@@ -88,6 +96,80 @@ export function useAppUpdate() {
     }
   }
 
+  async function startInAppUpdate() {
+    if (isUpgrading.value) return
+    isUpgrading.value = true
+    upgradeProgress.value = 5
+    upgradeStage.value = 'checking'
+    upgradeMessage.value = 'Initiating update...'
+    upgradeError.value = null
+    isUpgradeComplete.value = false
+
+    try {
+      const response = await fetch('/api/version/upgrade', {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      if (!response.body) {
+        throw new Error('ReadableStream not supported on this browser')
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder('utf-8')
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          const trimmed = line.trim()
+          if (trimmed.startsWith('data:')) {
+            try {
+              const eventData = JSON.parse(trimmed.slice(5).trim())
+              if (eventData.percentage !== undefined) {
+                upgradeProgress.value = Math.round(eventData.percentage)
+              }
+              if (eventData.stage) {
+                upgradeStage.value = eventData.stage
+              }
+              if (eventData.message) {
+                upgradeMessage.value = eventData.message
+              }
+              if (eventData.error) {
+                upgradeError.value = eventData.error
+              }
+              if (eventData.stage === 'completed') {
+                isUpgradeComplete.value = true
+                currentVersion.value = latestVersion.value
+                hasUpdate.value = false
+              }
+              if (eventData.stage === 'failed') {
+                throw new Error(eventData.error || eventData.message || 'Update failed')
+              }
+            } catch (jsonErr: any) {
+              // Ignore malformed ping lines
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('[UpdateChecker] Self-update failed:', err)
+      upgradeError.value = err?.message || 'Failed to update Vidonex'
+      upgradeStage.value = 'failed'
+    } finally {
+      isUpgrading.value = false
+    }
+  }
+
   function isNewerVersion(remote: string, current: string): boolean {
     const p1 = remote.split('.').map((x) => parseInt(x, 10) || 0)
     const p2 = current.split('.').map((x) => parseInt(x, 10) || 0)
@@ -121,7 +203,15 @@ export function useAppUpdate() {
     checkError,
     isAboutModalOpen,
     isUpdateBannerDismissed,
+    isUpgrading,
+    upgradeProgress,
+    upgradeStage,
+    upgradeMessage,
+    upgradeError,
+    isUpgradeComplete,
     checkForUpdates,
+    startInAppUpdate,
     openReleaseUrl,
   }
 }
+

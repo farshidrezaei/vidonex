@@ -468,8 +468,17 @@
     "license": "MIT License",
     "github": "GitHub",
     "documentation": "Documentation",
-    "changelog": "Changelog",
     "action_about_desc": "View engine version, system diagnostics and check for updates",
-    "action_update_desc": "Check for the latest Vidonex release on GitHub"
+    "action_update_desc": "Check for the latest Vidonex release on GitHub",
+    "install_update": "Install Update Automatically",
+    "confirm_update_title": "Confirm Download & Installation",
+    "confirm_update_desc": "Do you want to automatically download and install Vidonex v{version} on this system?",
+    "downloading": "Downloading update package...",
+    "extracting": "Extracting and verifying binary archive...",
+    "replacing": "Applying atomic binary replacement...",
+    "update_complete": "Update successfully installed!",
+    "restart_notice": "New binary has been applied. Please restart the server or reload the page to finish.",
+    "refresh_page": "Reload Studio",
+    "view_release_page": "View on GitHub"
   }
 }

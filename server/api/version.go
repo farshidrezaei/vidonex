@@ -237,8 +237,75 @@ func (h *Handlers) HandleCheckUpdate(responseWriter http.ResponseWriter, httpReq
 	response.ReleaseName = release.Name
 	response.ReleaseNotes = release.Body
 	response.ReleaseURL = release.HTMLURL
-	response.PublishedAt = release.PublishedAt
-	response.Assets = release.Assets
-
 	respondJSON(responseWriter, http.StatusOK, response)
 }
+
+// HandleSelfUpdate handles POST /api/version/upgrade with Server-Sent Events (SSE) progress streaming.
+func (h *Handlers) HandleSelfUpdate(responseWriter http.ResponseWriter, httpRequest *http.Request) {
+	if httpRequest.Method != http.MethodPost {
+		http.Error(responseWriter, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	flusher, ok := responseWriter.(http.Flusher)
+	if !ok {
+		http.Error(responseWriter, "Streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	// Set SSE streaming headers
+	responseWriter.Header().Set("Content-Type", "text/event-stream")
+	responseWriter.Header().Set("Cache-Control", "no-cache")
+	responseWriter.Header().Set("Connection", "keep-alive")
+
+	sendProgressEvent := func(progress UpdateProgress) {
+		payload, err := json.Marshal(progress)
+		if err == nil {
+			_, _ = fmt.Fprintf(responseWriter, "data: %s\n\n", payload)
+			flusher.Flush()
+		}
+	}
+
+	sendProgressEvent(UpdateProgress{
+		Stage:      "checking",
+		Percentage: 0,
+		Message:    "Fetching latest release information...",
+	})
+
+	updateContext, cancel := context.WithTimeout(httpRequest.Context(), 5*time.Minute)
+	defer cancel()
+
+	release, err := FetchLatestRelease(updateContext, true)
+	if err != nil {
+		sendProgressEvent(UpdateProgress{
+			Stage:   "failed",
+			Message: "Failed fetching latest release metadata",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	latestCleanTag := strings.TrimPrefix(release.TagName, "v")
+	hasUpdate := CompareSemanticVersions(latestCleanTag, CurrentEngineVersion) > 0
+	forceUpgrade := httpRequest.URL.Query().Get("force") == "true"
+
+	if !hasUpdate && !forceUpgrade {
+		sendProgressEvent(UpdateProgress{
+			Stage:      "completed",
+			Percentage: 100,
+			Message:    fmt.Sprintf("Vidonex is already on the latest version (v%s)", CurrentEngineVersion),
+		})
+		return
+	}
+
+	err = ExecuteSelfUpdate(updateContext, release, func(progress UpdateProgress) {
+		sendProgressEvent(progress)
+	})
+
+	if err != nil {
+		h.logger.Error("in-app self update failed", "error", err)
+	} else {
+		h.logger.Info("in-app self update successfully applied", "version", release.TagName)
+	}
+}
+

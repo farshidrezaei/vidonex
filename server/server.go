@@ -86,6 +86,7 @@ func (s *Server) Handler() http.Handler {
 
 	// Engine & Version Information
 	mux.HandleFunc("/api/version/check", s.apiHandlers.HandleCheckUpdate)
+	mux.HandleFunc("/api/version/upgrade", s.apiHandlers.HandleSelfUpdate)
 
 	// API Endpoints
 	mux.HandleFunc("/api/projects", func(w http.ResponseWriter, r *http.Request) {
