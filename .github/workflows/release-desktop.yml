@@ -163,6 +163,8 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
 
       - name: Build Desktop macOS ARM64 & AMD64
+        env:
+          CGO_LDFLAGS: "-framework UniformTypeIdentifiers"
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -tags production -ldflags="-s -w" -o build/bin/vidonex-darwin-arm64 .
           CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -tags production -ldflags="-s -w" -o build/bin/vidonex-darwin-amd64 .
