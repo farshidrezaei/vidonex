@@ -234,7 +234,7 @@
       "line_width": "ضخامت خط موج",
       "fill_area": "پرشدگی زیر موج",
       "inner_radius": "شعاع دایره داخلی"
-    },
+     },
     "subtitle": {
       "title": "زیرنویس",
       "import_srt": "وارد کردن فایل SRT",
@@ -444,5 +444,32 @@
     "delete_asset_message": "آیا از حذف فایل «{name}» اطمینان دارید؟ این فایل از دیتابیس مدیا حذف خواهد شد.",
     "delete_project_title": "حذف پروژه",
     "delete_project_message": "آیا از حذف پروژه «{name}» مطمئن هستید؟ این عملیات غیرقابل بازگشت است."
+  },
+  "about": {
+    "title": "درباره ویدانیكس استودیو",
+    "button": "درباره",
+    "update_now": "بروزرسانی اکنون",
+    "check_updates": "بررسی نسخه جدید",
+    "update_available": "نسخه جدید در دسترس است",
+    "update_available_desc": "نسخه جدیدی از ویدانیكس با قابلیت‌ها و بهبودهای تازه برای دریافت آماده است.",
+    "up_to_date": "ویدانیكس به روز است",
+    "up_to_date_desc": "شما از آخرین نسخه پایدار استفاده می‌کنید.",
+    "system_specs": "مشخصات سیستم و موتور پردازش",
+    "update_banner": "نسخه جدید ویدانیكس v{version} منتشر شد!",
+    "view_details": "تغییرات جدید",
+    "os_arch": "سیستم عامل و معماری",
+    "hardware_accel": "شتاب‌دهنده سخت‌افزاری",
+    "ffmpeg_engine": "موتور FFmpeg",
+    "ffmpeg_active": "فعال",
+    "ffmpeg_detected": "موتور FFmpeg سیستم شناسایی شد",
+    "software_cpu": "پردازش نرم‌افزاری (CPU)",
+    "cores": "هسته",
+    "new_badge": "جدید",
+    "license": "مجوز MIT",
+    "github": "گیت‌هاب",
+    "documentation": "مستندات",
+    "changelog": "گزارش تغییرات",
+    "action_about_desc": "مشاهده نسخه موتور، مشخصات سیستم و بررسی آپدیت‌ها",
+    "action_update_desc": "بررسی انتشار آخرین نسخه ویدانیكس در گیت‌هاب"
   }
 }
