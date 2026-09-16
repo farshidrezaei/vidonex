@@ -284,7 +284,7 @@ const commandGroups = computed(() => [
       {
         id: 'about-modal',
         label: t('about.title') || 'About Vidonex Studio...',
-        description: 'View engine version, system diagnostics and check for updates',
+        description: t('about.action_about_desc') || 'View engine version, system diagnostics and check for updates',
         icon: 'i-heroicons-information-circle',
         action: () => {
           isAboutModalOpen.value = true
@@ -293,7 +293,7 @@ const commandGroups = computed(() => [
       {
         id: 'check-updates',
         label: t('about.check_updates') || 'Check for Updates...',
-        description: 'Check for the latest Vidonex release on GitHub',
+        description: t('about.action_update_desc') || 'Check for the latest Vidonex release on GitHub',
         icon: 'i-heroicons-arrow-path',
         action: () => {
           isAboutModalOpen.value = true

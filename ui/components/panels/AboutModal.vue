@@ -45,7 +45,7 @@
                     size="xs"
                     class="animate-pulse text-[10px] font-mono font-bold"
                   >
-                    NEW v{{ latestVersion }}
+                    {{ $t('about.new_badge') || 'NEW' }} v{{ latestVersion }}
                   </UBadge>
                 </div>
                 <p class="text-xs text-gray-400 leading-relaxed">
@@ -98,14 +98,14 @@
 
           <div class="grid grid-cols-2 gap-2 text-xs font-mono">
             <div class="bg-gray-900/60 p-2.5 rounded-lg border border-gray-800/70 flex flex-col justify-between">
-              <span class="text-gray-500 text-[11px]">Operating System / Arch</span>
+              <span class="text-gray-500 text-[11px]">{{ $t('about.os_arch') || 'Operating System / Arch' }}</span>
               <span class="text-gray-200 font-medium truncate mt-1">
-                {{ systemDiagnostics?.os || 'linux' }} / {{ systemDiagnostics?.architecture || 'amd64' }} ({{ systemDiagnostics?.cpu_count || 1 }} Cores)
+                {{ systemDiagnostics?.os || 'linux' }} / {{ systemDiagnostics?.architecture || 'amd64' }} ({{ systemDiagnostics?.cpu_count || 1 }} {{ $t('about.cores') || 'Cores' }})
               </span>
             </div>
 
             <div class="bg-gray-900/60 p-2.5 rounded-lg border border-gray-800/70 flex flex-col justify-between">
-              <span class="text-gray-500 text-[11px]">Hardware Acceleration</span>
+              <span class="text-gray-500 text-[11px]">{{ $t('about.hardware_accel') || 'Hardware Acceleration' }}</span>
               <span class="text-emerald-400 font-medium truncate mt-1 flex items-center gap-1">
                 <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 shrink-0" />
                 {{ hardwareAcceleratorLabel }}
@@ -114,14 +114,14 @@
 
             <div class="col-span-2 bg-gray-900/60 p-2.5 rounded-lg border border-gray-800/70 space-y-1.5">
               <div class="flex items-center justify-between">
-                <span class="text-gray-500 text-[11px]">FFmpeg Engine</span>
+                <span class="text-gray-500 text-[11px]">{{ $t('about.ffmpeg_engine') || 'FFmpeg Engine' }}</span>
                 <span class="text-[10px] text-emerald-400 font-sans font-medium flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Active
+                  {{ $t('about.ffmpeg_active') || 'Active' }}
                 </span>
               </div>
               <p class="text-gray-300 text-[11px] truncate" :title="systemDiagnostics?.ffmpeg_version">
-                {{ systemDiagnostics?.ffmpeg_version || 'FFmpeg system binary detected' }}
+                {{ systemDiagnostics?.ffmpeg_version || ($t('about.ffmpeg_detected') || 'FFmpeg system binary detected') }}
               </p>
             </div>
           </div>
@@ -137,7 +137,7 @@
               class="hover:text-gray-300 transition flex items-center gap-1"
             >
               <UIcon name="i-heroicons-code-bracket" class="w-3.5 h-3.5" />
-              <span>GitHub</span>
+              <span>{{ $t('about.github') || 'GitHub' }}</span>
             </a>
             <a
               href="https://farshidrezaei.github.io/vidonex/"
@@ -146,7 +146,7 @@
               class="hover:text-gray-300 transition flex items-center gap-1"
             >
               <UIcon name="i-heroicons-book-open" class="w-3.5 h-3.5" />
-              <span>Documentation</span>
+              <span>{{ $t('about.documentation') || 'Documentation' }}</span>
             </a>
             <a
               href="https://github.com/farshidrezaei/vidonex/blob/main/CHANGELOG.md"
@@ -155,11 +155,11 @@
               class="hover:text-gray-300 transition flex items-center gap-1"
             >
               <UIcon name="i-heroicons-document-text" class="w-3.5 h-3.5" />
-              <span>Changelog</span>
+              <span>{{ $t('about.changelog') || 'Changelog' }}</span>
             </a>
           </div>
 
-          <span>MIT License</span>
+          <span>{{ $t('about.license') || 'MIT License' }}</span>
         </div>
       </div>
     </template>
@@ -230,7 +230,7 @@ const hardwareAcceleratorLabel = computed(() => {
   if (accels.length > 0) {
     return accels.map((a) => a.toUpperCase()).join(', ')
   }
-  return 'Software (CPU)'
+  return t('about.software_cpu') || 'Software (CPU)'
 })
 
 const formatCheckedTime = computed(() => {

@@ -456,6 +456,20 @@
     "up_to_date_desc": "شما از آخرین نسخه پایدار استفاده می‌کنید.",
     "system_specs": "مشخصات سیستم و موتور پردازش",
     "update_banner": "نسخه جدید ویدانیكس v{version} منتشر شد!",
-    "view_details": "تغییرات جدید"
+    "view_details": "تغییرات جدید",
+    "os_arch": "سیستم عامل و معماری",
+    "hardware_accel": "شتاب‌دهنده سخت‌افزاری",
+    "ffmpeg_engine": "موتور FFmpeg",
+    "ffmpeg_active": "فعال",
+    "ffmpeg_detected": "موتور FFmpeg سیستم شناسایی شد",
+    "software_cpu": "پردازش نرم‌افزاری (CPU)",
+    "cores": "هسته",
+    "new_badge": "جدید",
+    "license": "مجوز MIT",
+    "github": "گیت‌هاب",
+    "documentation": "مستندات",
+    "changelog": "گزارش تغییرات",
+    "action_about_desc": "مشاهده نسخه موتور، مشخصات سیستم و بررسی آپدیت‌ها",
+    "action_update_desc": "بررسی انتشار آخرین نسخه ویدانیكس در گیت‌هاب"
   }
 }
