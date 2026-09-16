@@ -60,7 +60,7 @@ jobs:
 
       - name: Build Desktop Binary
         run: |
-          go build -trimpath -tags webkit2_41 -ldflags="-s -w" -o build/bin/vidonex-linux-amd64 .
+          go build -trimpath -tags "production,webkit2_41" -ldflags="-s -w" -o build/bin/vidonex-linux-amd64 .
 
       - name: Build Headless CLI Binary
         run: |
@@ -112,7 +112,7 @@ jobs:
 
       - name: Build Desktop Binary
         run: |
-          go build -trimpath -ldflags="-s -w -H windowsgui" -o build/bin/vidonex-windows-amd64.exe .
+          go build -trimpath -tags production -ldflags="-s -w -H windowsgui" -o build/bin/vidonex-windows-amd64.exe .
 
       - name: Build Headless CLI Binary
         run: |
@@ -164,8 +164,8 @@ jobs:
 
       - name: Build Desktop macOS ARM64 & AMD64
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-darwin-arm64 .
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o build/bin/vidonex-darwin-amd64 .
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -tags production -ldflags="-s -w" -o build/bin/vidonex-darwin-arm64 .
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -tags production -ldflags="-s -w" -o build/bin/vidonex-darwin-amd64 .
           lipo -create -output build/bin/vidonex-darwin-universal build/bin/vidonex-darwin-arm64 build/bin/vidonex-darwin-amd64
           chmod +x build/bin/vidonex-darwin-universal
 

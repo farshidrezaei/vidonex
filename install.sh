@@ -70,10 +70,12 @@ while [ $# -gt 0 ]; do
             ;;
         --desktop)
             APP_TYPE="desktop"
+            APP_TYPE_EXPLICIT=1
             shift
             ;;
         --cli)
             APP_TYPE="cli"
+            APP_TYPE_EXPLICIT=1
             shift
             ;;
         --no-modify-path)
@@ -208,6 +210,14 @@ success_msg "Platform verified: ${BOLD}${OS_LABEL} (${ARCH_LABEL})${RESET}"
 
 # Step 2: Resolve Artifact & Target Binary
 step_badge "2" "Resolving target package artifact..."
+
+# Auto-detect if user is in a desktop environment (X11/Wayland/macOS) when APP_TYPE was not explicitly passed
+if [ "${APP_TYPE}" = "cli" ] && [ -z "${APP_TYPE_EXPLICIT:-}" ]; then
+    if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ] || [ "${OS_TYPE}" = "darwin" ]; then
+        APP_TYPE="desktop"
+        info_msg "Graphical display environment detected -> Auto-selected ${BOLD}Vidonex Studio Desktop${RESET}"
+    fi
+fi
 
 if [ "${APP_TYPE}" = "desktop" ]; then
     BIN_NAME="vidonex"
@@ -367,6 +377,28 @@ fi
 
 chmod +x "${TARGET_PATH}" 2>/dev/null || true
 success_msg "Binary installed to ${BOLD}${TARGET_PATH}${RESET}"
+
+# Create convenient vidonex-desktop symlink if installing Desktop GUI package
+if [ "${APP_TYPE}" = "desktop" ] && [ "${OS_TYPE}" = "linux" ]; then
+    ln -sf "${TARGET_PATH}" "${INSTALL_DIR}/vidonex-desktop" 2>/dev/null || true
+    # Also create/update .desktop launcher entry if ~/.local/share/applications exists
+    APPS_DIR="${HOME}/.local/share/applications"
+    if [ -d "${APPS_DIR}" ] && [ -w "${APPS_DIR}" ]; then
+        cat << DESKTOP_EOF > "${APPS_DIR}/vidonex.desktop"
+[Desktop Entry]
+Name=Vidonex Studio
+Comment=Professional Declarative Video Composition & FFmpeg Filtergraph Editor
+Exec=${TARGET_PATH}
+Icon=vidonex
+Terminal=false
+Type=Application
+StartupWMClass=vidonex
+Categories=AudioVideo;Video;AudioVideoEditing;
+MimeType=application/x-vidonex;
+DESKTOP_EOF
+        success_msg "Desktop launcher registered in ${BOLD}${APPS_DIR}/vidonex.desktop${RESET}"
+    fi
+fi
 
 # Check whether INSTALL_DIR is in user's active PATH
 PATH_UPDATED=0
