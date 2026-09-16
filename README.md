@@ -71,22 +71,30 @@ Whether you need a **visual desktop editing suite**, a **cloud video rendering m
 
 ## 🚀 Quick Start
 
-### 1. Install Automation CLI (1-Liner)
+### 1. Install CLI or Desktop Studio (1-Liner)
 
-**macOS & Linux:**
+By default, the 1-liner installer installs the **Headless Automation CLI**. To install the **Desktop Studio GUI Workstation**, simply add `-- --desktop`:
+
+#### 💻 Headless Automation CLI:
 ```bash
+# macOS & Linux
 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
-```
 
-**Windows (PowerShell):**
-```powershell
+# Windows (PowerShell)
 irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1 | iex
 ```
 
-*(Or via Go toolchain: `go install github.com/farshidrezaei/vidonex/cmd/vidonex@latest`)*
+#### 🎬 Desktop Studio GUI Workstation:
+```bash
+# macOS & Linux
+curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash -s -- --desktop
 
-### 2. Download Native Desktop Studio
-Standalone production installers for Linux, macOS (Universal), and Windows are available from [**GitHub Releases**](https://github.com/farshidrezaei/vidonex/releases/latest).
+# Windows (PowerShell)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1))) -AppType desktop
+```
+
+### 2. Standalone Downloads
+Direct binary downloads and native installers are also available from [**GitHub Releases**](https://github.com/farshidrezaei/vidonex/releases/latest).
 
 ### 3. Add to Go Project
 ```bash

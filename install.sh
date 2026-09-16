@@ -211,14 +211,6 @@ success_msg "Platform verified: ${BOLD}${OS_LABEL} (${ARCH_LABEL})${RESET}"
 # Step 2: Resolve Artifact & Target Binary
 step_badge "2" "Resolving target package artifact..."
 
-# Auto-detect if user is in a desktop environment (X11/Wayland/macOS) when APP_TYPE was not explicitly passed
-if [ "${APP_TYPE}" = "cli" ] && [ -z "${APP_TYPE_EXPLICIT:-}" ]; then
-    if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ] || [ "${OS_TYPE}" = "darwin" ]; then
-        APP_TYPE="desktop"
-        info_msg "Graphical display environment detected -> Auto-selected ${BOLD}Vidonex Studio Desktop${RESET}"
-    fi
-fi
-
 if [ "${APP_TYPE}" = "desktop" ]; then
     BIN_NAME="vidonex"
     if [ "${OS_TYPE}" = "darwin" ]; then

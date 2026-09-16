@@ -6,17 +6,37 @@ Install **Vidonex** on macOS, Linux, or Windows via your favorite package manage
 
 ## ⚡ Universal 1-Line Installer
 
-The quickest way to install the latest `vidonex` binary on any system:
+The quickest way to install Vidonex on any system. By default, the installer fetches the **Headless Automation CLI**. If you want the visual **Desktop Studio Workstation**, supply the `--desktop` flag:
 
-### macOS & Linux (Bash / Zsh)
+### 💻 Headless Automation CLI (Default)
+
+#### macOS & Linux (Bash / Zsh):
 ```bash
 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
 ```
 
-### Windows (PowerShell)
+#### Windows (PowerShell):
 ```powershell
 irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1 | iex
 ```
+
+---
+
+### 🎬 Desktop Studio GUI Workstation
+
+If you want the full visual workstation GUI with the timeline, multi-track editor, transform gizmos, and real-time preview:
+
+#### macOS & Linux (Bash / Zsh):
+```bash
+curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash -s -- --desktop
+```
+
+#### Windows (PowerShell):
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1))) -AppType desktop
+```
+
+---
 
 ### ✨ What the Installer Does Automatically:
 1. **Detects OS & Architecture Matrix**: Supports Linux (`x86_64`), macOS Universal (`Apple Silicon` + `Intel`), and Windows.
@@ -25,13 +45,10 @@ irm https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.ps1 | i
 4. **Environment `$PATH` Configuration**: Automatically updates your shell configuration (`.bashrc`, `.zshrc`, `.config/fish/config.fish`, or Windows User PATH).
 5. **System Readiness Check**: Probes for `ffmpeg` and detects available GPU hardware acceleration (NVENC, VideoToolbox, VA-API, QSV).
 
-### 🛠️ Advanced Installer Options:
+### 🛠️ Additional Installer Options:
 ```bash
 # Install a specific release version
-VERSION=v1.0.0 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
-
-# Install the Desktop Studio GUI Workstation instead of headless CLI
-APP_TYPE=desktop curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
+VERSION=v1.6.0 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
 
 # Install into a custom directory without touching shell profiles
 INSTALL_DIR=~/.bin NO_MODIFY_PATH=1 curl -fsSL https://raw.githubusercontent.com/farshidrezaei/vidonex/main/install.sh | bash
