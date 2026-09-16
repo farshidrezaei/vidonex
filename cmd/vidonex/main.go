@@ -47,6 +47,10 @@ func main() {
 		executeGraphCommand(os.Args[2:])
 	case "probe":
 		executeProbeCommand(os.Args[2:])
+	case "about", "info":
+		executeAboutCommand(os.Args[2:])
+	case "upgrade", "update":
+		executeUpgradeCommand(os.Args[2:])
 	case "completion":
 		executeCompletionCommand(os.Args[2:])
 	case "version", "--version", "-v":
@@ -463,13 +467,15 @@ USAGE:
   vidonex <command> [arguments] [flags]
 
 COMMANDS:
-  serve    [flags]              Launch the Vidonex Web Studio GUI server
-  render   <project.yaml|json>  Compile and render video composition
-  validate <project.yaml|json>  Validate specification syntax and constraints
-  graph    <project.yaml|json>  Export Mermaid.js or Graphviz DOT filtergraph diagram
-  probe    <media.mp4>          Inspect media container and stream properties
-  completion <shell>            Generate shell autocompletions (bash, zsh, fish)
-  version                       Show Vidonex engine version
+  serve      [flags]              Launch the Vidonex Web Studio GUI server
+  render     <project.yaml|json>  Compile and render video composition
+  validate   <project.yaml|json>  Validate specification syntax and constraints
+  graph      <project.yaml|json>  Export Mermaid.js or Graphviz DOT filtergraph diagram
+  probe      <media.mp4>          Inspect media container and stream properties
+  about                           Show environment, engine, FFmpeg and GPU diagnostics
+  upgrade    [--check] [--force]  Check and automatically upgrade Vidonex binary
+  completion <shell>              Generate shell autocompletions (bash, zsh, fish)
+  version                         Show Vidonex engine version
 
 SERVE FLAGS:
   --port <number>               HTTP port (default: 8080)
@@ -485,6 +491,10 @@ RENDER FLAGS:
   --log-format <format>         Log format (text, json)
   --dry-run                     Compile filtergraph without executing FFmpeg
 
+UPGRADE FLAGS:
+  --check                       Only check if an update is available without downloading
+  --force                       Force reinstall even if already on latest version
+
 EXAMPLES:
   vidonex serve --port 8080
   vidonex render project.yaml -o final.mp4
@@ -492,6 +502,9 @@ EXAMPLES:
   vidonex validate project.yaml
   vidonex graph project.yaml --format mermaid
   vidonex probe gameplay.mp4 --json
+  vidonex about
+  vidonex upgrade --check
+  vidonex upgrade
   vidonex completion zsh > ~/.zsh/completion/_vidonex
 `
 	fmt.Println(strings.TrimSpace(usage))
@@ -529,7 +542,7 @@ _vidonex_completion() {
         cword=$COMP_CWORD
     fi
 
-    local commands="serve render validate graph probe completion version help"
+    local commands="serve render validate graph probe about upgrade completion version help"
 
     if [[ ${cword} -eq 1 ]]; then
         COMPREPLY=( $(compgen -W "${commands}" -- "${cur}") )
@@ -555,6 +568,11 @@ _vidonex_completion() {
                 COMPREPLY=( $(compgen -W "--json" -- "${cur}") )
             fi
             ;;
+        upgrade|update)
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "--check --force" -- "${cur}") )
+            fi
+            ;;
         completion)
             COMPREPLY=( $(compgen -W "bash zsh fish" -- "${cur}") )
             ;;
@@ -573,6 +591,8 @@ _vidonex() {
         'validate:Validate specification syntax and constraints'
         'graph:Export Mermaid.js or Graphviz DOT filtergraph diagram'
         'probe:Inspect media container and stream properties'
+        'about:Show environment, engine, FFmpeg and GPU diagnostics'
+        'upgrade:Check and upgrade Vidonex binary'
         'completion:Generate shell autocompletions'
         'version:Show Vidonex engine version'
         'help:Show help documentation'
@@ -620,6 +640,11 @@ _vidonex() {
                         '--json[Output JSON format]' \
                         '1:media file:_files'
                     ;;
+                upgrade|update)
+                    _arguments \
+                        '--check[Check for updates without downloading]' \
+                        '--force[Force reinstall latest release]'
+                    ;;
                 completion)
                     _arguments '1:shell:(bash zsh fish)'
                     ;;
@@ -638,6 +663,8 @@ complete -c vidonex -n "__fish_use_subcommand" -a render -d "Compile and render 
 complete -c vidonex -n "__fish_use_subcommand" -a validate -d "Validate specification syntax"
 complete -c vidonex -n "__fish_use_subcommand" -a graph -d "Export filtergraph diagram"
 complete -c vidonex -n "__fish_use_subcommand" -a probe -d "Inspect media container"
+complete -c vidonex -n "__fish_use_subcommand" -a about -d "Show environment, engine, FFmpeg and GPU diagnostics"
+complete -c vidonex -n "__fish_use_subcommand" -a upgrade -d "Check and upgrade Vidonex binary"
 complete -c vidonex -n "__fish_use_subcommand" -a completion -d "Generate shell autocompletions"
 complete -c vidonex -n "__fish_use_subcommand" -a version -d "Show engine version"
 complete -c vidonex -n "__fish_use_subcommand" -a help -d "Show help documentation"

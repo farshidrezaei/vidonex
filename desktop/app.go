@@ -24,7 +24,7 @@ import (
 )
 
 // ApplicationVersion defines the semantic version of the desktop application.
-const ApplicationVersion = "1.0.0"
+const ApplicationVersion = "1.6.0"
 
 // DefaultServerPort specifies the default port (0 indicates dynamic ephemeral allocation).
 const DefaultServerPort = 0

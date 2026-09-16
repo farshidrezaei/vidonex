@@ -444,5 +444,18 @@
     "delete_asset_message": "Are you sure you want to delete \"{name}\"? This will permanently delete the file from the media library.",
     "delete_project_title": "Delete Project",
     "delete_project_message": "Are you sure you want to delete project \"{name}\"? This action cannot be undone."
+  },
+  "about": {
+    "title": "About Vidonex Studio",
+    "button": "About",
+    "update_now": "Update Now",
+    "check_updates": "Check for Updates",
+    "update_available": "Update Available",
+    "update_available_desc": "A new version of Vidonex Studio is ready for download with new features and improvements.",
+    "up_to_date": "Vidonex is up to date",
+    "up_to_date_desc": "You are currently running the latest release.",
+    "system_specs": "System & Engine Diagnostics",
+    "update_banner": "Vidonex Studio v{version} is available!",
+    "view_details": "What's New"
   }
 }

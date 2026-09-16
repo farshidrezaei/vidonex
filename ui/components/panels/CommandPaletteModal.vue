@@ -23,8 +23,10 @@ import { useTimelineStore } from '~/stores/timeline'
 import { usePlaybackStore } from '~/stores/playback'
 import { useProjectStore } from '~/stores/project'
 import { resetViewportZoom } from '~/composables/useViewportZoom'
+import { isAboutModalOpen, useAppUpdate } from '~/composables/useAppUpdate'
 
 const { t } = useI18n()
+const { checkForUpdates } = useAppUpdate()
 const timelineStore = useTimelineStore()
 const playbackStore = usePlaybackStore()
 const projectStore = useProjectStore()
@@ -275,9 +277,27 @@ const commandGroups = computed(() => [
         label: t('command_palette.actions.keyboard_shortcuts') || 'Keyboard Shortcuts Reference...',
         description: t('command_palette.actions.keyboard_shortcuts_desc') || 'View complete hotkey cheat sheet',
         icon: 'i-heroicons-command-line',
-        kbds: ['?'],
         action: () => {
           isShortcutsModalOpen.value = true
+        },
+      },
+      {
+        id: 'about-modal',
+        label: t('about.title') || 'About Vidonex Studio...',
+        description: 'View engine version, system diagnostics and check for updates',
+        icon: 'i-heroicons-information-circle',
+        action: () => {
+          isAboutModalOpen.value = true
+        },
+      },
+      {
+        id: 'check-updates',
+        label: t('about.check_updates') || 'Check for Updates...',
+        description: 'Check for the latest Vidonex release on GitHub',
+        icon: 'i-heroicons-arrow-path',
+        action: () => {
+          isAboutModalOpen.value = true
+          checkForUpdates(true)
         },
       },
       {

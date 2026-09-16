@@ -49,7 +49,8 @@ func NewUI(writer io.Writer) *UI {
 	}
 }
 
-func (ui *UI) colorize(colorCode, text string) string {
+// Colorize wraps text with ANSI color sequences if TTY and colors are enabled.
+func (ui *UI) Colorize(colorCode, text string) string {
 	if ui.NoColors || !ui.IsTTY {
 		return text
 	}
@@ -65,25 +66,25 @@ func (ui *UI) PrintBanner() {
     \_/_/_/\_,_/\___/_//_/\_, //_\_\ 
                          /___/       
 `
-	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorCyan+ColorBold, banner))
-	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorDim, "  Declarative Video Composition & FFmpeg Filtergraph Engine in Go"))
-	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorDim, "  -------------------------------------------------------------"))
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorCyan+ColorBold, banner))
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorDim, "  Declarative Video Composition & FFmpeg Filtergraph Engine in Go"))
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorDim, "  -------------------------------------------------------------"))
 }
 
 // PrintStep prints a major pipeline step badge.
 func (ui *UI) PrintStep(stepIndex, totalSteps int, symbol, description string) {
 	badge := fmt.Sprintf("[%d/%d] %s", stepIndex, totalSteps, symbol)
-	_, _ = fmt.Fprintf(ui.Writer, "\n%s %s\n", ui.colorize(ColorCyan+ColorBold, badge), ui.colorize(ColorWhiteBold, description))
+	_, _ = fmt.Fprintf(ui.Writer, "\n%s %s\n", ui.Colorize(ColorCyan+ColorBold, badge), ui.Colorize(ColorWhiteBold, description))
 }
 
 // PrintSuccess prints a success message.
 func (ui *UI) PrintSuccess(message string) {
-	_, _ = fmt.Fprintf(ui.Writer, "%s %s\n", ui.colorize(ColorGreen+ColorBold, "✓"), ui.colorize(ColorGreen, message))
+	_, _ = fmt.Fprintf(ui.Writer, "%s %s\n", ui.Colorize(ColorGreen+ColorBold, "✓"), ui.Colorize(ColorGreen, message))
 }
 
 // PrintError prints an error message.
 func (ui *UI) PrintError(err error) {
-	_, _ = fmt.Fprintf(ui.Writer, "\n%s %s\n", ui.colorize(ColorRed+ColorBold, "✖ Error:"), ui.colorize(ColorRed, err.Error()))
+	_, _ = fmt.Fprintf(ui.Writer, "\n%s %s\n", ui.Colorize(ColorRed+ColorBold, "✖ Error:"), ui.Colorize(ColorRed, err.Error()))
 }
 
 // PrintSummaryCard prints an executive completion card.
@@ -96,14 +97,14 @@ func (ui *UI) PrintSummaryCard(outputPath string, fileSizeBytes int64, renderDur
 
 	border := strings.Repeat("─", 60)
 	_, _ = fmt.Fprintln(ui.Writer, "")
-	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorCyan, "┌"+border+"┐"))
-	_, _ = fmt.Fprintf(ui.Writer, ui.colorize(ColorCyan, "│")+"  %s\n", ui.colorize(ColorGreen+ColorBold, "✨ Composition Rendered Successfully!"))
-	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorCyan, "├"+border+"┤"))
-	_, _ = fmt.Fprintf(ui.Writer, ui.colorize(ColorCyan, "│")+"  %-20s : %s\n", ui.colorize(ColorDim, "Output File"), ui.colorize(ColorBold, outputPath))
-	_, _ = fmt.Fprintf(ui.Writer, ui.colorize(ColorCyan, "│")+"  %-20s : %s\n", ui.colorize(ColorDim, "File Size"), formattedSize)
-	_, _ = fmt.Fprintf(ui.Writer, ui.colorize(ColorCyan, "│")+"  %-20s : %s\n", ui.colorize(ColorDim, "Video Duration"), videoDuration.Round(10*time.Millisecond))
-	_, _ = fmt.Fprintf(ui.Writer, ui.colorize(ColorCyan, "│")+"  %-20s : %s (Speedup: %.2fx)\n", ui.colorize(ColorDim, "Render Elapsed"), renderDuration.Round(10*time.Millisecond), speedRatio)
-	_, _ = fmt.Fprintln(ui.Writer, ui.colorize(ColorCyan, "└"+border+"┘"))
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorCyan, "┌"+border+"┐"))
+	_, _ = fmt.Fprintf(ui.Writer, ui.Colorize(ColorCyan, "│")+"  %s\n", ui.Colorize(ColorGreen+ColorBold, "✨ Composition Rendered Successfully!"))
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorCyan, "├"+border+"┤"))
+	_, _ = fmt.Fprintf(ui.Writer, ui.Colorize(ColorCyan, "│")+"  %-20s : %s\n", ui.Colorize(ColorDim, "Output File"), ui.Colorize(ColorBold, outputPath))
+	_, _ = fmt.Fprintf(ui.Writer, ui.Colorize(ColorCyan, "│")+"  %-20s : %s\n", ui.Colorize(ColorDim, "File Size"), formattedSize)
+	_, _ = fmt.Fprintf(ui.Writer, ui.Colorize(ColorCyan, "│")+"  %-20s : %s\n", ui.Colorize(ColorDim, "Video Duration"), videoDuration.Round(10*time.Millisecond))
+	_, _ = fmt.Fprintf(ui.Writer, ui.Colorize(ColorCyan, "│")+"  %-20s : %s (Speedup: %.2fx)\n", ui.Colorize(ColorDim, "Render Elapsed"), renderDuration.Round(10*time.Millisecond), speedRatio)
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorCyan, "└"+border+"┘"))
 }
 
 // FormatFileSize formats raw bytes into human readable binary units.

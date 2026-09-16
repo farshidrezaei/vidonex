@@ -1,6 +1,9 @@
 <template>
   <UApp>
     <div class="h-screen w-screen flex flex-col bg-[#0b0f19] text-gray-100 overflow-hidden font-sans">
+      <!-- Top Notification Banner for New Releases -->
+      <CommonUpdateNotificationBanner />
+
       <!-- Top Header -->
       <LayoutAppHeader />
 
@@ -76,6 +79,7 @@
       <PanelsProbeDetailsModal />
       <PanelsKeyboardShortcutsModal v-model="isShortcutsModalOpen" />
       <PanelsCommandPaletteModal />
+      <PanelsAboutModal />
       <PanelsNewProjectModal />
       <CommonConfirmModal />
     </div>
@@ -90,6 +94,7 @@ import { useTimelineStore } from '~/stores/timeline'
 import { useWebSocket } from '~/composables/useWebSocket'
 import { useDesktop } from '~/composables/useDesktop'
 import { useGlobalShortcuts, isShortcutsModalOpen } from '~/composables/useGlobalShortcuts'
+import { useAppUpdate } from '~/composables/useAppUpdate'
 
 const { locale } = useI18n()
 const projectStore = useProjectStore()
@@ -98,6 +103,7 @@ const timelineStore = useTimelineStore()
 const { isDesktop, getServerInfo } = useDesktop()
 const { connect } = useWebSocket()
 const { registerGlobalListeners, unregisterGlobalListeners } = useGlobalShortcuts()
+const { checkForUpdates } = useAppUpdate()
 
 // Outer vertical layout splitter panels (Workspace vs Timeline)
 const verticalPanels = ref<SplitterItem[]>([
@@ -189,6 +195,9 @@ onMounted(async () => {
       timelineStore.loadFromSpec(specData as any)
     }
   }
+
+  // Check for updates non-blockingly in background
+  checkForUpdates()
 })
 
 onUnmounted(() => {

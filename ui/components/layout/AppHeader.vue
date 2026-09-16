@@ -141,6 +141,29 @@
         {{ $t('app.export') }}
       </UButton>
 
+      <!-- About / Updates Button -->
+      <div class="relative">
+        <UButton
+          icon="i-heroicons-information-circle"
+          size="sm"
+          color="neutral"
+          variant="ghost"
+          :title="$t('about.title') || 'About Vidonex & Updates'"
+          @click="isAboutModalOpen = true"
+        >
+          <span class="hidden lg:inline text-xs font-medium">{{ $t('about.button') || 'About' }}</span>
+        </UButton>
+        <!-- Update Available Indicator Dot -->
+        <span
+          v-if="hasUpdate"
+          class="absolute -top-0.5 -right-0.5 flex h-2 w-2"
+          :title="$t('about.update_available')"
+        >
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+        </span>
+      </div>
+
       <div class="h-5 w-px bg-gray-800 mx-1"></div>
 
       <!-- Language Switcher -->
@@ -162,11 +185,13 @@ import { useProjectStore, ASPECT_RATIO_PRESETS } from '~/stores/project'
 import { useTimelineStore } from '~/stores/timeline'
 import { isShortcutsModalOpen, isCommandPaletteOpen } from '~/composables/useGlobalShortcuts'
 import { useConfirmDialog } from '~/composables/useConfirmDialog'
+import { isAboutModalOpen, useAppUpdate } from '~/composables/useAppUpdate'
 
 const { locale, setLocale, t } = useI18n()
 const { confirm } = useConfirmDialog()
 const projectStore = useProjectStore()
 const timelineStore = useTimelineStore()
+const { hasUpdate } = useAppUpdate()
 
 const currentLocale = computed(() => locale.value)
 

@@ -81,3 +81,30 @@ Inspects audio and video streams inside a container using FFprobe, with optional
 ```bash
 vidonex probe assets/video.mp4 --json
 ```
+
+---
+
+### `vidonex about`
+
+Displays comprehensive system environment diagnostics, installed engine version, detected FFmpeg/FFprobe binaries and versions, active hardware accelerators (e.g. NVIDIA NVENC, Apple VideoToolbox, VAAPI, Intel QSV), documentation resources, and an instant release check against GitHub.
+
+```bash
+vidonex about
+```
+
+---
+
+### `vidonex upgrade`
+
+Checks and automatically updates the local `vidonex` binary directly from GitHub Releases.
+
+```bash
+# Check if a newer version is available without installing
+vidonex upgrade --check
+
+# Download and perform atomic in-place binary upgrade
+vidonex upgrade
+
+# Force reinstall or downgrade to the latest release
+vidonex upgrade --force
+```

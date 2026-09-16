@@ -84,6 +84,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/docs", s.apiHandlers.HandleScalarDocs)
 	mux.HandleFunc("/docs/", s.apiHandlers.HandleScalarDocs)
 
+	// Engine & Version Information
+	mux.HandleFunc("/api/version/check", s.apiHandlers.HandleCheckUpdate)
+
 	// API Endpoints
 	mux.HandleFunc("/api/projects", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
