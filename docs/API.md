@@ -275,6 +275,8 @@ if err := srv.Start(); err != nil {
 | `GET` | `/api/render/:id` | Get render job status, progress percentage, and output |
 | `POST` | `/api/render/:id/cancel` | Cancel active background render process |
 | `GET` | `/api/exports/*` | Download completed rendered MP4 video exports |
+| `GET` | `/api/version/check` | Check GitHub release updates, return version and host diagnostics |
+| `POST` | `/api/version/upgrade` | Trigger in-app self-update with SSE progress streaming |
 
 ### WebSocket Telemetry (`/ws`):
 

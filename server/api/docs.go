@@ -10,7 +10,7 @@ const OpenAPISpecDefinition = `{
   "openapi": "3.0.3",
   "info": {
     "title": "Vidonex Video Composition Engine API",
-    "version": "1.4.0",
+    "version": "1.6.0",
     "description": "RESTful and WebSocket API for declarative video composition, intermediate representation DAG compilation, timeline management, and real-time FFmpeg telemetry.",
     "contact": {
       "name": "Vidonex Engineering",
@@ -213,6 +213,30 @@ const OpenAPISpecDefinition = `{
         "operationId": "streamTelemetry",
         "responses": {
           "101": { "description": "Switching Protocols to WebSocket" }
+        }
+      }
+    },
+    "/api/version/check": {
+      "get": {
+        "summary": "Check for engine updates and retrieve host system diagnostics",
+        "operationId": "checkVersion",
+        "parameters": [
+          { "name": "force", "in": "query", "required": false, "schema": { "type": "boolean" }, "description": "Bypass 10-minute cache and force GitHub API query" }
+        ],
+        "responses": {
+          "200": { "description": "Version check and system hardware diagnostics" }
+        }
+      }
+    },
+    "/api/version/upgrade": {
+      "post": {
+        "summary": "Trigger in-app self-update with SSE progress streaming",
+        "operationId": "upgradeEngine",
+        "parameters": [
+          { "name": "force", "in": "query", "required": false, "schema": { "type": "boolean" }, "description": "Force upgrade even if already on latest version" }
+        ],
+        "responses": {
+          "200": { "description": "Server-Sent Events (SSE) stream of update progress" }
         }
       }
     }

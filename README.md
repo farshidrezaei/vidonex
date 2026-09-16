@@ -227,6 +227,13 @@ vidonex graph project.yaml --format mermaid -o graph.mmd
 # Start headless Studio Web Server & REST API
 vidonex serve --port 8080
 
+# Inspect system specs, FFmpeg engine & update status
+vidonex about
+
+# Upgrade Vidonex to the latest release
+vidonex upgrade
+vidonex upgrade --check
+
 # Probe media streams and container metadata
 vidonex probe assets/scenery.mp4 --json
 ```

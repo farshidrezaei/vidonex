@@ -53,3 +53,8 @@ It provides the fluid tactile experience of Premiere Pro and CapCut without the 
 - **Audio Ducking**: Graphically select dialogue tracks to automatically lower background music volume.
 - **Animated Audiograms**: Real-time waveform rendering with customizable neon gradients, bars, and symmetry modes.
 - **SRT / VTT Burn-in**: Custom fonts, shadow offsets, background cards, and yellow karaoke highlights.
+
+### 🔔 Updates & System Diagnostics
+- **One-Click In-App Updates**: When a new release is available on GitHub, the Studio alerts the user via a top banner and header notification dot. Users can upgrade automatically with live download progress streaming and atomic replacement.
+- **About Modal**: Inspect engine version, operating system architecture, CPU core count, active GPU hardware acceleration (NVENC, VideoToolbox, VA-API, QSV), and detected FFmpeg binaries directly within the application.
+

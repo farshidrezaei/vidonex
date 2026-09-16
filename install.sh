@@ -35,6 +35,9 @@ setup_terminal_styles() {
         MAGENTA="$(tput setaf 5 2>/dev/null || printf '\033[35m')"
         RED="$(tput setaf 1 2>/dev/null || printf '\033[31m')"
         WHITE="$(tput setaf 7 2>/dev/null || printf '\033[37m')"
+        PURPLE="\033[38;2;168;85;247m"
+        INDIGO="\033[38;2;99;102;241m"
+        SKYBLUE="\033[38;2;56;189;248m"
         RESET="$(tput sgr0 2>/dev/null || printf '\033[0m')"
     else
         BOLD=""
@@ -46,6 +49,9 @@ setup_terminal_styles() {
         MAGENTA=""
         RED=""
         WHITE=""
+        PURPLE=""
+        INDIGO=""
+        SKYBLUE=""
         RESET=""
     fi
 }
@@ -102,14 +108,16 @@ done
 print_banner() {
     if [ "${QUIET}" = "1" ]; then return; fi
     printf "\n"
-    printf "${CYAN}${BOLD}  __   ___     __                  ${RESET}\n"
-    printf "${CYAN}${BOLD}  \\ \\ / (_)___/ /__  ___  __ _____ ${RESET}\n"
-    printf "${CYAN}${BOLD}   \\ V / / / _  / _ \\/ _ \\/ // /\\ \\ /${RESET}\n"
-    printf "${CYAN}${BOLD}    \\_/_/_/\\_,_/\\___/_//_/\\_, //_\\_\\ ${RESET}\n"
-    printf "${CYAN}${BOLD}                         /___/       ${RESET}\n"
-    printf "  ${WHITE}${BOLD}Vidonex Video Engine Installer${RESET}\n"
-    printf "  ${DIM}Declarative Video Composition & FFmpeg Filtergraph Compiler${RESET}\n"
-    printf "  ${DIM}─────────────────────────────────────────────────────────────${RESET}\n\n"
+    printf "${PURPLE}${BOLD}   ██╗   ██╗██╗██████╗  ██████╗ ███╗   ██╗███████╗██╗  ██╗${RESET}\n"
+    printf "${PURPLE}${BOLD}   ██║   ██║██║██╔══██╗██╔═══██╗████╗  ██║██╔════╝╚██╗██╔╝${RESET}\n"
+    printf "${INDIGO}${BOLD}   ██║   ██║██║██║  ██║██║   ██║██╔██╗ ██║█████╗   ╚███╔╝ ${RESET}\n"
+    printf "${INDIGO}${BOLD}   ╚██╗ ██╔╝██║██║  ██║██║   ██║██║╚██╗██║██╔══╝   ██╔██╗ ${RESET}\n"
+    printf "${SKYBLUE}${BOLD}    ╚████╔╝ ██║██████╔╝╚██████╔╝██║ ╚████║███████╗██╔╝ ██╗${RESET}\n"
+    printf "${SKYBLUE}${BOLD}     ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝${RESET}\n"
+    printf "\n"
+    printf "   ${WHITE}${BOLD}Vidonex Video Engine Universal Installer${RESET}\n"
+    printf "   ${DIM}Declarative Video Composition & FFmpeg Filtergraph Compiler${RESET}\n"
+    printf "   ${DIM}─────────────────────────────────────────────────────────────${RESET}\n\n"
 }
 
 step_badge() {

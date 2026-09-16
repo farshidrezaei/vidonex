@@ -119,14 +119,39 @@ go install github.com/farshidrezaei/vidonex/cmd/vidonex@latest
 
 ---
 
-## 🔍 Verification
+## 🔍 Verification & System Diagnostics
  
-Once installed, verify that Vidonex is available in your `$PATH`:
+Once installed, verify that Vidonex is available in your `$PATH` and inspect system diagnostics:
 
 ```bash
+# Check version
 vidonex version
-vidonex --help
+
+# Comprehensive system hardware specs, FFmpeg engine & GPU acceleration diagnostics
+vidonex about
+
+# Verify and check for updates
+vidonex upgrade --check
 ```
+
+---
+
+## 🔄 Self-Upgrades
+
+To keep Vidonex updated to the latest release without manually downloading archives:
+
+```bash
+# Check if an update is available
+vidonex upgrade --check
+
+# Upgrade to the latest release with atomic binary replacement
+vidonex upgrade
+
+# Force reinstall or update to latest release
+vidonex upgrade --force
+```
+
+Additionally, when running the Web Studio (`vidonex serve`), you can click **"Install Update Automatically"** directly inside the **About** modal or top notification banner to perform a one-click in-app update with live progress streaming.
 
 ---
 

@@ -11,9 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 38 Real-Time Viewport Transitions, Advanced Multi-Mode Audio Waveforms, Color Adjustment Filters & Multi-Track Stacking Isolation 🌊✨
 
-Vidonex v1.6.0 introduces real-time viewport simulation for all 38 video transitions, an overhaul of the animated audio waveform engine with interactive on-canvas positioning and multiple rendering modes, expanded color adjustment filters (Gaussian Blur, Edge Sharpening, Highlights/Shadows/Whites/Blacks tonal controls), multi-track audio autoplay unlocking with drift smoothing, and a rock-solid track stacking isolation architecture ensuring overlays, watermarks, and logos remain strictly on top during transitions.
+Vidonex v1.6.0 introduces real-time viewport simulation for all 38 video transitions, an overhaul of the animated audio waveform engine with interactive on-canvas positioning and multiple rendering modes, expanded color adjustment filters (Gaussian Blur, Edge Sharpening, Highlights/Shadows/Whites/Blacks tonal controls), multi-track audio autoplay unlocking with drift smoothing, a rock-solid track stacking isolation architecture, and a comprehensive update management and system diagnostics suite including one-click in-app self-updates, an About Vidonex Studio modal, and CLI commands `vidonex about` and `vidonex upgrade`.
 
 ### Added
+
+#### 🔄 One-Click In-App Automatic Updates & System Diagnostics (`server/api/updater.go`, `server/api/version.go`, `ui/`)
+- **One-Click In-App Self-Update**:
+  - `POST /api/version/upgrade` endpoint with live Server-Sent Events (SSE) progress streaming.
+  - Automatic host OS and CPU architecture matching against official GitHub release assets.
+  - Safe, atomic in-place binary replacement with temporary backup and automatic rollback on failure.
+  - User confirmation prompt before download, real-time download and extraction percentage indicators, and one-click "Reload Studio" action upon completion.
+- **About Vidonex Studio Modal & Top Notification Banner (`ui/components/panels/AboutModal.vue`, `useAppUpdate.ts`)**:
+  - Displays host operating system, architecture, CPU core count, active GPU hardware acceleration (NVENC, VideoToolbox, VA-API, QSV), and detected FFmpeg/FFprobe binaries.
+  - Live release checking with a 10-minute caching layer and client-side fallback.
+  - Non-blocking top notification banner and pulsating header indicator dot when a new version is released.
+  - Complete dual-language localization (Persian `fa.json` and English `en.json`) for all updater states and technical diagnostics.
+- **CLI Commands (`cmd/vidonex/about.go`, `cmd/vidonex/update.go`)**:
+  - `vidonex about`: Formatted terminal overview of hardware capabilities, engine versions, and update status.
+  - `vidonex upgrade`: Native self-updater supporting `--check` and `--force` flags, sharing the core `api.ExecuteSelfUpdate` engine.
+  - Redesigned CLI and installer ASCII banner matching the official Vidonex block shadowed logo with TrueColor purple, indigo, and sky blue gradients.
 
 #### 🎬 38 Real-Time Video Transitions (`ui/composables/useTransitionPreview.ts`, `compiler/`)
 - **Full Viewport Preview Coverage**:

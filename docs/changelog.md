@@ -27,6 +27,13 @@ Vidonex v1.6.0 brings high-fidelity visual parity and studio-grade media tools a
 - **Top-Tier Control Gizmos**: Transform and crop handles maintain priority (`z-[9999]`) above all media content.
 :::
 
+::: tip 🔄 One-Click In-App Automatic Updates & System Diagnostics
+- **One-Click In-App Self-Update**: Automatically download, extract, and atomically replace the running binary with live SSE progress streaming and user confirmation.
+- **About Modal & Top Banner**: Real-time GitHub release checking, system specs (CPU, OS/Arch, FFmpeg engine, GPU accelerators), and responsive notifications.
+- **CLI Commands**: Added `vidonex about` for formatted terminal diagnostics and `vidonex upgrade` for binary updates.
+- **Logo Parity**: Block shadowed ASCII banner with TrueColor gradient across CLI and installer scripts.
+:::
+
 ---
 
 ## [v1.0.0] - 2026-09-14 <Badge text="Latest Stable" type="tip" />

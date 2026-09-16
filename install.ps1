@@ -27,14 +27,16 @@ $Repo = "vidonex"
 function Write-Banner {
     if ($Quiet) { return }
     Write-Host ""
-    Write-Host "  __   ___     __                  " -ForegroundColor Cyan
-    Write-Host "  \ \ / (_)___/ /__  ___  __ _____ " -ForegroundColor Cyan
-    Write-Host "   \ V / / / _  / _ \/ _ \/ // /\ \ /" -ForegroundColor Cyan
-    Write-Host "    \_/_/_/\_,_/\___/_//_/\_, //_\_\ " -ForegroundColor Cyan
-    Write-Host "                         /___/       " -ForegroundColor Cyan
-    Write-Host "  Vidonex Video Engine Installer (Windows PowerShell)" -ForegroundColor White
-    Write-Host "  Declarative Video Composition & FFmpeg Filtergraph Compiler" -ForegroundColor DarkGray
-    Write-Host "  ─────────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+    Write-Host "   ██╗   ██╗██╗██████╗  ██████╗ ███╗   ██╗███████╗██╗  ██╗" -ForegroundColor Magenta
+    Write-Host "   ██║   ██║██║██╔══██╗██╔═══██╗████╗  ██║██╔════╝╚██╗██╔╝" -ForegroundColor Magenta
+    Write-Host "   ██║   ██║██║██║  ██║██║   ██║██╔██╗ ██║█████╗   ╚███╔╝ " -ForegroundColor Blue
+    Write-Host "   ╚██╗ ██╔╝██║██║  ██║██║   ██║██║╚██╗██║██╔══╝   ██╔██╗ " -ForegroundColor Blue
+    Write-Host "    ╚████╔╝ ██║██████╔╝╚██████╔╝██║ ╚████║███████╗██╔╝ ██╗" -ForegroundColor Cyan
+    Write-Host "     ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "   Vidonex Video Engine Installer (Windows PowerShell)" -ForegroundColor White
+    Write-Host "   Declarative Video Composition & FFmpeg Filtergraph Compiler" -ForegroundColor DarkGray
+    Write-Host "   ─────────────────────────────────────────────────────────────" -ForegroundColor DarkGray
     Write-Host ""
 }
 
