@@ -21,6 +21,9 @@ const (
 	ColorMagenta   = "\033[35m"
 	ColorBlue      = "\033[34m"
 	ColorWhiteBold = "\033[1;37m"
+	ColorPurple    = "\033[38;2;168;85;247m" // Hex #A855F7 (Vidonex Ribbon Purple)
+	ColorIndigo    = "\033[38;2;99;102;241m" // Hex #6366F1 (Vidonex Indigo)
+	ColorSkyBlue   = "\033[38;2;56;189;248m" // Hex #38BDF8 (Vidonex Play Button Sky Blue)
 )
 
 // UI manages stylized terminal output.
@@ -57,18 +60,43 @@ func (ui *UI) Colorize(colorCode, text string) string {
 	return colorCode + text + ColorReset
 }
 
-// PrintBanner outputs the stylized Vidonex engine banner.
+// PrintBanner outputs the stylized Vidonex engine banner matching the official logo.
 func (ui *UI) PrintBanner() {
-	banner := `
-  __   ___     __                  
-  \ \ / (_)___/ /__  ___  __ _____ 
-   \ V / / / _  / _ \/ _ \/ // /\ \ /
-    \_/_/_/\_,_/\___/_//_/\_, //_\_\ 
-                         /___/       
+	if ui.NoColors || !ui.IsTTY {
+		banner := `
+   ██╗   ██╗██╗██████╗  ██████╗ ███╗   ██╗███████╗██╗  ██╗
+   ██║   ██║██║██╔══██╗██╔═══██╗████╗  ██║██╔════╝╚██╗██╔╝
+   ██║   ██║██║██║  ██║██║   ██║██╔██╗ ██║█████╗   ╚███╔╝ 
+   ╚██╗ ██╔╝██║██║  ██║██║   ██║██║╚██╗██║██╔══╝   ██╔██╗ 
+    ╚████╔╝ ██║██████╔╝╚██████╔╝██║ ╚████║███████╗██╔╝ ██╗
+     ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝
 `
-	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorCyan+ColorBold, banner))
-	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorDim, "  Declarative Video Composition & FFmpeg Filtergraph Engine in Go"))
-	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorDim, "  -------------------------------------------------------------"))
+		_, _ = fmt.Fprintln(ui.Writer, strings.TrimSpace(banner))
+		_, _ = fmt.Fprintln(ui.Writer, "   Declarative Video Composition & FFmpeg Filtergraph Engine in Go")
+		_, _ = fmt.Fprintln(ui.Writer, "   ---------------------------------------------------------------")
+		return
+	}
+
+	// Colored lines with logo's purple-to-blue gradient
+	bannerLines := []struct {
+		color string
+		text  string
+	}{
+		{ColorPurple + ColorBold, "   ██╗   ██╗██╗██████╗  ██████╗ ███╗   ██╗███████╗██╗  ██╗"},
+		{ColorPurple + ColorBold, "   ██║   ██║██║██╔══██╗██╔═══██╗████╗  ██║██╔════╝╚██╗██╔╝"},
+		{ColorIndigo + ColorBold, "   ██║   ██║██║██║  ██║██║   ██║██╔██╗ ██║█████╗   ╚███╔╝ "},
+		{ColorIndigo + ColorBold, "   ╚██╗ ██╔╝██║██║  ██║██║   ██║██║╚██╗██║██╔══╝   ██╔██╗ "},
+		{ColorSkyBlue + ColorBold, "    ╚████╔╝ ██║██████╔╝╚██████╔╝██║ ╚████║███████╗██╔╝ ██╗"},
+		{ColorSkyBlue + ColorBold, "     ╚═══╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"},
+	}
+
+	_, _ = fmt.Fprintln(ui.Writer, "")
+	for _, line := range bannerLines {
+		_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(line.color, line.text))
+	}
+	_, _ = fmt.Fprintln(ui.Writer, "")
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorDim, "   Declarative Video Composition & FFmpeg Filtergraph Engine in Go"))
+	_, _ = fmt.Fprintln(ui.Writer, ui.Colorize(ColorDim, "   ---------------------------------------------------------------"))
 }
 
 // PrintStep prints a major pipeline step badge.
